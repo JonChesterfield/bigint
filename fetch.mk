@@ -22,3 +22,10 @@ $(FETCH_DIR)/lua/lua.tar.gz:
 
 endif
 
+fetch:: $(FETCH_DIR)/libtommath/libtommath.zip
+ifeq (,$(wildcard $(FETCH_DIR)/libtommath/libtommath.zip))
+$(FETCH_DIR)/libtommath/libtommath.zip:
+	@rm -rf $(FETCH_DIR)/libtommath
+	@mkdir -p $(FETCH_DIR)/libtommath
+	wget https://github.com/libtom/libtommath/archive/refs/tags/v1.3.0.zip -O $@
+endif

@@ -68,7 +68,11 @@ $(VENDOR_OBJ):	$(VENDOR_DIR_OBJ)/%.o:	$(VENDOR_DIR)/%.c $(VENDOR_HDR)
 	@mkdir -p $(VENDOR_OBJ_DIR_LIST)
 	@$(CC) $(CFLAGS) $< -c -o $@
 
-build::	$(VENDOR_OBJ)
+VENDOR_LIBTOMMATH_OBJ := $(VENDOR_LIBTOMMATH_SRC:$(VENDOR_DIR)/%.c=$(VENDOR_DIR_OBJ)/%.o)
+.vendor.O/libtommath.o: $(VENDOR_LIBTOMMATH_OBJ)
+	ld -r $^ -o $@
+
+build::	$(VENDOR_OBJ) .vendor.O/libtommath.o
 
 HELP_PADDING := 30
 help:
