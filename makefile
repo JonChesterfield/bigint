@@ -51,9 +51,13 @@ deepclean::
 VENDOR_DIR := vendor
 include vendor.mk
 VENDOR_DIR_OBJ := .$(VENDOR_DIR).O
+deepclean:: vendorclean
 clean::
-	@rm -rf $(VENDOR_DIR)
 	@rm -rf $(VENDOR_DIR_OBJ)
+
+
+vendorclean::
+	@rm -rf $(VENDOR_DIR)
 
 
 # Build each C file under vendor into a corresponding object file, depending on all headers
@@ -73,6 +77,22 @@ VENDOR_LIBTOMMATH_OBJ := $(VENDOR_LIBTOMMATH_SRC:$(VENDOR_DIR)/%.c=$(VENDOR_DIR_
 	ld -r $^ -o $@
 
 build::	$(VENDOR_OBJ) .vendor.O/libtommath.o
+
+
+$(VENDOR_DIR_OBJ)/proto_impl.o:	proto_impl.c proto.h $(VENDOR_HDR)
+	@mkdir -p $(VENDOR_DIR_OBJ)
+	@$(CC) $(CFLAGS) $< -c -o $@
+
+$(VENDOR_DIR_OBJ)/proto.o:	proto.c proto.h $(VENDOR_HDR)
+	@mkdir -p $(VENDOR_DIR_OBJ)
+	@$(CC) $(CFLAGS) $< -c -o $@
+
+proto:	$(VENDOR_DIR_OBJ)/proto.o $(VENDOR_DIR_OBJ)/proto_impl.o $(VENDOR_LIBTOMMATH_OBJ)
+	@$(CC) $(CFLAGS) $< -o $@
+clean::
+	@rm -f proto
+
+build::	proto
 
 HELP_PADDING := 30
 help:
