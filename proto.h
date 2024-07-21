@@ -22,12 +22,14 @@ proto proto_copy(proto x);
 void proto_dump(proto x);
 
 proto proto_from_u32(uint32_t);
+uint32_t proto_to_u32(proto); // truncates
 
 size_t proto_used(proto x);
 size_t proto_alloced(proto x);
 
 bool proto_zpos(proto x);
 bool proto_neg(proto x);
+bool proto_is_zero(proto x);
 
 void proto_swap(proto *x, proto *y);
 
@@ -44,5 +46,11 @@ proto proto_from_base10(const char *, size_t N);
 
 // Write proto into out, returning how many bytes written
 size_t proto_into_base10(proto, char *out, size_t N);
+
+proto proto_add(proto x, proto y);
+proto proto_sub(proto x, proto y);
+proto proto_mul(proto x, proto y);
+proto proto_div(proto x, proto y);
+proto proto_rem(proto x, proto y);
 
 #endif

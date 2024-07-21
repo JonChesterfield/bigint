@@ -41,7 +41,9 @@ proto proto_create(size_t digits) {
   return state;
 }
 
-bool proto_valid(proto x) { return x != NULL; }
+proto proto_create_invalid(void) { return NULL; }
+
+bool proto_valid(proto x) { return x != proto_create_invalid(); }
 
 void proto_destroy(proto x) { free(x); }
 
@@ -86,11 +88,26 @@ proto proto_from_u32(uint32_t val) {
   return mp_int_to_proto(&tmp);
 }
 
+uint32_t proto_to_u32(proto x) {
+  mp_int tmp = proto_to_mp_int(x);
+  return mp_get_u32(&tmp);
+}
+
 size_t proto_used(proto x) { return x->used; }
 size_t proto_alloced(proto x) { return x->alloc; }
 
 bool proto_zpos(proto x) { return x->zpos; }
 bool proto_neg(proto x) { return !proto_zpos(x); }
+
+bool proto_is_zero(proto x) {
+  uint64_t N = proto_used(x);
+  for (uint64_t i = 0; i < N; i++) {
+    if (x->digits[i] != 0) {
+      return false;
+    }
+  }
+  return true;
+}
 
 void proto_swap(proto *x, proto *y) {
   proto tmp = *x;
@@ -186,3 +203,55 @@ mp_err mp_shrink(mp_int *a)
   return MP_MEM;
 }
 #endif
+
+static proto proto_binary(proto x, proto y,
+                          mp_err (*func)(const mp_int *, const mp_int *,
+                                         mp_int *)) {
+  proto z = proto_create(1);
+
+  mp_int mx = proto_to_mp_int(x);
+  mp_int my = proto_to_mp_int(y);
+  mp_int mz = proto_to_mp_int(z);
+
+  mp_err res = func(&mx, &my, &mz);
+  if (res == MP_OKAY) {
+    return mp_int_to_proto(&mz);
+  } else {
+    proto_destroy(z);
+    return proto_create_invalid();
+  }
+}
+
+proto proto_add(proto x, proto y) { return proto_binary(x, y, mp_add); }
+
+proto proto_sub(proto x, proto y) { return proto_binary(x, y, mp_sub); }
+
+proto proto_mul(proto x, proto y) { return proto_binary(x, y, mp_mul); }
+
+static mp_err mp_div_quotient(const mp_int *a, const mp_int *b, mp_int *c) {
+  mp_int tmp;
+  mp_err err;
+  if ((err = mp_init(&tmp)) != MP_OKAY)
+    return err;
+  err = mp_div(a, b, c, &tmp);
+  mp_clear(&tmp);
+  return err;
+}
+
+proto proto_div(proto x, proto y) {
+  return proto_binary(x, y, mp_div_quotient);
+}
+
+static mp_err mp_div_remainder(const mp_int *a, const mp_int *b, mp_int *c) {
+  mp_int tmp;
+  mp_err err;
+  if ((err = mp_init(&tmp)) != MP_OKAY)
+    return err;
+  err = mp_div(a, b, &tmp, c);
+  mp_clear(&tmp);
+  return err;
+}
+
+proto proto_rem(proto x, proto y) {
+  return proto_binary(x, y, mp_div_remainder);
+}

@@ -14,6 +14,7 @@ EVILUNIT_MAIN_MODULE() {
     CHECK(proto_valid(p));
     CHECK(proto_zpos(p));
     CHECK(!proto_neg(p));
+    CHECK(proto_is_zero(p));
     CHECK(proto_used(p) == 0);
     CHECK(proto_alloced(p) == 4);
 
@@ -35,6 +36,7 @@ EVILUNIT_MAIN_MODULE() {
       CHECK(proto_valid(p));
       CHECK(proto_zpos(p));
       CHECK(!proto_neg(p));
+      CHECK(proto_is_zero(p) == (i == 0));
       proto_destroy(p);
     }
 
@@ -52,6 +54,41 @@ EVILUNIT_MAIN_MODULE() {
       CHECK(proto_resize(&p, 8));
       CHECK(proto_alloced(p) == 8);
       proto_destroy(p);
+    }
+  }
+
+  TEST("small arithmetic") {
+    proto x = proto_from_u32(13);
+    proto y = proto_from_u32(7);
+
+    {
+      proto z = proto_add(x, y);
+      CHECK(proto_to_u32(z) == 20);
+      proto_destroy(z);
+    }
+
+    {
+      proto z = proto_sub(x, y);
+      CHECK(proto_to_u32(z) == 6);
+      proto_destroy(z);
+    }
+
+    {
+      proto z = proto_mul(x, y);
+      CHECK(proto_to_u32(z) == 13 * 7);
+      proto_destroy(z);
+    }
+
+    {
+      proto z = proto_div(x, y);
+      CHECK(proto_to_u32(z) == 13 / 7);
+      proto_destroy(z);
+    }
+
+    {
+      proto z = proto_rem(x, y);
+      CHECK(proto_to_u32(z) == 13 % 7);
+      proto_destroy(z);
     }
   }
 }
