@@ -10,7 +10,7 @@ ifeq ($(origin CC),default)
 CC = clang
 endif
 
-CFLAGS ?= -std=c99 -Wall
+CFLAGS ?= -std=c99 -Wall -O0 -g -gdwarf-4
 
 # make help looks through this makefile for ## annotations
 .PHONY: help
@@ -55,7 +55,6 @@ deepclean:: vendorclean
 clean::
 	@rm -rf $(VENDOR_DIR_OBJ)
 
-
 vendorclean::
 	@rm -rf $(VENDOR_DIR)
 
@@ -93,6 +92,31 @@ clean::
 	@rm -f proto
 
 build::	proto
+
+
+
+
+DEMOLANG_DIR := demolang
+DEMOLANG_DIR_OBJ := .$(DEMOLANG_DIR).O
+
+include demolang/files.mk
+DEMOLANG_SRC := $(addprefix demolang/,$(filter %.c,$(DEMOLANG_FILES)))
+DEMOLANG_HDR := $(addprefix demolang/,$(filter %.h,$(DEMOLANG_FILES)))
+DEMOLANG_OBJ := $(DEMOLANG_SRC:$(DEMOLANG_DIR)/%.c=$(DEMOLANG_DIR_OBJ)/%.o)
+
+$(DEMOLANG_DIR_OBJ)/%.o:	$(DEMOLANG_DIR)/%.c $(DEMOLANG_HDR) proto.h $(VENDOR_HDR)
+	@mkdir -p $(DEMOLANG_DIR_OBJ)
+	@$(CC) $(CFLAGS) $< -c -o $@
+
+demolang::	$(DEMOLANG_OBJ)
+
+calc: $(VENDOR_LIBTOMMATH_OBJ)
+calc: $(VENDOR_DIR_OBJ)/proto_impl.o
+
+calc:	$(DEMOLANG_OBJ) 
+	@$(CC) $(CFLAGS) $^ -o $@
+
+
 
 HELP_PADDING := 30
 help:

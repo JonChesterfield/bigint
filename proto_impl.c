@@ -43,7 +43,7 @@ proto proto_create(size_t digits) {
 
 proto proto_create_invalid(void) { return NULL; }
 
-bool proto_valid(proto x) { return x != proto_create_invalid(); }
+bool proto_valid(proto x) { return x != NULL; }
 
 void proto_destroy(proto x) { free(x); }
 
@@ -62,6 +62,14 @@ proto proto_copy(proto x) {
 }
 
 void proto_dump(proto x) {
+  if (!proto_valid(x)) {
+    printf("(proto) <invalid>\n");
+    return;
+  }
+  if (proto_is_sentinel(x)) {
+    printf("(proto) <sentinel>\n");
+    return;
+  }
   size_t alloc = x->alloc;
   printf("(proto)\n"
          "{\n"
@@ -80,6 +88,22 @@ void proto_dump(proto x) {
          "}\n");
 }
 
+proto proto_sentinel(void)
+{
+  static struct proto_ty p = {
+    .used = ~0,
+    .alloc = ~0,
+    .zpos = false,
+  };
+  return &p;
+}
+
+bool proto_is_sentinel(proto x)
+{
+  return x == proto_sentinel();
+}
+
+
 proto proto_from_u32(uint32_t val) {
   proto p = proto_create(1);
   mp_int tmp = proto_to_mp_int(p);
@@ -97,7 +121,6 @@ size_t proto_used(proto x) { return x->used; }
 size_t proto_alloced(proto x) { return x->alloc; }
 
 bool proto_zpos(proto x) { return x->zpos; }
-bool proto_neg(proto x) { return !proto_zpos(x); }
 
 bool proto_is_zero(proto x) {
   uint64_t N = proto_used(x);
