@@ -204,6 +204,24 @@ mp_err mp_shrink(mp_int *a)
 }
 #endif
 
+
+static proto proto_unary(proto x,
+                          mp_err (*func)(const mp_int *,
+                                         mp_int *)) {
+  proto y = proto_create(1);
+
+  mp_int mx = proto_to_mp_int(x);
+  mp_int my = proto_to_mp_int(y);
+
+  mp_err res = func(&mx, &my);
+  if (res == MP_OKAY) {
+    return mp_int_to_proto(&my);
+  } else {
+    proto_destroy(y);
+    return proto_create_invalid();
+  }
+}
+
 static proto proto_binary(proto x, proto y,
                           mp_err (*func)(const mp_int *, const mp_int *,
                                          mp_int *)) {
@@ -222,10 +240,10 @@ static proto proto_binary(proto x, proto y,
   }
 }
 
+proto proto_abs(proto x) { return proto_unary(x, mp_abs); }
+proto proto_neg(proto x) { return proto_unary(x, mp_neg); }
 proto proto_add(proto x, proto y) { return proto_binary(x, y, mp_add); }
-
 proto proto_sub(proto x, proto y) { return proto_binary(x, y, mp_sub); }
-
 proto proto_mul(proto x, proto y) { return proto_binary(x, y, mp_mul); }
 
 static mp_err mp_div_quotient(const mp_int *a, const mp_int *b, mp_int *c) {

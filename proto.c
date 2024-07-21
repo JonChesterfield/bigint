@@ -90,5 +90,8 @@ EVILUNIT_MAIN_MODULE() {
       CHECK(proto_to_u32(z) == 13 % 7);
       proto_destroy(z);
     }
+
+    proto_destroy(x);
+    proto_destroy(y);
   }
 }

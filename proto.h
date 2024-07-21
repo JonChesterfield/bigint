@@ -47,6 +47,9 @@ proto proto_from_base10(const char *, size_t N);
 // Write proto into out, returning how many bytes written
 size_t proto_into_base10(proto, char *out, size_t N);
 
+proto proto_abs(proto x, proto y);
+proto proto_neg(proto x, proto y);
+
 proto proto_add(proto x, proto y);
 proto proto_sub(proto x, proto y);
 proto proto_mul(proto x, proto y);
