@@ -6,6 +6,27 @@
 _Static_assert(MP_DIGIT_BIT == 60, "");
 _Static_assert(sizeof(mp_digit) == 8, "");
 
+_Static_assert(offsetof(struct proto_ty, digits) == 24, "");
+
+// Cast carefully as it's the same underlying memory
+static mp_int proto_to_mp_int(proto x) {
+  mp_int res;
+  res.used = proto_used(x);
+  res.alloc = proto_alloced(x);
+  res.sign = proto_zpos(x) ? MP_ZPOS : MP_NEG;
+  res.dp = &x->digits[0];
+  return res;
+}
+
+static proto mp_int_to_proto(mp_int *x) {
+  // The mp_int instance may have updated used/zpos fields which
+  // aren't yet reflected in the underlying proto instance
+  proto res = (proto)((char *)x->dp - offsetof(struct proto_ty, digits));
+  res->used = x->used;
+  res->zpos = (x->sign == MP_ZPOS);
+  return res;
+}
+
 proto proto_create(size_t digits) {
   size_t bytes = sizeof(struct proto_ty) + digits * sizeof(uint64_t);
   proto state = malloc(bytes);
@@ -38,14 +59,40 @@ proto proto_copy(proto x) {
   return res;
 }
 
+void proto_dump(proto x) {
+  size_t alloc = x->alloc;
+  printf("(proto)\n"
+         "{\n"
+         "  .used = %zu,\n"
+         "  .alloc = %zu,\n"
+         "  .zpos = %u,\n"
+         "  .digits[%lu] =\n  {\n",
+         x->used, alloc, x->zpos, alloc);
+
+  for (size_t i = 0; i < alloc; i++) {
+    printf("    %lu,\n", x->digits[i]);
+  }
+
+  printf(""
+         "  },\n"
+         "}\n");
+}
+
+proto proto_from_u32(uint32_t val) {
+  proto p = proto_create(1);
+  mp_int tmp = proto_to_mp_int(p);
+  mp_set_u32(&tmp, val);
+
+  return mp_int_to_proto(&tmp);
+}
+
 size_t proto_used(proto x) { return x->used; }
 size_t proto_alloced(proto x) { return x->alloc; }
 
 bool proto_zpos(proto x) { return x->zpos; }
 bool proto_neg(proto x) { return !proto_zpos(x); }
 
-void proto_swap(proto *x, proto *y)
-{
+void proto_swap(proto *x, proto *y) {
   proto tmp = *x;
   *x = *y;
   *y = tmp;
@@ -57,9 +104,11 @@ bool proto_resize(proto *x, size_t digits) {
   proto p = *x;
   proto r = realloc(p, bytes);
   if (r) {
+    r->alloc = digits;
     for (size_t i = alloced; i < digits; i++) {
       r->digits[i] = 0;
     }
+    *x = r;
     return true;
   } else {
     return false;
@@ -85,79 +134,49 @@ bool proto_equal(proto x, proto y) {
   return true;
 }
 
+mp_err mp_init_size(mp_int *a, int size) {
+  if (size < 0) {
+    return MP_VAL;
+  }
 
-_Static_assert(offsetof(struct proto_ty, digits) == 24, "");
+  enum {
+    sizeof_bits = ((size_t)CHAR_BIT * sizeof(long long)),
+    min_prec = ((((int)sizeof_bits + MP_DIGIT_BIT) - 1) / MP_DIGIT_BIT)
+  };
 
-// Cast carefully as it's the same underlying memory
-mp_int proto_to_mp_int(proto x)
-{
-  mp_int res;
-  res.used = proto_used(x);
-  res.alloc = proto_alloced(x);
-  res.sign =
-    proto_zpos(x) ? MP_ZPOS : MP_NEG;
-  res.dp = &x->digits[0];
-  return res;
+  size = (min_prec > size) ? min_prec : size;
+
+  proto p = proto_create(size);
+  if (proto_valid(p)) {
+    *a = proto_to_mp_int(p);
+    return MP_OKAY;
+  } else {
+    return MP_MEM;
+  }
 }
 
-proto mp_int_to_proto(mp_int *x)
-{
-  return (proto) ((char*)x->dp - offsetof(struct proto_ty, digits));
+void mp_clear(mp_int *a) {
+  if (a->dp != NULL) {
+    proto p = mp_int_to_proto(a);
+    proto_destroy(p);
+    a->dp = NULL;
+    a->alloc = 0;
+    a->used = 0;
+    a->sign = MP_ZPOS;
+  }
 }
 
-mp_err mp_init_size(mp_int *a, int size)
-{
-   if (size < 0) {
-      return MP_VAL;
-   }
-
-   enum {
-     sizeof_bits = ((size_t)CHAR_BIT * sizeof(long long)),
-     min_prec = ((((int)sizeof_bits + MP_DIGIT_BIT) - 1) / MP_DIGIT_BIT)
-   };
-
-   size = (min_prec > size) ? min_prec : size;
-   
-   proto p = proto_create(size);
-   if (proto_valid(p))
-     {
-       *a = proto_to_mp_int(p);
-       return MP_OKAY;
-     }
-   else
-     {  
-       return MP_MEM;
-     }
-}
-
-void mp_clear(mp_int *a)
-{
-  if (a->dp != NULL)
-    {
-      proto p = mp_int_to_proto(a);
-      proto_destroy(p);
-      a->dp = NULL;
-      a->alloc = 0;
-      a->used = 0;
-      a->sign = MP_ZPOS;
-    }
-}
-    
-mp_err mp_grow(mp_int *a, int size)
-{
+mp_err mp_grow(mp_int *a, int size) {
   if (size < 0)
     return MP_VAL;
 
   proto p = mp_int_to_proto(a);
-  if (proto_resize(&p, size))
-    {
-      *a = proto_to_mp_int(p);
-      return  MP_OKAY ; 
-    }
-  else
-    {
-      return MP_MEM;
-    }
+  if (proto_resize(&p, size)) {
+    *a = proto_to_mp_int(p);
+    return MP_OKAY;
+  } else {
+    return MP_MEM;
+  }
 }
 
 #if 0

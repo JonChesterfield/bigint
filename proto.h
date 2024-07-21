@@ -5,21 +5,23 @@
 #include <stddef.h>
 #include <stdint.h>
 
-struct proto_ty
-{
+struct proto_ty {
   size_t used;
   size_t alloc;
   bool zpos;
   uint64_t digits[];
 };
 
-typedef struct proto_ty * proto;
+typedef struct proto_ty *proto;
 
 // Create zero with at least digits allocated space
 proto proto_create(size_t digits);
 bool proto_valid(proto x); // allocation succeeded
 void proto_destroy(proto x);
 proto proto_copy(proto x);
+void proto_dump(proto x);
+
+proto proto_from_u32(uint32_t);
 
 size_t proto_used(proto x);
 size_t proto_alloced(proto x);
@@ -41,7 +43,6 @@ size_t proto_count_base10(proto x);
 proto proto_from_base10(const char *, size_t N);
 
 // Write proto into out, returning how many bytes written
-size_t proto_into_base10(proto, char* out, size_t N);
-
+size_t proto_into_base10(proto, char *out, size_t N);
 
 #endif

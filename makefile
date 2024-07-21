@@ -88,7 +88,7 @@ $(VENDOR_DIR_OBJ)/proto.o:	proto.c proto.h $(VENDOR_HDR)
 	@$(CC) $(CFLAGS) $< -c -o $@
 
 proto:	$(VENDOR_DIR_OBJ)/proto.o $(VENDOR_DIR_OBJ)/proto_impl.o $(VENDOR_LIBTOMMATH_OBJ)
-	@$(CC) $(CFLAGS) $< -o $@
+	@$(CC) $(CFLAGS) $^ -o $@
 clean::
 	@rm -f proto
 
