@@ -38,6 +38,7 @@ static inline bool arith_lexer_identifier_valid_token(uint64_t);
 enum arith_token arith_lexer_try_string_to_token(const lexer_function_table_t *tab, lexer_t lex, const char * bytes, size_t N);
 // True iff the entire c string lexes successfully to token with this type
 bool arith_lexer_string_lexes_to_token(const char *str, enum arith_token req);
+lexer_summarise_res_t arith_lexer_summarise_string(const char * bytes, size_t N);
 
 // Enumeration
 #include "arith.token.t"

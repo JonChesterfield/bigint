@@ -9,8 +9,13 @@ SHELL = sh -xv
 ifeq ($(origin CC),default)
 CC = clang
 endif
+ifeq ($(origin CXX),default)
+CXX = clang++
+endif
 
 CFLAGS ?= -std=c99 -Wall -O0 -g -gdwarf-4
+LDFLAGS ?=
+
 
 # make help looks through this makefile for ## annotations
 .PHONY: help
@@ -75,7 +80,15 @@ VENDOR_LIBTOMMATH_OBJ := $(VENDOR_LIBTOMMATH_SRC:$(VENDOR_DIR)/%.c=$(VENDOR_DIR_
 .vendor.O/libtommath.o: $(VENDOR_LIBTOMMATH_OBJ)
 	ld -r $^ -o $@
 
-build::	$(VENDOR_OBJ) .vendor.O/libtommath.o
+
+VENDOR_LIBTOMMATH_CXX_OBJ := $(VENDOR_LIBTOMMATH_SRC:$(VENDOR_DIR)/%.c=$(VENDOR_DIR_OBJ)/%.cpp.o)
+
+$(VENDOR_LIBTOMMATH_CXX_OBJ):	$(VENDOR_DIR_OBJ)/%.cpp.o:	$(VENDOR_DIR)/%.c $(VENDOR_HDR)
+	@mkdir -p $(VENDOR_OBJ_DIR_LIST)
+	@$(CXX) -xc++ -Wall $< -c -o $@
+
+
+build::	$(VENDOR_OBJ) .vendor.O/libtommath.o $(VENDOR_LIBTOMMATH_CXX_OBJ)
 
 
 $(VENDOR_DIR_OBJ)/proto_impl.o:	proto_impl.c proto.h $(VENDOR_HDR)
@@ -87,7 +100,7 @@ $(VENDOR_DIR_OBJ)/proto.o:	proto.c proto.h $(VENDOR_HDR)
 	@$(CC) $(CFLAGS) $< -c -o $@
 
 proto:	$(VENDOR_DIR_OBJ)/proto.o $(VENDOR_DIR_OBJ)/proto_impl.o $(VENDOR_LIBTOMMATH_OBJ)
-	@$(CC) $(CFLAGS) $^ -o $@
+	@$(CC) $(CFLAGS) $(LDFLAGS) $^ -o $@
 clean::
 	@rm -f proto
 
@@ -113,8 +126,9 @@ calc: ## Build a prefix notation calculator
 calc: $(VENDOR_LIBTOMMATH_OBJ)
 calc: $(VENDOR_DIR_OBJ)/proto_impl.o
 
+# libfuzzer is a c++ thing
 calc:	$(DEMOLANG_OBJ) 
-	@$(CC) $(CFLAGS) $^ -o $@
+	@$(CXX) -std=c++11 $^ $(LDFLAGS) -o $@
 
 clean::
 	@rm -rf $(DEMOLANG_DIR_OBJ)

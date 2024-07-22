@@ -63,6 +63,39 @@ bool arith_lexer_string_lexes_to_token(const char *cstr, enum arith_token req)
   return tok == req;
 }
 
+lexer_summarise_res_t arith_lexer_summarise_string(const char * bytes, size_t N)
+
+{
+  lexer_summarise_res_t res = {0, 0, 0};
+  lexer_t lexer = arith_lexer_create();
+  if (!arith_lexer_valid(lexer))
+  {
+    return res;
+  }
+
+  lexer_iterator_t iter = lexer_iterator_t_create(bytes, N);
+  while (!lexer_iterator_t_empty(iter))
+  {
+    lexer_token_t tok = arith_lexer_iterator_step(lexer, &iter);
+    if (arith_lexer_identifier_valid_token(tok.id))
+    {
+      res.known++;
+    }
+    else if (arith_lexer_discard_token(tok.id))
+    {
+      res.discard++;
+    }
+    else
+    {
+      res.unknown++;
+    }
+  }
+  arith_lexer_destroy(lexer);
+
+  return res;
+}
+
+
 // Names table
 // Moved to arith.token_names.c
 

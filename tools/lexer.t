@@ -57,4 +57,11 @@ typedef struct
   lexer_match_t (*const sequence_regex_bytes_matching)(lexer_t, lexer_iterator_t);
 } lexer_function_table_t;
 
+typedef struct
+{
+  size_t known;
+  size_t discard;
+  size_t unknown;
+} lexer_summarise_res_t;
+
 #endif
