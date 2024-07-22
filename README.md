@@ -29,11 +29,11 @@ The details of that are slightly unclear while writing this initial readme. It's
 Source layout as of current alpha / experimental state.
 Just enough code in place to create a arbitrary precision integer calculator, reads stdin.
 
-proto* at the top level is the work in progress hack iterating on this idea
-fetch/ is created by `make fetch` and contains some third party code, notably libtommath
-vendor/ is derived from fetch/
-replacements/ is part of how vendor/ is put together
+- proto* at the top level is the work in progress hack iterating on this idea
+- fetch/ is created by `make fetch` and contains some third party code, notably libtommath
+- vendor/ is derived from fetch/
+- replacements/ is part of how vendor/ is put together
 
 Two subdirectories supporting the calculator, largely derived from code generators similar to those under github.com/jonchesterfield/xml
-demolang/* is a lexer and parser for a prefix calculator
-tools/* is some ad hoc C used by demolang
+- demolang/* is a lexer and parser for a prefix calculator
+- tools/* is some ad hoc C used by demolang
