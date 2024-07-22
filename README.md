@@ -33,5 +33,7 @@ fetch/ is created by `make fetch` and contains some third party code, notably li
 vendor/ is derived from fetch/
 replacements/ is part of how vendor/ is put together
 
+Two subdirectories supporting the calculator, largely derived from code generators
+# similar to those under github.com/jonchesterfield/xml
 demolang/* is a lexer and parser for a prefix calculator
 tools/* is some ad hoc C used by demolang
