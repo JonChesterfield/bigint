@@ -98,7 +98,6 @@ build::	proto
 
 DEMOLANG_DIR := demolang
 DEMOLANG_DIR_OBJ := .$(DEMOLANG_DIR).O
-
 include demolang/files.mk
 DEMOLANG_SRC := $(addprefix demolang/,$(filter %.c,$(DEMOLANG_FILES)))
 DEMOLANG_HDR := $(addprefix demolang/,$(filter %.h,$(DEMOLANG_FILES)))
@@ -110,12 +109,16 @@ $(DEMOLANG_DIR_OBJ)/%.o:	$(DEMOLANG_DIR)/%.c $(DEMOLANG_HDR) proto.h $(VENDOR_HD
 
 demolang::	$(DEMOLANG_OBJ)
 
+calc: ## Build a prefix notation calculator
 calc: $(VENDOR_LIBTOMMATH_OBJ)
 calc: $(VENDOR_DIR_OBJ)/proto_impl.o
 
 calc:	$(DEMOLANG_OBJ) 
 	@$(CC) $(CFLAGS) $^ -o $@
 
+clean::
+	@rm -rf $(DEMOLANG_DIR_OBJ)
+	@rm -f calc
 
 
 HELP_PADDING := 30
