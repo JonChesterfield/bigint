@@ -1,13 +1,13 @@
+#include "../vendor/EvilUnit/EvilUnit.h"
+
+#include "calc.h"
+
 #include "arith.h"
 #include "arith.lexer.h"
 #include "arith.parser.h"
 
-// #include "arith.parse_state.h"
-
 #include "arith.parser_lemon.h"
 #include "arith.parser_lemon.t"
-
-#include "../tools/io_buffer.h"
 
 static int print_token(lexer_token_t s)
 {
@@ -58,6 +58,9 @@ int calclib(const uint8_t *bytes, size_t N, bool verbose)
   struct arith_parse_state parse_state_lemon;
   parse_state_lemon.stored = proto_sentinel();
 
+  uint64_t malloc_state = UINT64_MAX; 
+  parse_state_lemon.context = (proto_context){.malloc_state = &malloc_state};
+  
   for (lexer_iterator_t lexer_iterator =
            lexer_iterator_t_create((const char *)bytes, N);
        !lexer_iterator_t_empty(lexer_iterator);)
@@ -105,16 +108,16 @@ int calclib(const uint8_t *bytes, size_t N, bool verbose)
     }
 
   proto lemon_res = arith_parser_lemon_tree(&parse_state_lemon, &parser);
-
   if (verbose)
     {
-      proto_dump(lemon_res);
+      proto_dump(parse_state_lemon.context, lemon_res);
     }
 
+  proto_destroy(parse_state_lemon.context, lemon_res);
   arith_parser_lemon_finalize(&parser);
   arith_lexer_destroy(lexer);
 
-  return 0;
+  return proto_valid(parse_state_lemon.context, lemon_res) ? 0 : 5;
 }
 
 int LLVMFuzzerTestOneInput(const uint8_t *Data, size_t Size)
@@ -130,22 +133,24 @@ int LLVMFuzzerTestOneInput(const uint8_t *Data, size_t Size)
     }
 }
 
-int calc_main(void)
+
+
+EVILUNIT_MODULE(calc)
 {
-  io_buffer *in = file_to_io_buffer(stdin);
-  if (!in)
+  TEST("passing cases")
     {
-      fprintf(stderr, "Failed to read stdin\n");
-      return 1;
+      const char * cases[] = {
+        "add 3 4\n",
+        "9 add 4 5\n",
+        "4 sub 10 6\n",
+        "ABC 10 add 5 5\n",
+      };
+      size_t N = sizeof(cases)/sizeof(cases[0]);
+      for (size_t i = 0; i < N; i++)
+        {
+          CHECK(0 == calclib((const unsigned char*)cases[i],
+                             __builtin_strlen(cases[i]),
+                             false));
+        }
     }
-
-  int rc = calclib((const unsigned char *)&in->data[0], in->N, true);
-
-  free(in);
-
-  return rc;
 }
-
-#if 0
-int main(void) { return calc_main(); }
-#endif

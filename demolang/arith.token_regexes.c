@@ -16,7 +16,7 @@ const char*arith_token_regexes[arith_token_count] = {
   [arith_token_INCREMENT] = "incr",
   [arith_token_DECREMENT] = "decr",
   [arith_token_INTEGER] = "[-]\x3f[\x30-\x39]+",
-  [arith_token_LPAREN] = "\\(",
-  [arith_token_RPAREN] = "\\)",
-  [arith_token_WHITESPACE] = "[\x20\x5c\x66\x5c\x6e\x5c\x72\x5c\x74\x5c\x76]+",
+  [arith_token_SPACE] = "\\x20",
+  [arith_token_NEWLINE] = "\\x0a",
+  [arith_token_CONTROL] = "[\x40\x41-\x5a\x21\x23\x24\x25\x26]+",
 };

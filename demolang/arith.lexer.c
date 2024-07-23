@@ -118,9 +118,9 @@ static __attribute__((unused))const char*arith_language_regexes[arith_token_coun
   [arith_token_INCREMENT] = 0,
   [arith_token_DECREMENT] = 0,
   [arith_token_INTEGER] = "[-]\x3f[\x30-\x39]+",
-  [arith_token_LPAREN] = 0,
-  [arith_token_RPAREN] = 0,
-  [arith_token_WHITESPACE] = "[\x20\x5c\x66\x5c\x6e\x5c\x72\x5c\x74\x5c\x76]+",
+  [arith_token_SPACE] = 0,
+  [arith_token_NEWLINE] = 0,
+  [arith_token_CONTROL] = "[\x40\x41-\x5a\x21\x23\x24\x25\x26]+",
 };
 // Language literals table
 static __attribute__((unused))const char*arith_language_literals[arith_token_count] = {
@@ -138,9 +138,9 @@ static __attribute__((unused))const char*arith_language_literals[arith_token_cou
   [arith_token_INCREMENT] = "incr",
   [arith_token_DECREMENT] = "decr",
   [arith_token_INTEGER] = 0,
-  [arith_token_LPAREN] = "\\(",
-  [arith_token_RPAREN] = "\\)",
-  [arith_token_WHITESPACE] = 0,
+  [arith_token_SPACE] = 0,
+  [arith_token_NEWLINE] = 0,
+  [arith_token_CONTROL] = 0,
 };
 
 // Language hex literals table
@@ -159,9 +159,9 @@ static __attribute__((unused))const char*arith_language_hex_literals[arith_token
   [arith_token_INCREMENT] = 0,
   [arith_token_DECREMENT] = 0,
   [arith_token_INTEGER] = 0,
-  [arith_token_LPAREN] = 0,
-  [arith_token_RPAREN] = 0,
-  [arith_token_WHITESPACE] = 0,
+  [arith_token_SPACE] = "\\x20",
+  [arith_token_NEWLINE] = "\\x0a",
+  [arith_token_CONTROL] = 0,
 };
 
 // Lexer instantiations
@@ -358,14 +358,9 @@ lexer_match_t arith_lexer_single_regex_bytes_matching(lexer_t lex, size_t regex_
 lexer_match_t arith_lexer_sequence_regex_bytes_matching(lexer_t lex, lexer_iterator_t iter) { return arith_lexer_a2pc_sequence_regex_bytes_matching(lex, iter); }
 lexer_token_t arith_lexer_iterator_step(lexer_t lex, lexer_iterator_t *iter) { return arith_lexer_a2pc_iterator_step(lex, iter); }
 
-// TokenDiscard start
+// No tokens are discarded, define the symbol anyway
 bool arith_lexer_discard_token(enum arith_token id)
 {
-  switch(id)  {
-    case arith_token_WHITESPACE:
-    return true;
-  default:
-    return false;
-  }
+  (void)id;
+  return false;
 }
-// TokenDiscard end

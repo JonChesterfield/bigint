@@ -5,6 +5,7 @@
 struct arith_parse_state
 {
   proto stored;
+  proto_context context;
 };
 
 #endif

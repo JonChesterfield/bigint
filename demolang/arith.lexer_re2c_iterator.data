@@ -903,7 +903,7 @@ match:;
 
 }
 
-static lexer_match_t arith_match_LPAREN(lexer_t l, lexer_iterator_t iter)
+static lexer_match_t arith_match_SPACE(lexer_t l, lexer_iterator_t iter)
 {
   const char* YYCURSOR = iter.cursor;
   const char* YYLIMIT = iter.end;
@@ -918,7 +918,7 @@ static lexer_match_t arith_match_LPAREN(lexer_t l, lexer_iterator_t iter)
   char yych;
   yych = *YYCURSOR;
   switch (yych) {
-    case '(': goto re2c105;
+    case ' ': goto re2c105;
     default:
       if (YYLIMIT <= YYCURSOR) goto re2c106;
       goto re2c104;
@@ -928,7 +928,7 @@ re2c104:
   { goto failure; }
 re2c105:
   ++YYCURSOR;
-  { id = arith_token_LPAREN; goto match; }
+  { id = arith_token_SPACE; goto match; }
 re2c106:
   { goto failure; }
 }
@@ -954,7 +954,7 @@ match:;
 
 }
 
-static lexer_match_t arith_match_RPAREN(lexer_t l, lexer_iterator_t iter)
+static lexer_match_t arith_match_NEWLINE(lexer_t l, lexer_iterator_t iter)
 {
   const char* YYCURSOR = iter.cursor;
   const char* YYLIMIT = iter.end;
@@ -969,7 +969,7 @@ static lexer_match_t arith_match_RPAREN(lexer_t l, lexer_iterator_t iter)
   char yych;
   yych = *YYCURSOR;
   switch (yych) {
-    case ')': goto re2c109;
+    case '\n': goto re2c109;
     default:
       if (YYLIMIT <= YYCURSOR) goto re2c110;
       goto re2c108;
@@ -979,7 +979,7 @@ re2c108:
   { goto failure; }
 re2c109:
   ++YYCURSOR;
-  { id = arith_token_RPAREN; goto match; }
+  { id = arith_token_NEWLINE; goto match; }
 re2c110:
   { goto failure; }
 }
@@ -1005,7 +1005,7 @@ match:;
 
 }
 
-static lexer_match_t arith_match_WHITESPACE(lexer_t l, lexer_iterator_t iter)
+static lexer_match_t arith_match_CONTROL(lexer_t l, lexer_iterator_t iter)
 {
   const char* YYCURSOR = iter.cursor;
   const char* YYLIMIT = iter.end;
@@ -1020,12 +1020,38 @@ static lexer_match_t arith_match_WHITESPACE(lexer_t l, lexer_iterator_t iter)
   char yych;
   yych = *YYCURSOR;
   switch (yych) {
-    case '\t':
-    case '\n':
-    case '\v':
-    case '\f':
-    case '\r':
-    case ' ': goto re2c113;
+    case '!':
+    case '#':
+    case '$':
+    case '%':
+    case '&':
+    case '@':
+    case 'A':
+    case 'B':
+    case 'C':
+    case 'D':
+    case 'E':
+    case 'F':
+    case 'G':
+    case 'H':
+    case 'I':
+    case 'J':
+    case 'K':
+    case 'L':
+    case 'M':
+    case 'N':
+    case 'O':
+    case 'P':
+    case 'Q':
+    case 'R':
+    case 'S':
+    case 'T':
+    case 'U':
+    case 'V':
+    case 'W':
+    case 'X':
+    case 'Y':
+    case 'Z': goto re2c113;
     default:
       if (YYLIMIT <= YYCURSOR) goto re2c115;
       goto re2c112;
@@ -1036,16 +1062,42 @@ re2c112:
 re2c113:
   yych = *++YYCURSOR;
   switch (yych) {
-    case '\t':
-    case '\n':
-    case '\v':
-    case '\f':
-    case '\r':
-    case ' ': goto re2c113;
+    case '!':
+    case '#':
+    case '$':
+    case '%':
+    case '&':
+    case '@':
+    case 'A':
+    case 'B':
+    case 'C':
+    case 'D':
+    case 'E':
+    case 'F':
+    case 'G':
+    case 'H':
+    case 'I':
+    case 'J':
+    case 'K':
+    case 'L':
+    case 'M':
+    case 'N':
+    case 'O':
+    case 'P':
+    case 'Q':
+    case 'R':
+    case 'S':
+    case 'T':
+    case 'U':
+    case 'V':
+    case 'W':
+    case 'X':
+    case 'Y':
+    case 'Z': goto re2c113;
     default: goto re2c114;
   }
 re2c114:
-  { id = arith_token_WHITESPACE; goto match; }
+  { id = arith_token_CONTROL; goto match; }
 re2c115:
   { goto failure; }
 }
@@ -1090,14 +1142,40 @@ lexer_match_t arith_lexer_re2c_sequence_regex_bytes_matching(lexer_t lex,
   char yych;
   yych = *YYCURSOR;
   switch (yych) {
-    case '\t':
-    case '\n':
-    case '\v':
-    case '\f':
-    case '\r':
-    case ' ': goto re2c119;
-    case '(': goto re2c121;
-    case ')': goto re2c122;
+    case '\n': goto re2c119;
+    case ' ': goto re2c120;
+    case '!':
+    case '#':
+    case '$':
+    case '%':
+    case '&':
+    case '@':
+    case 'A':
+    case 'B':
+    case 'C':
+    case 'D':
+    case 'E':
+    case 'F':
+    case 'G':
+    case 'H':
+    case 'I':
+    case 'J':
+    case 'K':
+    case 'L':
+    case 'M':
+    case 'N':
+    case 'O':
+    case 'P':
+    case 'Q':
+    case 'R':
+    case 'S':
+    case 'T':
+    case 'U':
+    case 'V':
+    case 'W':
+    case 'X':
+    case 'Y':
+    case 'Z': goto re2c121;
     case '-': goto re2c123;
     case '0':
     case '1':
@@ -1127,24 +1205,50 @@ re2c117:
 re2c118:
   { id = arith_token_UNKNOWN; goto match; }
 re2c119:
+  ++YYCURSOR;
+  { id = arith_token_NEWLINE; goto match; }
+re2c120:
+  ++YYCURSOR;
+  { id = arith_token_SPACE; goto match; }
+re2c121:
   yych = *++YYCURSOR;
   switch (yych) {
-    case '\t':
-    case '\n':
-    case '\v':
-    case '\f':
-    case '\r':
-    case ' ': goto re2c119;
-    default: goto re2c120;
+    case '!':
+    case '#':
+    case '$':
+    case '%':
+    case '&':
+    case '@':
+    case 'A':
+    case 'B':
+    case 'C':
+    case 'D':
+    case 'E':
+    case 'F':
+    case 'G':
+    case 'H':
+    case 'I':
+    case 'J':
+    case 'K':
+    case 'L':
+    case 'M':
+    case 'N':
+    case 'O':
+    case 'P':
+    case 'Q':
+    case 'R':
+    case 'S':
+    case 'T':
+    case 'U':
+    case 'V':
+    case 'W':
+    case 'X':
+    case 'Y':
+    case 'Z': goto re2c121;
+    default: goto re2c122;
   }
-re2c120:
-  { id = arith_token_WHITESPACE; goto match; }
-re2c121:
-  ++YYCURSOR;
-  { id = arith_token_LPAREN; goto match; }
 re2c122:
-  ++YYCURSOR;
-  { id = arith_token_RPAREN; goto match; }
+  { id = arith_token_CONTROL; goto match; }
 re2c123:
   yych = *++YYCURSOR;
   switch (yych) {
@@ -1412,9 +1516,9 @@ lexer_match_t arith_lexer_re2c_single_regex_bytes_matching(lexer_t l, size_t reg
     case arith_token_INCREMENT: return arith_match_INCREMENT(l, iter);
     case arith_token_DECREMENT: return arith_match_DECREMENT(l, iter);
     case arith_token_INTEGER: return arith_match_INTEGER(l, iter);
-    case arith_token_LPAREN: return arith_match_LPAREN(l, iter);
-    case arith_token_RPAREN: return arith_match_RPAREN(l, iter);
-    case arith_token_WHITESPACE: return arith_match_WHITESPACE(l, iter);
+    case arith_token_SPACE: return arith_match_SPACE(l, iter);
+    case arith_token_NEWLINE: return arith_match_NEWLINE(l, iter);
+    case arith_token_CONTROL: return arith_match_CONTROL(l, iter);
     default: return failure;
   }
 }

@@ -2,10 +2,23 @@
 #include "arith.parser.h"
 #include "arith.productions.h"
 
-proto arith_custom_production_FromInteger(struct arith_parse_state* ctx,
+#define EXPLICIT_SPACING 1
+
+#if EXPLICIT_SPACING
+#define SPACE(X) token s##X,
+#define NEWLINE(X) , token s##X
+#define VOID(X) (void)s##X
+#else
+#define SPACE(X)
+#define NEWLINE(X)
+#define VOID(X)
+#endif
+
+proto arith_custom_production_FromInteger(struct arith_parse_state* parse_ctx,
                                           token /*INTEGER*/ x1)
 {
-  (void)ctx;
+  // leaks pretty badly on the failure paths at present
+  proto_context ctx = arith_parse_state_get_tree_context(parse_ctx);
 
   size_t width = token_width(x1);
   const char* bytes = token_value(x1);
@@ -19,167 +32,357 @@ proto arith_custom_production_FromInteger(struct arith_parse_state* ctx,
     {
       if (width == 1)
         {
-          proto_create_invalid();
+          return proto_create_invalid();
         }
       bytes++;
       width--;
     }
 
-  proto acc = proto_create(1);
-  if (!proto_is_zero(acc)) return proto_create_invalid();
-
-  proto ten = proto_from_u32(10);
-  if (!proto_valid(ten))
+  proto acc = proto_create(ctx, 1);
+  if (!proto_valid(ctx, acc)) return proto_create_invalid();
+  if (!proto_is_zero(ctx, acc))
     {
+      proto_destroy(ctx, acc);
       return proto_create_invalid();
     }
+
+  proto ten = proto_from_u32(ctx, 10);
+  if (!proto_valid(ctx, ten))
+    {
+      proto_destroy(ctx, acc);
+      return proto_create_invalid();
+    }
+
   for (size_t i = 0; i < width; i++)
     {
       char b = (bytes[i] - '0');
       if (b < 0 || b > 9)
         {
-          proto_destroy(acc);
-          proto_destroy(ten);
+          proto_destroy(ctx, acc);
+          proto_destroy(ctx, ten);
           return proto_create_invalid();
         }
 
       {
-        proto tmp = proto_mul(acc, ten);
-        if (!proto_valid(tmp)) return proto_create_invalid();
-        proto_destroy(acc);
+        proto tmp = proto_mul(ctx, acc, ten);
+        if (!proto_valid(ctx, tmp))
+          {
+            proto_destroy(ctx, acc);
+            proto_destroy(ctx, ten);
+            return proto_create_invalid();
+          }
+        proto_destroy(ctx, acc);
         acc = tmp;
       }
 
       {
-        proto addend = proto_from_u32((unsigned)b);
-        if (!proto_valid(addend)) return proto_create_invalid();
-        proto tmp = proto_add(acc, addend);
-        if (!proto_valid(tmp)) return proto_create_invalid();
-        proto_destroy(addend);
-        proto_destroy(acc);
+        proto addend = proto_from_u32(ctx, (unsigned)b);
+        if (!proto_valid(ctx, addend)) return proto_create_invalid();
+        proto tmp = proto_add(ctx, acc, addend);
+        if (!proto_valid(ctx, tmp)) return proto_create_invalid();
+        proto_destroy(ctx, addend);
+        proto_destroy(ctx, acc);
         acc = tmp;
       }
     }
 
-  proto_destroy(ten);
+  proto_destroy(ctx, ten);
 
   if (neg)
     {
-      proto tmp = proto_neg(acc);
-      proto_destroy(acc);
+      proto tmp = proto_neg(ctx, acc);
+      proto_destroy(ctx, acc);
       acc = tmp;
     }
 
   return acc;
 }
 
-proto arith_custom_production_BinOpPlus(struct arith_parse_state* ctx,
-                                        token /*PLUS*/ x1, proto /*expr*/ x2,
-                                        proto /*expr*/ x3)
+proto arith_custom_production_BinaryOp(struct arith_parse_state* parse_ctx,
+                                       proto (*func)(proto_context, proto,
+                                                     proto),
+                                       proto /*expr*/ x2, proto /*expr*/ x3)
 {
-  (void)ctx;
+  proto_context ctx = arith_parse_state_get_tree_context(parse_ctx);
+  proto res = func(ctx, x2, x3);
+  proto_destroy(ctx, x2);
+  proto_destroy(ctx, x3);
+  return res;
+}
+
+proto arith_custom_production_UnaryOp(struct arith_parse_state* parse_ctx,
+                                      proto (*func)(proto_context, proto),
+                                      proto /*expr*/ x2)
+{
+  proto_context ctx = arith_parse_state_get_tree_context(parse_ctx);
+  proto res = func(ctx, x2);
+  proto_destroy(ctx, x2);
+  return res;
+}
+
+proto arith_custom_production_BinOpPlus(struct arith_parse_state* parse_ctx,
+                                        token /*PLUS*/ x1,
+                                        SPACE(0) proto /*expr*/ x2,
+                                        SPACE(1) proto /*expr*/ x3 NEWLINE(2))
+{
   (void)x1;
-  return proto_add(x2, x3);
+  VOID(0);
+  VOID(1);
+  VOID(2);
+  return arith_custom_production_BinaryOp(parse_ctx, proto_add, x2, x3);
 }
 
 // CustomProduction BinOpMinus -> arith_grouping_expr
-proto arith_custom_production_BinOpMinus(struct arith_parse_state* ctx,
-                                         token /*MINUS*/ x1, proto /*expr*/ x2,
-                                         proto /*expr*/ x3)
+proto arith_custom_production_BinOpMinus(struct arith_parse_state* parse_ctx,
+                                         token /*MINUS*/ x1,
+                                         SPACE(0) proto /*expr*/ x2,
+                                         SPACE(1) proto /*expr*/ x3 NEWLINE(2))
 {
-  (void)ctx;
   (void)x1;
-  return proto_sub(x2, x3);
+  VOID(0);
+  VOID(1);
+  VOID(2);
+  return arith_custom_production_BinaryOp(parse_ctx, proto_sub, x2, x3);
 }
 
 // CustomProduction BinOpTimes -> arith_grouping_expr
-proto arith_custom_production_BinOpTimes(struct arith_parse_state* ctx,
-                                         token /*TIMES*/ x1, proto /*expr*/ x2,
-                                         proto /*expr*/ x3)
+proto arith_custom_production_BinOpTimes(struct arith_parse_state* parse_ctx,
+                                         token /*TIMES*/ x1,
+                                         SPACE(0) proto /*expr*/ x2,
+                                         SPACE(1) proto /*expr*/ x3 NEWLINE(2))
 {
-  (void)ctx;
   (void)x1;
-  return proto_mul(x2, x3);
+  VOID(0);
+  VOID(1);
+  VOID(2);
+  return arith_custom_production_BinaryOp(parse_ctx, proto_mul, x2, x3);
 }
 
 // CustomProduction BinOpDivide -> arith_grouping_expr
-proto arith_custom_production_BinOpDivide(struct arith_parse_state* ctx,
+proto arith_custom_production_BinOpDivide(struct arith_parse_state* parse_ctx,
                                           token /*DIVIDE*/ x1,
-                                          proto /*expr*/ x2, proto /*expr*/ x3)
+                                          SPACE(0) proto /*expr*/ x2,
+                                          SPACE(1) proto /*expr*/ x3 NEWLINE(2))
 {
-  (void)ctx;
   (void)x1;
-  return proto_div(x2, x3);
+  VOID(0);
+  VOID(1);
+  VOID(2);
+  return arith_custom_production_BinaryOp(parse_ctx, proto_div, x2, x3);
 }
 
 // CustomProduction BinOpModulo -> arith_grouping_expr
-proto arith_custom_production_BinOpRemainder(struct arith_parse_state* ctx,
-                                             token /*REMAINDER*/ x1,
-                                             proto /*expr*/ x2,
-                                             proto /*expr*/ x3)
+proto arith_custom_production_BinOpRemainder(
+    struct arith_parse_state* parse_ctx, token /*REMAINDER*/ x1,
+    SPACE(0) proto /*expr*/ x2, SPACE(1) proto /*expr*/ x3 NEWLINE(2))
 {
-  (void)ctx;
   (void)x1;
-  return proto_rem(x2, x3);
+  VOID(0);
+  VOID(1);
+  VOID(2);
+  return arith_custom_production_BinaryOp(parse_ctx, proto_rem, x2, x3);
 }
 
-proto arith_custom_production_BinOpBitOr(struct arith_parse_state* ctx,
-                                         token /*BITOR*/ x1, proto /*expr*/ x2,
-                                         proto /*expr*/ x3)
+proto arith_custom_production_BinOpBitOr(struct arith_parse_state* parse_ctx,
+                                         token /*BITOR*/ x1,
+                                         SPACE(0) proto /*expr*/ x2,
+                                         SPACE(1) proto /*expr*/ x3 NEWLINE(2))
 {
-  (void)ctx;
   (void)x1;
-  return proto_or(x2, x3);
+  VOID(0);
+  VOID(1);
+  VOID(2);
+  return arith_custom_production_BinaryOp(parse_ctx, proto_or, x2, x3);
 }
 
-proto arith_custom_production_BinOpBitAnd(struct arith_parse_state* ctx,
-                                         token /*BITAND*/ x1, proto /*expr*/ x2,
-                                         proto /*expr*/ x3)
+proto arith_custom_production_BinOpBitAnd(struct arith_parse_state* parse_ctx,
+                                          token /*BITAND*/ x1,
+                                          SPACE(0) proto /*expr*/ x2,
+                                          SPACE(1) proto /*expr*/ x3 NEWLINE(2))
 {
-  (void)ctx;
   (void)x1;
-  return proto_and(x2, x3);
+  VOID(0);
+  VOID(1);
+  VOID(2);
+  return arith_custom_production_BinaryOp(parse_ctx, proto_and, x2, x3);
 }
 
-proto arith_custom_production_BinOpBitXor(struct arith_parse_state* ctx,
-                                         token /*BITXOR*/ x1, proto /*expr*/ x2,
-                                         proto /*expr*/ x3)
+proto arith_custom_production_BinOpBitXor(struct arith_parse_state* parse_ctx,
+                                          token /*BITXOR*/ x1,
+                                          SPACE(0) proto /*expr*/ x2,
+                                          SPACE(1) proto /*expr*/ x3 NEWLINE(2))
 {
-  (void)ctx;
   (void)x1;
-  return proto_xor(x2, x3);
+  VOID(0);
+  VOID(1);
+  VOID(2);
+  return arith_custom_production_BinaryOp(parse_ctx, proto_xor, x2, x3);
 }
 
-
-proto arith_custom_production_UnOpAbsolute(struct arith_parse_state* ctx,
-                                        token /*ABSOLUTE*/ x1, proto /*expr*/ x2)
+proto arith_custom_production_UnOpAbsolute(struct arith_parse_state* parse_ctx,
+                                           token /*ABSOLUTE*/ x1,
+                                           SPACE(0)
+                                               proto /*expr*/ x2 NEWLINE(1))
 {
-  (void)ctx;
   (void)x1;
-  return proto_abs(x2);
+  VOID(0);
+  VOID(1);
+  return arith_custom_production_UnaryOp(parse_ctx, proto_abs, x2);
 }
 
-proto arith_custom_production_UnOpNegate(struct arith_parse_state* ctx,
-                                        token /*NEGATE*/ x1, proto /*expr*/ x2)
+proto arith_custom_production_UnOpNegate(struct arith_parse_state* parse_ctx,
+                                         token /*NEGATE*/ x1,
+                                         SPACE(0) proto /*expr*/ x2 NEWLINE(1))
 {
-  (void)ctx;
   (void)x1;
-  return proto_neg(x2);
+  VOID(0);
+  VOID(1);
+  return arith_custom_production_UnaryOp(parse_ctx, proto_neg, x2);
 }
 
-proto arith_custom_production_UnOpIncrement(struct arith_parse_state* ctx,
-                                        token /*INCREMENT*/ x1, proto /*expr*/ x2)
+proto arith_custom_production_UnOpIncrement(struct arith_parse_state* parse_ctx,
+                                            token /*INCREMENT*/ x1,
+                                            SPACE(0)
+                                                proto /*expr*/ x2 NEWLINE(1))
 {
-  (void)ctx;
   (void)x1;
-  return proto_incr(x2);
+  VOID(0);
+  VOID(1);
+  return arith_custom_production_UnaryOp(parse_ctx, proto_incr, x2);
 }
 
-proto arith_custom_production_UnOpDecrement(struct arith_parse_state* ctx,
-                                        token /*DECREMENT*/ x1, proto /*expr*/ x2)
+proto arith_custom_production_UnOpDecrement(struct arith_parse_state* parse_ctx,
+                                            token /*DECREMENT*/ x1,
+                                            SPACE(0)
+                                                proto /*expr*/ x2 NEWLINE(1))
 {
-  (void)ctx;
   (void)x1;
-  return proto_decr(x2);
+  VOID(0);
+  VOID(1);
+  return arith_custom_production_UnaryOp(parse_ctx, proto_decr, x2);
 }
 
+static uint32_t base32_decode(char c)
+{
+  // base 32 in 26 UPPERCASE and six printable chars
+  // specific decoding pattern doesn't matter very much
+  _Static_assert('!' == 0x21, "");
+  _Static_assert('#' == 0x23, "");
+  _Static_assert('$' == 0x24, "");
+  _Static_assert('%' == 0x25, "");
+  _Static_assert('&' == 0x26, "");
+  _Static_assert('@' == 0x40, "");
+
+  _Static_assert('A' == 0x41, "");
+  _Static_assert('Z' == 0x5a, "");
+
+  if (c >= 'A' && c <= 'Z')
+    {
+      return c - 'A';
+    }
+
+  switch (c)
+    {
+      case '@':
+        return 26;
+      case '!':
+        return 27;
+      case '#':
+        return 28;
+      case '$':
+        return 29;
+      case '%':
+        return 30;
+      case '&':
+        return 31;
+      default:
+        return UINT32_MAX;
+    }
+}
+
+proto arith_custom_production_FromControl(struct arith_parse_state* parse_ctx,
+                                          token /*CONTROL*/ x1)
+{
+  // base 32 is five bits per character
+  // lets say 60 bit maximum is sufficient
+
+  size_t width = token_width(x1);
+  const char* bytes = token_value(x1);
+  if (width == 0 || width > 12)
+    {
+      return proto_create_invalid();
+    }
+
+  uint64_t value = 0;
+
+  for (size_t i = 0; i < width; i++)
+    {
+      uint32_t digit = base32_decode(bytes[i]);
+      if (digit >= 32)
+        {
+          return proto_create_invalid();
+        }
+
+      value *= 32;
+      value += digit;
+    }
+
+  // fprintf(stderr, "Setting malloc state to %lu\n", value);
+
+  proto_context ctx = arith_parse_state_get_tree_context(parse_ctx);
+  *(ctx.malloc_state) = value;
+
+  // This operation sets the state, doesn't otherwise affect the parse tree
+  return proto_from_u32(ctx, 0);
+}
+
+// The leading control block doesn't affect the tree. Check it holds !valid()
+// and otherwise tail call into the next handler.
+proto arith_custom_production_control_expr_to_program(
+    struct arith_parse_state* parse_ctx, proto /*control_block*/ x1,
+    token /*SPACE*/ x2, proto /*expr*/ x3)
+{
+  proto_context ctx = arith_parse_state_get_tree_context(parse_ctx);
+  proto_destroy(ctx, x1);
+  return arith_assign_production_expr_to_program(parse_ctx, x3);
+}
+
+proto arith_custom_production_control_result_expr_to_program(
+    struct arith_parse_state* parse_ctx, proto /*control_block*/ x1,
+    token /*SPACE*/ x2, proto /*integer*/ x3, token /*SPACE*/ x4,
+    proto /*expr*/ x5)
+{
+  proto_context ctx = arith_parse_state_get_tree_context(parse_ctx);
+  proto_destroy(ctx, x1);
+  return arith_custom_production_result_expr_to_program(parse_ctx, x3, x4, x5);
+}
+
+proto arith_custom_production_result_expr_to_program(
+    struct arith_parse_state* parse_ctx, proto /*integer*/ x1,
+    token /*SPACE*/ x2, proto /*expr*/ x3)
+{
+  proto_context ctx = arith_parse_state_get_tree_context(parse_ctx);
+
+  if (!proto_valid(ctx, x1) || !proto_valid(ctx, x3))
+    {
+      if (proto_valid(ctx, x1))
+        {
+          proto_destroy(ctx, x1);
+        }
+      if (proto_valid(ctx, x3))
+        {
+          proto_destroy(ctx, x3);
+        }
+      return proto_create_invalid();
+    }
+
+  if (!proto_equal(ctx, x1, x3))
+    {
+      proto_destroy(ctx, x1);
+      proto_destroy(ctx, x3);
+      return proto_create_invalid();
+    }
+
+  proto_destroy(ctx, x1);
+  return x3;
+}

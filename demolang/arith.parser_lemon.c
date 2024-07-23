@@ -87,9 +87,9 @@ static void arith_Lemon(void*, int, token, struct arith_parse_state *);
 #define TOKEN_ID_INCREMENT                      11
 #define TOKEN_ID_DECREMENT                      12
 #define TOKEN_ID_INTEGER                        13
-#define TOKEN_ID_LPAREN                         14
-#define TOKEN_ID_RPAREN                         15
-#define TOKEN_ID_WHITESPACE                     16
+#define TOKEN_ID_SPACE                          14
+#define TOKEN_ID_NEWLINE                        15
+#define TOKEN_ID_CONTROL                        16
 #endif
 /**************** End token definitions ***************************************/
 
@@ -149,13 +149,13 @@ static void arith_Lemon(void*, int, token, struct arith_parse_state *);
 #endif
 /************* Begin control #defines *****************************************/
 #define YYCODETYPE unsigned char
-#define YYNOCODE 19
+#define YYNOCODE 21
 #define YYACTIONTYPE unsigned char
 #define arith_LemonTOKENTYPE  token 
 typedef union {
   int yyinit;
   arith_LemonTOKENTYPE yy0;
-  proto yy19;
+  proto yy9;
 } YYMINORTYPE;
 #ifndef YYSTACKDEPTH
 #define YYSTACKDEPTH 0
@@ -170,18 +170,18 @@ typedef union {
 #define arith_LemonCTX_PARAM
 #define arith_LemonCTX_FETCH
 #define arith_LemonCTX_STORE
-#define YYNSTATE             24
-#define YYNRULE              15
-#define YYNRULE_WITH_ACTION  15
+#define YYNSTATE             63
+#define YYNRULE              18
+#define YYNRULE_WITH_ACTION  18
 #define YYNTOKEN             17
-#define YY_MAX_SHIFT         23
-#define YY_MIN_SHIFTREDUCE   38
-#define YY_MAX_SHIFTREDUCE   52
-#define YY_ERROR_ACTION      53
-#define YY_ACCEPT_ACTION     54
-#define YY_NO_ACTION         55
-#define YY_MIN_REDUCE        56
-#define YY_MAX_REDUCE        70
+#define YY_MAX_SHIFT         62
+#define YY_MIN_SHIFTREDUCE   77
+#define YY_MAX_SHIFTREDUCE   94
+#define YY_ERROR_ACTION      95
+#define YY_ACCEPT_ACTION     96
+#define YY_NO_ACTION         97
+#define YY_MIN_REDUCE        98
+#define YY_MAX_REDUCE        115
 /************* End control #defines *******************************************/
 #define YY_NLOOKAHEAD ((int)(sizeof(yy_lookahead)/sizeof(yy_lookahead[0])))
 
@@ -248,41 +248,66 @@ typedef union {
 **  yy_default[]       Default action for each state.
 **
 *********** Begin parsing tables **********************************************/
-#define YY_ACTTAB_COUNT (40)
+#define YY_ACTTAB_COUNT (123)
 static const YYACTIONTYPE yy_action[] = {
- /*     0 */    22,   21,   19,   17,   15,   13,   11,    9,    7,    5,
- /*    10 */     4,    3,    2,   52,    1,   54,   23,   68,   55,   67,
- /*    20 */    66,   65,   64,    6,   63,    8,   62,   10,   61,   12,
- /*    30 */    60,   14,   59,   16,   58,   18,   57,   51,   20,   56,
+ /*     0 */    24,   59,   56,   53,   50,   47,   44,   41,   38,   35,
+ /*    10 */    33,   31,   29,   81,   26,   25,   82,   60,   59,   56,
+ /*    20 */    53,   50,   47,   44,   41,   38,   35,   33,   31,   29,
+ /*    30 */    81,   59,   56,   53,   50,   47,   44,   41,   38,   35,
+ /*    40 */    33,   31,   29,   96,   62,   61,   27,   81,   28,   97,
+ /*    50 */    30,   32,   34,  101,   36,   37,   39,   40,   42,   43,
+ /*    60 */    45,   46,   48,   49,   51,   52,   54,   55,   57,    2,
+ /*    70 */    58,  100,    1,   97,   94,    4,   97,   93,    5,   97,
+ /*    80 */    92,    6,   97,   91,    7,   97,   97,   90,   89,    8,
+ /*    90 */     9,   97,   10,   11,   97,   97,   88,   87,   12,   13,
+ /*   100 */    97,   97,   14,   15,   97,   86,   85,   16,   17,   99,
+ /*   110 */    98,   18,   19,   97,   84,   83,   97,   20,   21,   97,
+ /*   120 */    22,   23,    3,
 };
 static const YYCODETYPE yy_lookahead[] = {
  /*     0 */    18,    1,    2,    3,    4,    5,    6,    7,    8,    9,
- /*    10 */    10,   11,   12,   13,   14,   17,   18,   18,   19,   18,
- /*    20 */    18,   18,   18,   18,   18,   18,   18,   18,   18,   18,
- /*    30 */    18,   18,   18,   18,   18,   18,   18,   15,   18,    0,
- /*    40 */    19,   19,   19,   19,   19,   19,   19,   19,   19,   19,
- /*    50 */    19,   19,   19,   19,   19,   19,   19,
+ /*    10 */    10,   11,   12,   13,   18,   19,   16,   18,    1,    2,
+ /*    20 */     3,    4,    5,    6,    7,    8,    9,   10,   11,   12,
+ /*    30 */    13,    1,    2,    3,    4,    5,    6,    7,    8,    9,
+ /*    40 */    10,   11,   12,   17,   18,   19,   20,   13,   19,   21,
+ /*    50 */    19,   19,   19,    0,   19,   19,   19,   19,   19,   19,
+ /*    60 */    19,   19,   19,   19,   19,   19,   19,   19,   19,   14,
+ /*    70 */    19,    0,   14,   21,   15,   14,   21,   15,   14,   21,
+ /*    80 */    15,   14,   21,   15,   14,   21,   21,   15,   15,   14,
+ /*    90 */    14,   21,   14,   14,   21,   21,   15,   15,   14,   14,
+ /*   100 */    21,   21,   14,   14,   21,   15,   15,   14,   14,    0,
+ /*   110 */     0,   14,   14,   21,   15,   15,   21,   14,   14,   21,
+ /*   120 */    14,   14,   14,   21,   21,   21,   21,   21,   21,   21,
+ /*   130 */    21,   21,   21,   21,   21,   21,   21,   21,   21,   21,
 };
-#define YY_SHIFT_COUNT    (23)
+#define YY_SHIFT_COUNT    (62)
 #define YY_SHIFT_MIN      (0)
-#define YY_SHIFT_MAX      (39)
+#define YY_SHIFT_MAX      (110)
 static const unsigned char yy_shift_ofst[] = {
- /*     0 */     0,    0,    0,    0,    0,    0,    0,    0,    0,    0,
- /*    10 */     0,    0,    0,    0,    0,    0,    0,    0,    0,    0,
- /*    20 */     0,    0,   22,   39,
+ /*     0 */     0,   17,   30,   30,   34,   34,   34,   34,   34,   34,
+ /*    10 */    34,   34,   34,   34,   34,   34,   34,   34,   34,   34,
+ /*    20 */    34,   34,   34,   34,   53,   55,   71,   58,   59,   61,
+ /*    30 */    62,   64,   65,   67,   68,   70,   72,   75,   76,   73,
+ /*    40 */    78,   79,   81,   84,   85,   82,   88,   89,   90,   93,
+ /*    50 */    94,   91,   97,   98,   99,  103,  104,  100,  106,  107,
+ /*    60 */   109,  108,  110,
 };
-#define YY_REDUCE_COUNT (21)
+#define YY_REDUCE_COUNT (23)
 #define YY_REDUCE_MIN   (-18)
-#define YY_REDUCE_MAX   (20)
+#define YY_REDUCE_MAX   (51)
 static const signed char yy_reduce_ofst[] = {
- /*     0 */    -2,  -18,   -1,    1,    2,    3,    4,    5,    6,    7,
- /*    10 */     8,    9,   10,   11,   12,   13,   14,   15,   16,   17,
- /*    20 */    18,   20,
+ /*     0 */    26,   -4,  -18,   -1,   29,   31,   32,   33,   35,   36,
+ /*    10 */    37,   38,   39,   40,   41,   42,   43,   44,   45,   46,
+ /*    20 */    47,   48,   49,   51,
 };
 static const YYACTIONTYPE yy_default[] = {
- /*     0 */    53,   53,   53,   53,   53,   53,   53,   53,   53,   53,
- /*    10 */    53,   53,   53,   53,   53,   53,   53,   53,   53,   53,
- /*    20 */    53,   53,   53,   53,
+ /*     0 */    95,   95,   95,   95,   95,   95,   95,   95,   95,   95,
+ /*    10 */    95,   95,   95,   95,   95,   95,   95,   95,   95,   95,
+ /*    20 */    95,   95,   95,   95,   95,   95,   95,   95,   95,   95,
+ /*    30 */    95,   95,   95,   95,   95,   95,   95,   95,   95,   95,
+ /*    40 */    95,   95,   95,   95,   95,   95,   95,   95,   95,   95,
+ /*    50 */    95,   95,   95,   95,   95,   95,   95,   95,   95,   95,
+ /*    60 */    95,   95,   95,
 };
 /********** End of lemon-generated parsing tables *****************************/
 
@@ -416,11 +441,13 @@ static const char *const yyTokenName[] = {
   /*   11 */ "INCREMENT",
   /*   12 */ "DECREMENT",
   /*   13 */ "INTEGER",
-  /*   14 */ "LPAREN",
-  /*   15 */ "RPAREN",
-  /*   16 */ "WHITESPACE",
+  /*   14 */ "SPACE",
+  /*   15 */ "NEWLINE",
+  /*   16 */ "CONTROL",
   /*   17 */ "program",
   /*   18 */ "expr",
+  /*   19 */ "integer",
+  /*   20 */ "control_block",
 };
 #endif /* defined(YYCOVERAGE) || !defined(NDEBUG) */
 #endif
@@ -431,20 +458,23 @@ static const char *const yyTokenName[] = {
 */
 static const char *const yyRuleName[] = {
  /*   0 */ "program ::= expr",
- /*   1 */ "expr ::= PLUS expr expr",
- /*   2 */ "expr ::= MINUS expr expr",
- /*   3 */ "expr ::= TIMES expr expr",
- /*   4 */ "expr ::= DIVIDE expr expr",
- /*   5 */ "expr ::= REMAINDER expr expr",
- /*   6 */ "expr ::= BITOR expr expr",
- /*   7 */ "expr ::= BITAND expr expr",
- /*   8 */ "expr ::= BITXOR expr expr",
- /*   9 */ "expr ::= ABSOLUTE expr",
- /*  10 */ "expr ::= NEGATE expr",
- /*  11 */ "expr ::= INCREMENT expr",
- /*  12 */ "expr ::= DECREMENT expr",
- /*  13 */ "expr ::= LPAREN expr RPAREN",
- /*  14 */ "expr ::= INTEGER",
+ /*   1 */ "program ::= integer SPACE expr",
+ /*   2 */ "program ::= control_block SPACE expr",
+ /*   3 */ "program ::= control_block SPACE integer SPACE expr",
+ /*   4 */ "integer ::= INTEGER",
+ /*   5 */ "control_block ::= CONTROL",
+ /*   6 */ "expr ::= PLUS SPACE integer SPACE integer NEWLINE",
+ /*   7 */ "expr ::= MINUS SPACE integer SPACE integer NEWLINE",
+ /*   8 */ "expr ::= TIMES SPACE integer SPACE integer NEWLINE",
+ /*   9 */ "expr ::= DIVIDE SPACE integer SPACE integer NEWLINE",
+ /*  10 */ "expr ::= REMAINDER SPACE integer SPACE integer NEWLINE",
+ /*  11 */ "expr ::= BITOR SPACE integer SPACE integer NEWLINE",
+ /*  12 */ "expr ::= BITAND SPACE integer SPACE integer NEWLINE",
+ /*  13 */ "expr ::= BITXOR SPACE integer SPACE integer NEWLINE",
+ /*  14 */ "expr ::= ABSOLUTE SPACE integer NEWLINE",
+ /*  15 */ "expr ::= NEGATE SPACE integer NEWLINE",
+ /*  16 */ "expr ::= INCREMENT SPACE integer NEWLINE",
+ /*  17 */ "expr ::= DECREMENT SPACE integer NEWLINE",
 };
 #endif /* NDEBUG */
 #endif
@@ -874,40 +904,46 @@ static void yy_shift(
 ** of that rule */
 static const YYCODETYPE yyRuleInfoLhs[] = {
     17,  /* (0) program ::= expr */
-    18,  /* (1) expr ::= PLUS expr expr */
-    18,  /* (2) expr ::= MINUS expr expr */
-    18,  /* (3) expr ::= TIMES expr expr */
-    18,  /* (4) expr ::= DIVIDE expr expr */
-    18,  /* (5) expr ::= REMAINDER expr expr */
-    18,  /* (6) expr ::= BITOR expr expr */
-    18,  /* (7) expr ::= BITAND expr expr */
-    18,  /* (8) expr ::= BITXOR expr expr */
-    18,  /* (9) expr ::= ABSOLUTE expr */
-    18,  /* (10) expr ::= NEGATE expr */
-    18,  /* (11) expr ::= INCREMENT expr */
-    18,  /* (12) expr ::= DECREMENT expr */
-    18,  /* (13) expr ::= LPAREN expr RPAREN */
-    18,  /* (14) expr ::= INTEGER */
+    17,  /* (1) program ::= integer SPACE expr */
+    17,  /* (2) program ::= control_block SPACE expr */
+    17,  /* (3) program ::= control_block SPACE integer SPACE expr */
+    19,  /* (4) integer ::= INTEGER */
+    20,  /* (5) control_block ::= CONTROL */
+    18,  /* (6) expr ::= PLUS SPACE integer SPACE integer NEWLINE */
+    18,  /* (7) expr ::= MINUS SPACE integer SPACE integer NEWLINE */
+    18,  /* (8) expr ::= TIMES SPACE integer SPACE integer NEWLINE */
+    18,  /* (9) expr ::= DIVIDE SPACE integer SPACE integer NEWLINE */
+    18,  /* (10) expr ::= REMAINDER SPACE integer SPACE integer NEWLINE */
+    18,  /* (11) expr ::= BITOR SPACE integer SPACE integer NEWLINE */
+    18,  /* (12) expr ::= BITAND SPACE integer SPACE integer NEWLINE */
+    18,  /* (13) expr ::= BITXOR SPACE integer SPACE integer NEWLINE */
+    18,  /* (14) expr ::= ABSOLUTE SPACE integer NEWLINE */
+    18,  /* (15) expr ::= NEGATE SPACE integer NEWLINE */
+    18,  /* (16) expr ::= INCREMENT SPACE integer NEWLINE */
+    18,  /* (17) expr ::= DECREMENT SPACE integer NEWLINE */
 };
 
 /* For rule J, yyRuleInfoNRhs[J] contains the negative of the number
 ** of symbols on the right-hand side of that rule. */
 static const signed char yyRuleInfoNRhs[] = {
    -1,  /* (0) program ::= expr */
-   -3,  /* (1) expr ::= PLUS expr expr */
-   -3,  /* (2) expr ::= MINUS expr expr */
-   -3,  /* (3) expr ::= TIMES expr expr */
-   -3,  /* (4) expr ::= DIVIDE expr expr */
-   -3,  /* (5) expr ::= REMAINDER expr expr */
-   -3,  /* (6) expr ::= BITOR expr expr */
-   -3,  /* (7) expr ::= BITAND expr expr */
-   -3,  /* (8) expr ::= BITXOR expr expr */
-   -2,  /* (9) expr ::= ABSOLUTE expr */
-   -2,  /* (10) expr ::= NEGATE expr */
-   -2,  /* (11) expr ::= INCREMENT expr */
-   -2,  /* (12) expr ::= DECREMENT expr */
-   -3,  /* (13) expr ::= LPAREN expr RPAREN */
-   -1,  /* (14) expr ::= INTEGER */
+   -3,  /* (1) program ::= integer SPACE expr */
+   -3,  /* (2) program ::= control_block SPACE expr */
+   -5,  /* (3) program ::= control_block SPACE integer SPACE expr */
+   -1,  /* (4) integer ::= INTEGER */
+   -1,  /* (5) control_block ::= CONTROL */
+   -6,  /* (6) expr ::= PLUS SPACE integer SPACE integer NEWLINE */
+   -6,  /* (7) expr ::= MINUS SPACE integer SPACE integer NEWLINE */
+   -6,  /* (8) expr ::= TIMES SPACE integer SPACE integer NEWLINE */
+   -6,  /* (9) expr ::= DIVIDE SPACE integer SPACE integer NEWLINE */
+   -6,  /* (10) expr ::= REMAINDER SPACE integer SPACE integer NEWLINE */
+   -6,  /* (11) expr ::= BITOR SPACE integer SPACE integer NEWLINE */
+   -6,  /* (12) expr ::= BITAND SPACE integer SPACE integer NEWLINE */
+   -6,  /* (13) expr ::= BITXOR SPACE integer SPACE integer NEWLINE */
+   -4,  /* (14) expr ::= ABSOLUTE SPACE integer NEWLINE */
+   -4,  /* (15) expr ::= NEGATE SPACE integer NEWLINE */
+   -4,  /* (16) expr ::= INCREMENT SPACE integer NEWLINE */
+   -4,  /* (17) expr ::= DECREMENT SPACE integer NEWLINE */
 };
 
 static void yy_accept(yyParser*);  /* Forward Declaration */
@@ -952,167 +988,200 @@ static YYACTIONTYPE yy_reduce(
       case 0: /* program ::= expr */
 {
 
-  yylhsminor.yy19 = arith_assign_production_expression_to_program(context, yymsp[0].minor.yy19);
+  yylhsminor.yy9 = arith_assign_production_expr_to_program(context, yymsp[0].minor.yy9);
   if (!arith_parse_state_is_failure(context))
   {
-    arith_parse_state_set_stored_tree(context, yylhsminor.yy19);
+    arith_parse_state_set_stored_tree(context, yylhsminor.yy9);
   }
 }
-  yymsp[0].minor.yy19 = yylhsminor.yy19;
+  yymsp[0].minor.yy9 = yylhsminor.yy9;
         break;
-      case 1: /* expr ::= PLUS expr expr */
+      case 1: /* program ::= integer SPACE expr */
 {
 
-  yylhsminor.yy19 = arith_custom_production_BinOpPlus(context, yymsp[-2].minor.yy0, yymsp[-1].minor.yy19, yymsp[0].minor.yy19);
+  yylhsminor.yy9 = arith_custom_production_result_expr_to_program(context, yymsp[-2].minor.yy9, yymsp[-1].minor.yy0, yymsp[0].minor.yy9);
   if (!arith_parse_state_is_failure(context))
   {
-    arith_parse_state_set_stored_tree(context, yylhsminor.yy19);
+    arith_parse_state_set_stored_tree(context, yylhsminor.yy9);
   }
 }
-  yymsp[-2].minor.yy19 = yylhsminor.yy19;
+  yymsp[-2].minor.yy9 = yylhsminor.yy9;
         break;
-      case 2: /* expr ::= MINUS expr expr */
+      case 2: /* program ::= control_block SPACE expr */
 {
 
-  yylhsminor.yy19 = arith_custom_production_BinOpMinus(context, yymsp[-2].minor.yy0, yymsp[-1].minor.yy19, yymsp[0].minor.yy19);
+  yylhsminor.yy9 = arith_custom_production_control_expr_to_program(context, yymsp[-2].minor.yy9, yymsp[-1].minor.yy0, yymsp[0].minor.yy9);
   if (!arith_parse_state_is_failure(context))
   {
-    arith_parse_state_set_stored_tree(context, yylhsminor.yy19);
+    arith_parse_state_set_stored_tree(context, yylhsminor.yy9);
   }
 }
-  yymsp[-2].minor.yy19 = yylhsminor.yy19;
+  yymsp[-2].minor.yy9 = yylhsminor.yy9;
         break;
-      case 3: /* expr ::= TIMES expr expr */
+      case 3: /* program ::= control_block SPACE integer SPACE expr */
 {
 
-  yylhsminor.yy19 = arith_custom_production_BinOpTimes(context, yymsp[-2].minor.yy0, yymsp[-1].minor.yy19, yymsp[0].minor.yy19);
+  yylhsminor.yy9 = arith_custom_production_control_result_expr_to_program(context, yymsp[-4].minor.yy9, yymsp[-3].minor.yy0, yymsp[-2].minor.yy9, yymsp[-1].minor.yy0, yymsp[0].minor.yy9);
   if (!arith_parse_state_is_failure(context))
   {
-    arith_parse_state_set_stored_tree(context, yylhsminor.yy19);
+    arith_parse_state_set_stored_tree(context, yylhsminor.yy9);
   }
 }
-  yymsp[-2].minor.yy19 = yylhsminor.yy19;
+  yymsp[-4].minor.yy9 = yylhsminor.yy9;
         break;
-      case 4: /* expr ::= DIVIDE expr expr */
+      case 4: /* integer ::= INTEGER */
 {
 
-  yylhsminor.yy19 = arith_custom_production_BinOpDivide(context, yymsp[-2].minor.yy0, yymsp[-1].minor.yy19, yymsp[0].minor.yy19);
+  yylhsminor.yy9 = arith_custom_production_FromInteger(context, yymsp[0].minor.yy0);
   if (!arith_parse_state_is_failure(context))
   {
-    arith_parse_state_set_stored_tree(context, yylhsminor.yy19);
+    arith_parse_state_set_stored_tree(context, yylhsminor.yy9);
   }
 }
-  yymsp[-2].minor.yy19 = yylhsminor.yy19;
+  yymsp[0].minor.yy9 = yylhsminor.yy9;
         break;
-      case 5: /* expr ::= REMAINDER expr expr */
+      case 5: /* control_block ::= CONTROL */
 {
 
-  yylhsminor.yy19 = arith_custom_production_BinOpRemainder(context, yymsp[-2].minor.yy0, yymsp[-1].minor.yy19, yymsp[0].minor.yy19);
+  yylhsminor.yy9 = arith_custom_production_FromControl(context, yymsp[0].minor.yy0);
   if (!arith_parse_state_is_failure(context))
   {
-    arith_parse_state_set_stored_tree(context, yylhsminor.yy19);
+    arith_parse_state_set_stored_tree(context, yylhsminor.yy9);
   }
 }
-  yymsp[-2].minor.yy19 = yylhsminor.yy19;
+  yymsp[0].minor.yy9 = yylhsminor.yy9;
         break;
-      case 6: /* expr ::= BITOR expr expr */
+      case 6: /* expr ::= PLUS SPACE integer SPACE integer NEWLINE */
 {
 
-  yylhsminor.yy19 = arith_custom_production_BinOpBitOr(context, yymsp[-2].minor.yy0, yymsp[-1].minor.yy19, yymsp[0].minor.yy19);
+  yylhsminor.yy9 = arith_custom_production_BinOpPlus(context, yymsp[-5].minor.yy0, yymsp[-4].minor.yy0, yymsp[-3].minor.yy9, yymsp[-2].minor.yy0, yymsp[-1].minor.yy9, yymsp[0].minor.yy0);
   if (!arith_parse_state_is_failure(context))
   {
-    arith_parse_state_set_stored_tree(context, yylhsminor.yy19);
+    arith_parse_state_set_stored_tree(context, yylhsminor.yy9);
   }
 }
-  yymsp[-2].minor.yy19 = yylhsminor.yy19;
+  yymsp[-5].minor.yy9 = yylhsminor.yy9;
         break;
-      case 7: /* expr ::= BITAND expr expr */
+      case 7: /* expr ::= MINUS SPACE integer SPACE integer NEWLINE */
 {
 
-  yylhsminor.yy19 = arith_custom_production_BinOpBitAnd(context, yymsp[-2].minor.yy0, yymsp[-1].minor.yy19, yymsp[0].minor.yy19);
+  yylhsminor.yy9 = arith_custom_production_BinOpMinus(context, yymsp[-5].minor.yy0, yymsp[-4].minor.yy0, yymsp[-3].minor.yy9, yymsp[-2].minor.yy0, yymsp[-1].minor.yy9, yymsp[0].minor.yy0);
   if (!arith_parse_state_is_failure(context))
   {
-    arith_parse_state_set_stored_tree(context, yylhsminor.yy19);
+    arith_parse_state_set_stored_tree(context, yylhsminor.yy9);
   }
 }
-  yymsp[-2].minor.yy19 = yylhsminor.yy19;
+  yymsp[-5].minor.yy9 = yylhsminor.yy9;
         break;
-      case 8: /* expr ::= BITXOR expr expr */
+      case 8: /* expr ::= TIMES SPACE integer SPACE integer NEWLINE */
 {
 
-  yylhsminor.yy19 = arith_custom_production_BinOpBitXor(context, yymsp[-2].minor.yy0, yymsp[-1].minor.yy19, yymsp[0].minor.yy19);
+  yylhsminor.yy9 = arith_custom_production_BinOpTimes(context, yymsp[-5].minor.yy0, yymsp[-4].minor.yy0, yymsp[-3].minor.yy9, yymsp[-2].minor.yy0, yymsp[-1].minor.yy9, yymsp[0].minor.yy0);
   if (!arith_parse_state_is_failure(context))
   {
-    arith_parse_state_set_stored_tree(context, yylhsminor.yy19);
+    arith_parse_state_set_stored_tree(context, yylhsminor.yy9);
   }
 }
-  yymsp[-2].minor.yy19 = yylhsminor.yy19;
+  yymsp[-5].minor.yy9 = yylhsminor.yy9;
         break;
-      case 9: /* expr ::= ABSOLUTE expr */
+      case 9: /* expr ::= DIVIDE SPACE integer SPACE integer NEWLINE */
 {
 
-  yylhsminor.yy19 = arith_custom_production_UnOpAbsolute(context, yymsp[-1].minor.yy0, yymsp[0].minor.yy19);
+  yylhsminor.yy9 = arith_custom_production_BinOpDivide(context, yymsp[-5].minor.yy0, yymsp[-4].minor.yy0, yymsp[-3].minor.yy9, yymsp[-2].minor.yy0, yymsp[-1].minor.yy9, yymsp[0].minor.yy0);
   if (!arith_parse_state_is_failure(context))
   {
-    arith_parse_state_set_stored_tree(context, yylhsminor.yy19);
+    arith_parse_state_set_stored_tree(context, yylhsminor.yy9);
   }
 }
-  yymsp[-1].minor.yy19 = yylhsminor.yy19;
+  yymsp[-5].minor.yy9 = yylhsminor.yy9;
         break;
-      case 10: /* expr ::= NEGATE expr */
+      case 10: /* expr ::= REMAINDER SPACE integer SPACE integer NEWLINE */
 {
 
-  yylhsminor.yy19 = arith_custom_production_UnOpNegate(context, yymsp[-1].minor.yy0, yymsp[0].minor.yy19);
+  yylhsminor.yy9 = arith_custom_production_BinOpRemainder(context, yymsp[-5].minor.yy0, yymsp[-4].minor.yy0, yymsp[-3].minor.yy9, yymsp[-2].minor.yy0, yymsp[-1].minor.yy9, yymsp[0].minor.yy0);
   if (!arith_parse_state_is_failure(context))
   {
-    arith_parse_state_set_stored_tree(context, yylhsminor.yy19);
+    arith_parse_state_set_stored_tree(context, yylhsminor.yy9);
   }
 }
-  yymsp[-1].minor.yy19 = yylhsminor.yy19;
+  yymsp[-5].minor.yy9 = yylhsminor.yy9;
         break;
-      case 11: /* expr ::= INCREMENT expr */
+      case 11: /* expr ::= BITOR SPACE integer SPACE integer NEWLINE */
 {
 
-  yylhsminor.yy19 = arith_custom_production_UnOpIncrement(context, yymsp[-1].minor.yy0, yymsp[0].minor.yy19);
+  yylhsminor.yy9 = arith_custom_production_BinOpBitOr(context, yymsp[-5].minor.yy0, yymsp[-4].minor.yy0, yymsp[-3].minor.yy9, yymsp[-2].minor.yy0, yymsp[-1].minor.yy9, yymsp[0].minor.yy0);
   if (!arith_parse_state_is_failure(context))
   {
-    arith_parse_state_set_stored_tree(context, yylhsminor.yy19);
+    arith_parse_state_set_stored_tree(context, yylhsminor.yy9);
   }
 }
-  yymsp[-1].minor.yy19 = yylhsminor.yy19;
+  yymsp[-5].minor.yy9 = yylhsminor.yy9;
         break;
-      case 12: /* expr ::= DECREMENT expr */
+      case 12: /* expr ::= BITAND SPACE integer SPACE integer NEWLINE */
 {
 
-  yylhsminor.yy19 = arith_custom_production_UnOpDecrement(context, yymsp[-1].minor.yy0, yymsp[0].minor.yy19);
+  yylhsminor.yy9 = arith_custom_production_BinOpBitAnd(context, yymsp[-5].minor.yy0, yymsp[-4].minor.yy0, yymsp[-3].minor.yy9, yymsp[-2].minor.yy0, yymsp[-1].minor.yy9, yymsp[0].minor.yy0);
   if (!arith_parse_state_is_failure(context))
   {
-    arith_parse_state_set_stored_tree(context, yylhsminor.yy19);
+    arith_parse_state_set_stored_tree(context, yylhsminor.yy9);
   }
 }
-  yymsp[-1].minor.yy19 = yylhsminor.yy19;
+  yymsp[-5].minor.yy9 = yylhsminor.yy9;
         break;
-      case 13: /* expr ::= LPAREN expr RPAREN */
+      case 13: /* expr ::= BITXOR SPACE integer SPACE integer NEWLINE */
 {
 
-  yylhsminor.yy19 = arith_assign_production_Parenthesised(context, yymsp[-2].minor.yy0, yymsp[-1].minor.yy19, yymsp[0].minor.yy0);
+  yylhsminor.yy9 = arith_custom_production_BinOpBitXor(context, yymsp[-5].minor.yy0, yymsp[-4].minor.yy0, yymsp[-3].minor.yy9, yymsp[-2].minor.yy0, yymsp[-1].minor.yy9, yymsp[0].minor.yy0);
   if (!arith_parse_state_is_failure(context))
   {
-    arith_parse_state_set_stored_tree(context, yylhsminor.yy19);
+    arith_parse_state_set_stored_tree(context, yylhsminor.yy9);
   }
 }
-  yymsp[-2].minor.yy19 = yylhsminor.yy19;
+  yymsp[-5].minor.yy9 = yylhsminor.yy9;
         break;
-      case 14: /* expr ::= INTEGER */
+      case 14: /* expr ::= ABSOLUTE SPACE integer NEWLINE */
 {
 
-  yylhsminor.yy19 = arith_custom_production_FromInteger(context, yymsp[0].minor.yy0);
+  yylhsminor.yy9 = arith_custom_production_UnOpAbsolute(context, yymsp[-3].minor.yy0, yymsp[-2].minor.yy0, yymsp[-1].minor.yy9, yymsp[0].minor.yy0);
   if (!arith_parse_state_is_failure(context))
   {
-    arith_parse_state_set_stored_tree(context, yylhsminor.yy19);
+    arith_parse_state_set_stored_tree(context, yylhsminor.yy9);
   }
 }
-  yymsp[0].minor.yy19 = yylhsminor.yy19;
+  yymsp[-3].minor.yy9 = yylhsminor.yy9;
+        break;
+      case 15: /* expr ::= NEGATE SPACE integer NEWLINE */
+{
+
+  yylhsminor.yy9 = arith_custom_production_UnOpNegate(context, yymsp[-3].minor.yy0, yymsp[-2].minor.yy0, yymsp[-1].minor.yy9, yymsp[0].minor.yy0);
+  if (!arith_parse_state_is_failure(context))
+  {
+    arith_parse_state_set_stored_tree(context, yylhsminor.yy9);
+  }
+}
+  yymsp[-3].minor.yy9 = yylhsminor.yy9;
+        break;
+      case 16: /* expr ::= INCREMENT SPACE integer NEWLINE */
+{
+
+  yylhsminor.yy9 = arith_custom_production_UnOpIncrement(context, yymsp[-3].minor.yy0, yymsp[-2].minor.yy0, yymsp[-1].minor.yy9, yymsp[0].minor.yy0);
+  if (!arith_parse_state_is_failure(context))
+  {
+    arith_parse_state_set_stored_tree(context, yylhsminor.yy9);
+  }
+}
+  yymsp[-3].minor.yy9 = yylhsminor.yy9;
+        break;
+      case 17: /* expr ::= DECREMENT SPACE integer NEWLINE */
+{
+
+  yylhsminor.yy9 = arith_custom_production_UnOpDecrement(context, yymsp[-3].minor.yy0, yymsp[-2].minor.yy0, yymsp[-1].minor.yy9, yymsp[0].minor.yy0);
+  if (!arith_parse_state_is_failure(context))
+  {
+    arith_parse_state_set_stored_tree(context, yylhsminor.yy9);
+  }
+}
+  yymsp[-3].minor.yy9 = yylhsminor.yy9;
         break;
       default:
         break;

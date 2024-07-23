@@ -16,7 +16,7 @@ const char*arith_token_names[arith_token_count] = {
   [arith_token_INCREMENT] = "INCREMENT",
   [arith_token_DECREMENT] = "DECREMENT",
   [arith_token_INTEGER] = "INTEGER",
-  [arith_token_LPAREN] = "LPAREN",
-  [arith_token_RPAREN] = "RPAREN",
-  [arith_token_WHITESPACE] = "WHITESPACE",
+  [arith_token_SPACE] = "SPACE",
+  [arith_token_NEWLINE] = "NEWLINE",
+  [arith_token_CONTROL] = "CONTROL",
 };

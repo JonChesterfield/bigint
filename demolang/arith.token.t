@@ -18,9 +18,9 @@ enum arith_token {
   arith_token_INCREMENT = 11,
   arith_token_DECREMENT = 12,
   arith_token_INTEGER = 13,
-  arith_token_LPAREN = 14,
-  arith_token_RPAREN = 15,
-  arith_token_WHITESPACE = 16,
+  arith_token_SPACE = 14,
+  arith_token_NEWLINE = 15,
+  arith_token_CONTROL = 16,
 };
 enum { arith_token_count = 17 };
 
