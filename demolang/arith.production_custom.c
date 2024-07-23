@@ -344,7 +344,7 @@ proto arith_custom_production_control_expr_to_program(
 {
   proto_context ctx = arith_parse_state_get_tree_context(parse_ctx);
   proto_destroy(ctx, x1);
-  return arith_assign_production_expr_to_program(parse_ctx, x3);
+  return x3;
 }
 
 proto arith_custom_production_control_result_expr_to_program(

@@ -239,6 +239,10 @@ static proto proto_unary(proto_context ctx, proto x,
     }
 
   proto y = proto_create(ctx, 1);
+  if (!proto_valid(ctx, y))
+    {
+      return proto_create_invalid();
+    }
 
   mp_int mx = proto_to_mp_int(x);
   mp_int my = proto_to_mp_int(y);
@@ -268,6 +272,10 @@ static proto proto_binary(proto_context ctx, proto x, proto y,
     }
 
   proto z = proto_create(ctx, 1);
+  if (!proto_valid(ctx, z))
+    {
+      return proto_create_invalid();
+    }
 
   mp_int mx = proto_to_mp_int(x);
   mp_int my = proto_to_mp_int(y);
@@ -297,6 +305,11 @@ static proto proto_mutating_unary(proto_context ctx, proto x,
     }
 
   proto res = proto_copy(ctx, x);
+  if (!proto_valid(ctx, res))
+    {
+      return proto_create_invalid();
+    }
+
   mp_int mx = proto_to_mp_int(res);
   global_set(&ctx);
   mp_err err = func(&mx);

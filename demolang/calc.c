@@ -33,7 +33,7 @@ static int print_token(lexer_token_t s)
   return 0;
 }
 
-int calclib(const uint8_t *bytes, size_t N, bool verbose)
+int calclib_repeat(const uint8_t *bytes, size_t N, bool verbose, bool on_second_try)
 {
   {
     // Reject some strings with no chance of parsing before
@@ -58,12 +58,27 @@ int calclib(const uint8_t *bytes, size_t N, bool verbose)
   struct arith_parse_state parse_state_lemon;
   parse_state_lemon.stored = proto_sentinel();
 
-  uint64_t malloc_state = UINT64_MAX; 
+  uint64_t malloc_state = UINT64_MAX;
   parse_state_lemon.context = (proto_context){.malloc_state = &malloc_state};
-  
-  for (lexer_iterator_t lexer_iterator =
-           lexer_iterator_t_create((const char *)bytes, N);
-       !lexer_iterator_t_empty(lexer_iterator);)
+
+
+  lexer_iterator_t lexer_iterator =
+    lexer_iterator_t_create((const char *)bytes, N);
+
+    if (on_second_try)
+      {
+        // First time around we ran out of memory. That limit is encoded
+        // in the first two tokens. Throw those away to see if the case would
+        // have been interesting if we didn't run out of memory
+        lexer_token_t control_token =
+          arith_lexer_iterator_step(lexer, &lexer_iterator);
+        if (control_token.id != arith_token_CONTROL) { return 6; }
+        lexer_token_t space_token =
+          arith_lexer_iterator_step(lexer, &lexer_iterator);
+        if (space_token.id != arith_token_SPACE) { return 7; }
+      }
+    
+    while(!lexer_iterator_t_empty(lexer_iterator))
     {
       lexer_token_t lexer_token =
           arith_lexer_iterator_step(lexer, &lexer_iterator);
@@ -113,11 +128,32 @@ int calclib(const uint8_t *bytes, size_t N, bool verbose)
       proto_dump(parse_state_lemon.context, lemon_res);
     }
 
+  bool interesting = false;
+  if (proto_valid(parse_state_lemon.context, lemon_res))
+    {
+      interesting = true;
+    }
+
   proto_destroy(parse_state_lemon.context, lemon_res);
   arith_parser_lemon_finalize(&parser);
   arith_lexer_destroy(lexer);
 
-  return proto_valid(parse_state_lemon.context, lemon_res) ? 0 : 5;
+
+  if (!interesting && 
+      (malloc_state == 0))
+    {
+      // Ran out of memory, would it have been interesting if we didn't run out? 
+      if (!on_second_try) {
+        return calclib_repeat(bytes, N, verbose, true);
+      }
+    }
+  
+  return interesting ? 0 : 5;
+}
+
+int calclib(const uint8_t *bytes, size_t N, bool verbose)
+{
+  return calclib_repeat(bytes, N, verbose, false);
 }
 
 int LLVMFuzzerTestOneInput(const uint8_t *Data, size_t Size)
@@ -133,24 +169,21 @@ int LLVMFuzzerTestOneInput(const uint8_t *Data, size_t Size)
     }
 }
 
-
-
 EVILUNIT_MODULE(calc)
 {
   TEST("passing cases")
-    {
-      const char * cases[] = {
+  {
+    const char *cases[] = {
         "add 3 4\n",
         "9 add 4 5\n",
         "4 sub 10 6\n",
         "ABC 10 add 5 5\n",
-      };
-      size_t N = sizeof(cases)/sizeof(cases[0]);
-      for (size_t i = 0; i < N; i++)
-        {
-          CHECK(0 == calclib((const unsigned char*)cases[i],
-                             __builtin_strlen(cases[i]),
-                             false));
-        }
-    }
+    };
+    size_t N = sizeof(cases) / sizeof(cases[0]);
+    for (size_t i = 0; i < N; i++)
+      {
+        CHECK(0 == calclib((const unsigned char *)cases[i],
+                           __builtin_strlen(cases[i]), false));
+      }
+  }
 }
