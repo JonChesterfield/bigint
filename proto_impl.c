@@ -267,6 +267,10 @@ proto proto_abs(proto x) { return proto_unary(x, mp_abs); }
 proto proto_neg(proto x) { return proto_unary(x, mp_neg); }
 
 proto proto_incr(proto x) {
+  if (!proto_valid(x)) {
+    return proto_create_invalid();
+  }
+
   proto res = proto_copy(x);
   mp_int mx = proto_to_mp_int(res);
   mp_err err = mp_incr(&mx);
@@ -280,6 +284,10 @@ proto proto_incr(proto x) {
 }
 
 proto proto_decr(proto x) {
+  if (!proto_valid(x)) {
+    return proto_create_invalid();
+  }
+
   proto res = proto_copy(x);
   mp_int mx = proto_to_mp_int(res);
   mp_err err = mp_decr(&mx);
