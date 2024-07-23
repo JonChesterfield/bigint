@@ -231,6 +231,9 @@ mp_err mp_shrink(mp_int *a)
 static proto proto_unary(proto x,
                           mp_err (*func)(const mp_int *,
                                          mp_int *)) {
+  if (!proto_valid(x)) { return proto_create_invalid(); }
+
+  
   proto y = proto_create(1);
 
   mp_int mx = proto_to_mp_int(x);
@@ -248,8 +251,10 @@ static proto proto_unary(proto x,
 static proto proto_binary(proto x, proto y,
                           mp_err (*func)(const mp_int *, const mp_int *,
                                          mp_int *)) {
+  if (!proto_valid(x) || !proto_valid(y)) { return proto_create_invalid(); }
+  
   proto z = proto_create(1);
-
+  
   mp_int mx = proto_to_mp_int(x);
   mp_int my = proto_to_mp_int(y);
   mp_int mz = proto_to_mp_int(z);
