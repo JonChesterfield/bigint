@@ -51,15 +51,6 @@ VENDOR_HDR := $(VENDOR_HDR) $(VENDOR_LIBTOMMATH_HDR)
 
 ifeq (,$(wildcard $(VENDOR_DIR)/libtommath.mk))
 
-define BN_MP_INIT
-@include "libtommath.h"
-/* init a new mp_int */
-mp_err mp_init(mp_int *a)
-{
-  return mp_init_size(a, (size_t)MP_PREC);
-}
-endef
-
 VENDOR_LIBTOM_REPLACEMENTS := bn_mp_init.c tommath_overrides.h
 VENDOR_LIBTOM_DELETIONS := .github changes.txt helper.pl testme.sh bn_mp_fwrite.c bn_mp_prime_rand.c bn_mp_init_size.c bn_mp_grow.c bn_mp_shrink.c bn_mp_clear.c
 
@@ -92,6 +83,5 @@ $(VENDOR_DIR)/libtommath.mk: $(FETCH_DIR)/libtommath/libtommath.zip
 	printf "VENDOR_LIBTOMMATH_FILES :=" > $@
 	find $(VENDOR_DIR)/libtommath -maxdepth 1 -type f -iname '*.[hc]' -printf ' \\\n  %p' >> $@
 	echo "" >> $@
-
 
 endif
