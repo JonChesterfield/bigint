@@ -61,7 +61,7 @@ typedef struct arith_parser_lemon_state arith_parser_lemon_state;
 __attribute__((unused)) static int arith_LemonFallback(int);
 
 struct yyParser;
-enum {verbose_error = 1,};
+enum {verbose_error = 0,};
 __attribute__((unused)) static void arith_LemonFailure(struct yyParser *);
 __attribute__((unused)) static void arith_LemonStackOverflow(struct yyParser *);
 

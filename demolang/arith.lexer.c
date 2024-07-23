@@ -325,17 +325,17 @@ lexer_token_t arith_lexer_a2pi_iterator_step(lexer_t lex, lexer_iterator_t *iter
 #endif
 
 
-// Lexer using engine re2c
-#if !ARITH_LEXER_RE2C_ENABLE
-#error "Default arith engine re2c is not enabled"
+// Lexer using engine a2pc
+#if !ARITH_LEXER_A2PC_ENABLE
+#error "Default arith engine a2pc is not enabled"
 #endif
-lexer_t arith_lexer_create(void) { return arith_lexer_re2c_create(); }
-void arith_lexer_destroy(lexer_t lex) { arith_lexer_re2c_destroy(lex); }
-bool arith_lexer_valid(lexer_t lex) { return arith_lexer_re2c_valid(lex); }
-size_t arith_lexer_regex_count(lexer_t lex) { return arith_lexer_re2c_regex_count(lex); }
-lexer_match_t arith_lexer_single_regex_bytes_matching(lexer_t lex, size_t regex_id, lexer_iterator_t iter) { return arith_lexer_re2c_single_regex_bytes_matching(lex, regex_id, iter); }
-lexer_match_t arith_lexer_sequence_regex_bytes_matching(lexer_t lex, lexer_iterator_t iter) { return arith_lexer_re2c_sequence_regex_bytes_matching(lex, iter); }
-lexer_token_t arith_lexer_iterator_step(lexer_t lex, lexer_iterator_t *iter) { return arith_lexer_re2c_iterator_step(lex, iter); }
+lexer_t arith_lexer_create(void) { return arith_lexer_a2pc_create(); }
+void arith_lexer_destroy(lexer_t lex) { arith_lexer_a2pc_destroy(lex); }
+bool arith_lexer_valid(lexer_t lex) { return arith_lexer_a2pc_valid(lex); }
+size_t arith_lexer_regex_count(lexer_t lex) { return arith_lexer_a2pc_regex_count(lex); }
+lexer_match_t arith_lexer_single_regex_bytes_matching(lexer_t lex, size_t regex_id, lexer_iterator_t iter) { return arith_lexer_a2pc_single_regex_bytes_matching(lex, regex_id, iter); }
+lexer_match_t arith_lexer_sequence_regex_bytes_matching(lexer_t lex, lexer_iterator_t iter) { return arith_lexer_a2pc_sequence_regex_bytes_matching(lex, iter); }
+lexer_token_t arith_lexer_iterator_step(lexer_t lex, lexer_iterator_t *iter) { return arith_lexer_a2pc_iterator_step(lex, iter); }
 
 // TokenDiscard start
 bool arith_lexer_discard_token(enum arith_token id)

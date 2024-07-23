@@ -62,44 +62,44 @@ extern const char*arith_token_prefix_regexes[arith_token_count];
 #define ARITH_LEXER_POSIX_ENABLE 0
 // Engine re2 disabled by the language spec
 #define ARITH_LEXER_RE2_ENABLE 0
-
-
-
-// Engine re2c enabled by the language spec
-#if !defined(LEXER_RE2C_ENABLE) || LEXER_RE2C_ENABLE
-#define ARITH_LEXER_RE2C_ENABLE 1
-#else
+// Engine re2c disabled by the language spec
 #define ARITH_LEXER_RE2C_ENABLE 0
+// Engine a2pi disabled by the language spec
+#define ARITH_LEXER_A2PI_ENABLE 0
+
+
+
+// Engine a2pc enabled by the language spec
+#if !defined(LEXER_A2PC_ENABLE) || LEXER_A2PC_ENABLE
+#define ARITH_LEXER_A2PC_ENABLE 1
+#else
+#define ARITH_LEXER_A2PC_ENABLE 0
 #endif
       
-#if ARITH_LEXER_RE2C_ENABLE
-lexer_t arith_lexer_re2c_create(void);
-void arith_lexer_re2c_destroy(lexer_t);
-bool arith_lexer_re2c_valid(lexer_t);
-lexer_token_t arith_lexer_re2c_iterator_step(lexer_t, lexer_iterator_t *);
-size_t arith_lexer_re2c_regex_count(lexer_t l);
-lexer_match_t arith_lexer_re2c_single_regex_bytes_matching(
+#if ARITH_LEXER_A2PC_ENABLE
+lexer_t arith_lexer_a2pc_create(void);
+void arith_lexer_a2pc_destroy(lexer_t);
+bool arith_lexer_a2pc_valid(lexer_t);
+lexer_token_t arith_lexer_a2pc_iterator_step(lexer_t, lexer_iterator_t *);
+size_t arith_lexer_a2pc_regex_count(lexer_t l);
+lexer_match_t arith_lexer_a2pc_single_regex_bytes_matching(
   lexer_t l, size_t regex_idx, lexer_iterator_t iter);
-lexer_match_t arith_lexer_re2c_sequence_regex_bytes_matching(
+lexer_match_t arith_lexer_a2pc_sequence_regex_bytes_matching(
   lexer_t l, lexer_iterator_t iter);
 
 
-static const lexer_function_table_t arith_lexer_re2c_table = {
-  .name = "arith_lexer_re2c",
-  .create = arith_lexer_re2c_create,
-  .destroy = arith_lexer_re2c_destroy,
-  .valid = arith_lexer_re2c_valid,
-  .iterator_step = arith_lexer_re2c_iterator_step,
-  .regex_count = arith_lexer_re2c_regex_count,
-  .single_regex_bytes_matching = arith_lexer_re2c_single_regex_bytes_matching,
-  .sequence_regex_bytes_matching = arith_lexer_re2c_sequence_regex_bytes_matching,
+static const lexer_function_table_t arith_lexer_a2pc_table = {
+  .name = "arith_lexer_a2pc",
+  .create = arith_lexer_a2pc_create,
+  .destroy = arith_lexer_a2pc_destroy,
+  .valid = arith_lexer_a2pc_valid,
+  .iterator_step = arith_lexer_a2pc_iterator_step,
+  .regex_count = arith_lexer_a2pc_regex_count,
+  .single_regex_bytes_matching = arith_lexer_a2pc_single_regex_bytes_matching,
+  .sequence_regex_bytes_matching = arith_lexer_a2pc_sequence_regex_bytes_matching,
 };
-#endif //  ARITH_LEXER_RE2C_ENABLE
+#endif //  ARITH_LEXER_A2PC_ENABLE
 
-// Engine a2pi disabled by the language spec
-#define ARITH_LEXER_A2PI_ENABLE 0
-// Engine a2pc disabled by the language spec
-#define ARITH_LEXER_A2PC_ENABLE 0
 // Engine interp disabled by the language spec
 #define ARITH_LEXER_INTERP_ENABLE 0
 // Engine handwritten disabled by the language spec
