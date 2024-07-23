@@ -88,21 +88,16 @@ void proto_dump(proto x) {
          "}\n");
 }
 
-proto proto_sentinel(void)
-{
+proto proto_sentinel(void) {
   static struct proto_ty p = {
-    .used = ~0,
-    .alloc = ~0,
-    .zpos = false,
+      .used = ~0,
+      .alloc = ~0,
+      .zpos = false,
   };
   return &p;
 }
 
-bool proto_is_sentinel(proto x)
-{
-  return x == proto_sentinel();
-}
-
+bool proto_is_sentinel(proto x) { return x == proto_sentinel(); }
 
 proto proto_from_u32(uint32_t val) {
   proto p = proto_create(1);
@@ -227,13 +222,11 @@ mp_err mp_shrink(mp_int *a)
 }
 #endif
 
+static proto proto_unary(proto x, mp_err (*func)(const mp_int *, mp_int *)) {
+  if (!proto_valid(x)) {
+    return proto_create_invalid();
+  }
 
-static proto proto_unary(proto x,
-                          mp_err (*func)(const mp_int *,
-                                         mp_int *)) {
-  if (!proto_valid(x)) { return proto_create_invalid(); }
-
-  
   proto y = proto_create(1);
 
   mp_int mx = proto_to_mp_int(x);
@@ -251,10 +244,12 @@ static proto proto_unary(proto x,
 static proto proto_binary(proto x, proto y,
                           mp_err (*func)(const mp_int *, const mp_int *,
                                          mp_int *)) {
-  if (!proto_valid(x) || !proto_valid(y)) { return proto_create_invalid(); }
-  
+  if (!proto_valid(x) || !proto_valid(y)) {
+    return proto_create_invalid();
+  }
+
   proto z = proto_create(1);
-  
+
   mp_int mx = proto_to_mp_int(x);
   mp_int my = proto_to_mp_int(y);
   mp_int mz = proto_to_mp_int(z);
@@ -270,6 +265,33 @@ static proto proto_binary(proto x, proto y,
 
 proto proto_abs(proto x) { return proto_unary(x, mp_abs); }
 proto proto_neg(proto x) { return proto_unary(x, mp_neg); }
+
+proto proto_incr(proto x) {
+  proto res = proto_copy(x);
+  mp_int mx = proto_to_mp_int(res);
+  mp_err err = mp_incr(&mx);
+
+  if (err == MP_OKAY) {
+    return mp_int_to_proto(&mx);
+  } else {
+    proto_destroy(res);
+    return proto_create_invalid();
+  }
+}
+
+proto proto_decr(proto x) {
+  proto res = proto_copy(x);
+  mp_int mx = proto_to_mp_int(res);
+  mp_err err = mp_decr(&mx);
+
+  if (err == MP_OKAY) {
+    return mp_int_to_proto(&mx);
+  } else {
+    proto_destroy(res);
+    return proto_create_invalid();
+  }
+}
+
 proto proto_add(proto x, proto y) { return proto_binary(x, y, mp_add); }
 proto proto_sub(proto x, proto y) { return proto_binary(x, y, mp_sub); }
 proto proto_mul(proto x, proto y) { return proto_binary(x, y, mp_mul); }
@@ -301,3 +323,7 @@ static mp_err mp_div_remainder(const mp_int *a, const mp_int *b, mp_int *c) {
 proto proto_rem(proto x, proto y) {
   return proto_binary(x, y, mp_div_remainder);
 }
+
+proto proto_or(proto x, proto y) { return proto_binary(x, y, mp_or); }
+proto proto_and(proto x, proto y) { return proto_binary(x, y, mp_and); }
+proto proto_xor(proto x, proto y) { return proto_binary(x, y, mp_xor); }

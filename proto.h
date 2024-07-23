@@ -22,8 +22,7 @@ void proto_destroy(proto x);
 proto proto_copy(proto x);
 void proto_dump(proto x);
 
-typedef struct 
-{
+typedef struct {
   char unused;
 } proto_context;
 
@@ -58,11 +57,17 @@ size_t proto_into_base10(proto, char *out, size_t N);
 
 proto proto_abs(proto x);
 proto proto_neg(proto x);
+proto proto_incr(proto x);
+proto proto_decr(proto x);
 
 proto proto_add(proto x, proto y);
 proto proto_sub(proto x, proto y);
 proto proto_mul(proto x, proto y);
 proto proto_div(proto x, proto y);
 proto proto_rem(proto x, proto y);
+
+proto proto_or(proto x, proto y);
+proto proto_and(proto x, proto y);
+proto proto_xor(proto x, proto y);
 
 #endif

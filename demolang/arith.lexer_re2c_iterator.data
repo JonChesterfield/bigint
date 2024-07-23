@@ -340,6 +340,466 @@ match:;
 
 }
 
+static lexer_match_t arith_match_BITOR(lexer_t l, lexer_iterator_t iter)
+{
+  const char* YYCURSOR = iter.cursor;
+  const char* YYLIMIT = iter.end;
+    
+  const char* YYMARKER; (void)YYMARKER;
+
+  enum arith_token id = arith_token_count;
+
+  // re2c begin
+  
+{
+  char yych;
+  yych = *YYCURSOR;
+  switch (yych) {
+    case 'o': goto re2c43;
+    default:
+      if (YYLIMIT <= YYCURSOR) goto re2c45;
+      goto re2c41;
+  }
+re2c41:
+  ++YYCURSOR;
+re2c42:
+  { goto failure; }
+re2c43:
+  yych = *++YYCURSOR;
+  switch (yych) {
+    case 'r': goto re2c44;
+    default: goto re2c42;
+  }
+re2c44:
+  ++YYCURSOR;
+  { id = arith_token_BITOR; goto match; }
+re2c45:
+  { goto failure; }
+}
+
+  // re2c finish
+
+  
+
+
+  // If we got here with none matching id is still count but YYCURSOR has
+  // probably been mutated. Set up the variables to indicate failure.
+failure:  
+  assert(id == arith_token_count);
+  YYCURSOR = iter.cursor;
+
+match:;
+
+  return (lexer_match_t)
+  {
+    .regex_id = id,
+    .bytes_count = YYCURSOR - iter.cursor,
+  };
+
+}
+
+static lexer_match_t arith_match_BITAND(lexer_t l, lexer_iterator_t iter)
+{
+  const char* YYCURSOR = iter.cursor;
+  const char* YYLIMIT = iter.end;
+    
+  const char* YYMARKER; (void)YYMARKER;
+
+  enum arith_token id = arith_token_count;
+
+  // re2c begin
+  
+{
+  char yych;
+  yych = *YYCURSOR;
+  switch (yych) {
+    case 'a': goto re2c49;
+    default:
+      if (YYLIMIT <= YYCURSOR) goto re2c53;
+      goto re2c47;
+  }
+re2c47:
+  ++YYCURSOR;
+re2c48:
+  { goto failure; }
+re2c49:
+  yych = *(YYMARKER = ++YYCURSOR);
+  switch (yych) {
+    case 'n': goto re2c50;
+    default: goto re2c48;
+  }
+re2c50:
+  yych = *++YYCURSOR;
+  switch (yych) {
+    case 'd': goto re2c52;
+    default: goto re2c51;
+  }
+re2c51:
+  YYCURSOR = YYMARKER;
+  goto re2c48;
+re2c52:
+  ++YYCURSOR;
+  { id = arith_token_BITAND; goto match; }
+re2c53:
+  { goto failure; }
+}
+
+  // re2c finish
+
+  
+
+
+  // If we got here with none matching id is still count but YYCURSOR has
+  // probably been mutated. Set up the variables to indicate failure.
+failure:  
+  assert(id == arith_token_count);
+  YYCURSOR = iter.cursor;
+
+match:;
+
+  return (lexer_match_t)
+  {
+    .regex_id = id,
+    .bytes_count = YYCURSOR - iter.cursor,
+  };
+
+}
+
+static lexer_match_t arith_match_BITXOR(lexer_t l, lexer_iterator_t iter)
+{
+  const char* YYCURSOR = iter.cursor;
+  const char* YYLIMIT = iter.end;
+    
+  const char* YYMARKER; (void)YYMARKER;
+
+  enum arith_token id = arith_token_count;
+
+  // re2c begin
+  
+{
+  char yych;
+  yych = *YYCURSOR;
+  switch (yych) {
+    case 'x': goto re2c57;
+    default:
+      if (YYLIMIT <= YYCURSOR) goto re2c61;
+      goto re2c55;
+  }
+re2c55:
+  ++YYCURSOR;
+re2c56:
+  { goto failure; }
+re2c57:
+  yych = *(YYMARKER = ++YYCURSOR);
+  switch (yych) {
+    case 'o': goto re2c58;
+    default: goto re2c56;
+  }
+re2c58:
+  yych = *++YYCURSOR;
+  switch (yych) {
+    case 'r': goto re2c60;
+    default: goto re2c59;
+  }
+re2c59:
+  YYCURSOR = YYMARKER;
+  goto re2c56;
+re2c60:
+  ++YYCURSOR;
+  { id = arith_token_BITXOR; goto match; }
+re2c61:
+  { goto failure; }
+}
+
+  // re2c finish
+
+  
+
+
+  // If we got here with none matching id is still count but YYCURSOR has
+  // probably been mutated. Set up the variables to indicate failure.
+failure:  
+  assert(id == arith_token_count);
+  YYCURSOR = iter.cursor;
+
+match:;
+
+  return (lexer_match_t)
+  {
+    .regex_id = id,
+    .bytes_count = YYCURSOR - iter.cursor,
+  };
+
+}
+
+static lexer_match_t arith_match_ABSOLUTE(lexer_t l, lexer_iterator_t iter)
+{
+  const char* YYCURSOR = iter.cursor;
+  const char* YYLIMIT = iter.end;
+    
+  const char* YYMARKER; (void)YYMARKER;
+
+  enum arith_token id = arith_token_count;
+
+  // re2c begin
+  
+{
+  char yych;
+  yych = *YYCURSOR;
+  switch (yych) {
+    case 'a': goto re2c65;
+    default:
+      if (YYLIMIT <= YYCURSOR) goto re2c69;
+      goto re2c63;
+  }
+re2c63:
+  ++YYCURSOR;
+re2c64:
+  { goto failure; }
+re2c65:
+  yych = *(YYMARKER = ++YYCURSOR);
+  switch (yych) {
+    case 'b': goto re2c66;
+    default: goto re2c64;
+  }
+re2c66:
+  yych = *++YYCURSOR;
+  switch (yych) {
+    case 's': goto re2c68;
+    default: goto re2c67;
+  }
+re2c67:
+  YYCURSOR = YYMARKER;
+  goto re2c64;
+re2c68:
+  ++YYCURSOR;
+  { id = arith_token_ABSOLUTE; goto match; }
+re2c69:
+  { goto failure; }
+}
+
+  // re2c finish
+
+  
+
+
+  // If we got here with none matching id is still count but YYCURSOR has
+  // probably been mutated. Set up the variables to indicate failure.
+failure:  
+  assert(id == arith_token_count);
+  YYCURSOR = iter.cursor;
+
+match:;
+
+  return (lexer_match_t)
+  {
+    .regex_id = id,
+    .bytes_count = YYCURSOR - iter.cursor,
+  };
+
+}
+
+static lexer_match_t arith_match_NEGATE(lexer_t l, lexer_iterator_t iter)
+{
+  const char* YYCURSOR = iter.cursor;
+  const char* YYLIMIT = iter.end;
+    
+  const char* YYMARKER; (void)YYMARKER;
+
+  enum arith_token id = arith_token_count;
+
+  // re2c begin
+  
+{
+  char yych;
+  yych = *YYCURSOR;
+  switch (yych) {
+    case 'n': goto re2c73;
+    default:
+      if (YYLIMIT <= YYCURSOR) goto re2c77;
+      goto re2c71;
+  }
+re2c71:
+  ++YYCURSOR;
+re2c72:
+  { goto failure; }
+re2c73:
+  yych = *(YYMARKER = ++YYCURSOR);
+  switch (yych) {
+    case 'e': goto re2c74;
+    default: goto re2c72;
+  }
+re2c74:
+  yych = *++YYCURSOR;
+  switch (yych) {
+    case 'g': goto re2c76;
+    default: goto re2c75;
+  }
+re2c75:
+  YYCURSOR = YYMARKER;
+  goto re2c72;
+re2c76:
+  ++YYCURSOR;
+  { id = arith_token_NEGATE; goto match; }
+re2c77:
+  { goto failure; }
+}
+
+  // re2c finish
+
+  
+
+
+  // If we got here with none matching id is still count but YYCURSOR has
+  // probably been mutated. Set up the variables to indicate failure.
+failure:  
+  assert(id == arith_token_count);
+  YYCURSOR = iter.cursor;
+
+match:;
+
+  return (lexer_match_t)
+  {
+    .regex_id = id,
+    .bytes_count = YYCURSOR - iter.cursor,
+  };
+
+}
+
+static lexer_match_t arith_match_INCREMENT(lexer_t l, lexer_iterator_t iter)
+{
+  const char* YYCURSOR = iter.cursor;
+  const char* YYLIMIT = iter.end;
+    
+  const char* YYMARKER; (void)YYMARKER;
+
+  enum arith_token id = arith_token_count;
+
+  // re2c begin
+  
+{
+  char yych;
+  yych = *YYCURSOR;
+  switch (yych) {
+    case 'i': goto re2c81;
+    default:
+      if (YYLIMIT <= YYCURSOR) goto re2c85;
+      goto re2c79;
+  }
+re2c79:
+  ++YYCURSOR;
+re2c80:
+  { goto failure; }
+re2c81:
+  yych = *(YYMARKER = ++YYCURSOR);
+  switch (yych) {
+    case 'n': goto re2c82;
+    default: goto re2c80;
+  }
+re2c82:
+  yych = *++YYCURSOR;
+  switch (yych) {
+    case 'c': goto re2c84;
+    default: goto re2c83;
+  }
+re2c83:
+  YYCURSOR = YYMARKER;
+  goto re2c80;
+re2c84:
+  ++YYCURSOR;
+  { id = arith_token_INCREMENT; goto match; }
+re2c85:
+  { goto failure; }
+}
+
+  // re2c finish
+
+  
+
+
+  // If we got here with none matching id is still count but YYCURSOR has
+  // probably been mutated. Set up the variables to indicate failure.
+failure:  
+  assert(id == arith_token_count);
+  YYCURSOR = iter.cursor;
+
+match:;
+
+  return (lexer_match_t)
+  {
+    .regex_id = id,
+    .bytes_count = YYCURSOR - iter.cursor,
+  };
+
+}
+
+static lexer_match_t arith_match_DECREMENT(lexer_t l, lexer_iterator_t iter)
+{
+  const char* YYCURSOR = iter.cursor;
+  const char* YYLIMIT = iter.end;
+    
+  const char* YYMARKER; (void)YYMARKER;
+
+  enum arith_token id = arith_token_count;
+
+  // re2c begin
+  
+{
+  char yych;
+  yych = *YYCURSOR;
+  switch (yych) {
+    case 'd': goto re2c89;
+    default:
+      if (YYLIMIT <= YYCURSOR) goto re2c93;
+      goto re2c87;
+  }
+re2c87:
+  ++YYCURSOR;
+re2c88:
+  { goto failure; }
+re2c89:
+  yych = *(YYMARKER = ++YYCURSOR);
+  switch (yych) {
+    case 'e': goto re2c90;
+    default: goto re2c88;
+  }
+re2c90:
+  yych = *++YYCURSOR;
+  switch (yych) {
+    case 'c': goto re2c92;
+    default: goto re2c91;
+  }
+re2c91:
+  YYCURSOR = YYMARKER;
+  goto re2c88;
+re2c92:
+  ++YYCURSOR;
+  { id = arith_token_DECREMENT; goto match; }
+re2c93:
+  { goto failure; }
+}
+
+  // re2c finish
+
+  
+
+
+  // If we got here with none matching id is still count but YYCURSOR has
+  // probably been mutated. Set up the variables to indicate failure.
+failure:  
+  assert(id == arith_token_count);
+  YYCURSOR = iter.cursor;
+
+match:;
+
+  return (lexer_match_t)
+  {
+    .regex_id = id,
+    .bytes_count = YYCURSOR - iter.cursor,
+  };
+
+}
+
 static lexer_match_t arith_match_INTEGER(lexer_t l, lexer_iterator_t iter)
 {
   const char* YYCURSOR = iter.cursor;
@@ -355,7 +815,7 @@ static lexer_match_t arith_match_INTEGER(lexer_t l, lexer_iterator_t iter)
   char yych;
   yych = *YYCURSOR;
   switch (yych) {
-    case '-': goto re2c43;
+    case '-': goto re2c97;
     case '0':
     case '1':
     case '2':
@@ -365,16 +825,16 @@ static lexer_match_t arith_match_INTEGER(lexer_t l, lexer_iterator_t iter)
     case '6':
     case '7':
     case '8':
-    case '9': goto re2c44;
+    case '9': goto re2c98;
     default:
-      if (YYLIMIT <= YYCURSOR) goto re2c46;
-      goto re2c41;
+      if (YYLIMIT <= YYCURSOR) goto re2c100;
+      goto re2c95;
   }
-re2c41:
+re2c95:
   ++YYCURSOR;
-re2c42:
+re2c96:
   { goto failure; }
-re2c43:
+re2c97:
   yych = *++YYCURSOR;
   switch (yych) {
     case '0':
@@ -386,10 +846,10 @@ re2c43:
     case '6':
     case '7':
     case '8':
-    case '9': goto re2c44;
-    default: goto re2c42;
+    case '9': goto re2c98;
+    default: goto re2c96;
   }
-re2c44:
+re2c98:
   yych = *++YYCURSOR;
   switch (yych) {
     case '0':
@@ -401,12 +861,12 @@ re2c44:
     case '6':
     case '7':
     case '8':
-    case '9': goto re2c44;
-    default: goto re2c45;
+    case '9': goto re2c98;
+    default: goto re2c99;
   }
-re2c45:
+re2c99:
   { id = arith_token_INTEGER; goto match; }
-re2c46:
+re2c100:
   { goto failure; }
 }
 
@@ -446,18 +906,18 @@ static lexer_match_t arith_match_LPAREN(lexer_t l, lexer_iterator_t iter)
   char yych;
   yych = *YYCURSOR;
   switch (yych) {
-    case '(': goto re2c49;
+    case '(': goto re2c103;
     default:
-      if (YYLIMIT <= YYCURSOR) goto re2c50;
-      goto re2c48;
+      if (YYLIMIT <= YYCURSOR) goto re2c104;
+      goto re2c102;
   }
-re2c48:
+re2c102:
   ++YYCURSOR;
   { goto failure; }
-re2c49:
+re2c103:
   ++YYCURSOR;
   { id = arith_token_LPAREN; goto match; }
-re2c50:
+re2c104:
   { goto failure; }
 }
 
@@ -497,18 +957,18 @@ static lexer_match_t arith_match_RPAREN(lexer_t l, lexer_iterator_t iter)
   char yych;
   yych = *YYCURSOR;
   switch (yych) {
-    case ')': goto re2c53;
+    case ')': goto re2c107;
     default:
-      if (YYLIMIT <= YYCURSOR) goto re2c54;
-      goto re2c52;
+      if (YYLIMIT <= YYCURSOR) goto re2c108;
+      goto re2c106;
   }
-re2c52:
+re2c106:
   ++YYCURSOR;
   { goto failure; }
-re2c53:
+re2c107:
   ++YYCURSOR;
   { id = arith_token_RPAREN; goto match; }
-re2c54:
+re2c108:
   { goto failure; }
 }
 
@@ -553,15 +1013,15 @@ static lexer_match_t arith_match_WHITESPACE(lexer_t l, lexer_iterator_t iter)
     case '\v':
     case '\f':
     case '\r':
-    case ' ': goto re2c57;
+    case ' ': goto re2c111;
     default:
-      if (YYLIMIT <= YYCURSOR) goto re2c59;
-      goto re2c56;
+      if (YYLIMIT <= YYCURSOR) goto re2c113;
+      goto re2c110;
   }
-re2c56:
+re2c110:
   ++YYCURSOR;
   { goto failure; }
-re2c57:
+re2c111:
   yych = *++YYCURSOR;
   switch (yych) {
     case '\t':
@@ -569,12 +1029,12 @@ re2c57:
     case '\v':
     case '\f':
     case '\r':
-    case ' ': goto re2c57;
-    default: goto re2c58;
+    case ' ': goto re2c111;
+    default: goto re2c112;
   }
-re2c58:
+re2c112:
   { id = arith_token_WHITESPACE; goto match; }
-re2c59:
+re2c113:
   { goto failure; }
 }
 
@@ -623,10 +1083,10 @@ lexer_match_t arith_lexer_re2c_sequence_regex_bytes_matching(lexer_t lex,
     case '\v':
     case '\f':
     case '\r':
-    case ' ': goto re2c63;
-    case '(': goto re2c65;
-    case ')': goto re2c66;
-    case '-': goto re2c67;
+    case ' ': goto re2c117;
+    case '(': goto re2c119;
+    case ')': goto re2c120;
+    case '-': goto re2c121;
     case '0':
     case '1':
     case '2':
@@ -636,21 +1096,25 @@ lexer_match_t arith_lexer_re2c_sequence_regex_bytes_matching(lexer_t lex,
     case '6':
     case '7':
     case '8':
-    case '9': goto re2c68;
-    case 'a': goto re2c70;
-    case 'd': goto re2c71;
-    case 'm': goto re2c72;
-    case 'r': goto re2c73;
-    case 's': goto re2c74;
+    case '9': goto re2c122;
+    case 'a': goto re2c124;
+    case 'd': goto re2c125;
+    case 'i': goto re2c126;
+    case 'm': goto re2c127;
+    case 'n': goto re2c128;
+    case 'o': goto re2c129;
+    case 'r': goto re2c130;
+    case 's': goto re2c131;
+    case 'x': goto re2c132;
     default:
-      if (YYLIMIT <= YYCURSOR) goto re2c86;
-      goto re2c61;
+      if (YYLIMIT <= YYCURSOR) goto re2c157;
+      goto re2c115;
   }
-re2c61:
+re2c115:
   ++YYCURSOR;
-re2c62:
+re2c116:
   { id = arith_token_UNKNOWN; goto match; }
-re2c63:
+re2c117:
   yych = *++YYCURSOR;
   switch (yych) {
     case '\t':
@@ -658,18 +1122,18 @@ re2c63:
     case '\v':
     case '\f':
     case '\r':
-    case ' ': goto re2c63;
-    default: goto re2c64;
+    case ' ': goto re2c117;
+    default: goto re2c118;
   }
-re2c64:
+re2c118:
   { id = arith_token_WHITESPACE; goto match; }
-re2c65:
+re2c119:
   ++YYCURSOR;
   { id = arith_token_LPAREN; goto match; }
-re2c66:
+re2c120:
   ++YYCURSOR;
   { id = arith_token_RPAREN; goto match; }
-re2c67:
+re2c121:
   yych = *++YYCURSOR;
   switch (yych) {
     case '0':
@@ -681,10 +1145,10 @@ re2c67:
     case '6':
     case '7':
     case '8':
-    case '9': goto re2c68;
-    default: goto re2c62;
+    case '9': goto re2c122;
+    default: goto re2c116;
   }
-re2c68:
+re2c122:
   yych = *++YYCURSOR;
   switch (yych) {
     case '0':
@@ -696,90 +1160,174 @@ re2c68:
     case '6':
     case '7':
     case '8':
-    case '9': goto re2c68;
-    default: goto re2c69;
+    case '9': goto re2c122;
+    default: goto re2c123;
   }
-re2c69:
+re2c123:
   { id = arith_token_INTEGER; goto match; }
-re2c70:
+re2c124:
   yych = *(YYMARKER = ++YYCURSOR);
   switch (yych) {
-    case 'd': goto re2c75;
-    default: goto re2c62;
+    case 'b': goto re2c133;
+    case 'd': goto re2c135;
+    case 'n': goto re2c136;
+    default: goto re2c116;
   }
-re2c71:
+re2c125:
   yych = *(YYMARKER = ++YYCURSOR);
   switch (yych) {
-    case 'i': goto re2c77;
-    default: goto re2c62;
+    case 'e': goto re2c137;
+    case 'i': goto re2c138;
+    default: goto re2c116;
   }
-re2c72:
+re2c126:
   yych = *(YYMARKER = ++YYCURSOR);
   switch (yych) {
-    case 'u': goto re2c78;
-    default: goto re2c62;
+    case 'n': goto re2c139;
+    default: goto re2c116;
   }
-re2c73:
+re2c127:
   yych = *(YYMARKER = ++YYCURSOR);
   switch (yych) {
-    case 'e': goto re2c79;
-    default: goto re2c62;
+    case 'u': goto re2c140;
+    default: goto re2c116;
   }
-re2c74:
+re2c128:
   yych = *(YYMARKER = ++YYCURSOR);
   switch (yych) {
-    case 'u': goto re2c80;
-    default: goto re2c62;
+    case 'e': goto re2c141;
+    default: goto re2c116;
   }
-re2c75:
+re2c129:
   yych = *++YYCURSOR;
   switch (yych) {
-    case 'd': goto re2c81;
-    default: goto re2c76;
+    case 'r': goto re2c142;
+    default: goto re2c116;
   }
-re2c76:
+re2c130:
+  yych = *(YYMARKER = ++YYCURSOR);
+  switch (yych) {
+    case 'e': goto re2c143;
+    default: goto re2c116;
+  }
+re2c131:
+  yych = *(YYMARKER = ++YYCURSOR);
+  switch (yych) {
+    case 'u': goto re2c144;
+    default: goto re2c116;
+  }
+re2c132:
+  yych = *(YYMARKER = ++YYCURSOR);
+  switch (yych) {
+    case 'o': goto re2c145;
+    default: goto re2c116;
+  }
+re2c133:
+  yych = *++YYCURSOR;
+  switch (yych) {
+    case 's': goto re2c146;
+    default: goto re2c134;
+  }
+re2c134:
   YYCURSOR = YYMARKER;
-  goto re2c62;
-re2c77:
+  goto re2c116;
+re2c135:
   yych = *++YYCURSOR;
   switch (yych) {
-    case 'v': goto re2c82;
-    default: goto re2c76;
+    case 'd': goto re2c147;
+    default: goto re2c134;
   }
-re2c78:
+re2c136:
   yych = *++YYCURSOR;
   switch (yych) {
-    case 'l': goto re2c83;
-    default: goto re2c76;
+    case 'd': goto re2c148;
+    default: goto re2c134;
   }
-re2c79:
+re2c137:
   yych = *++YYCURSOR;
   switch (yych) {
-    case 'm': goto re2c84;
-    default: goto re2c76;
+    case 'c': goto re2c149;
+    default: goto re2c134;
   }
-re2c80:
+re2c138:
   yych = *++YYCURSOR;
   switch (yych) {
-    case 'b': goto re2c85;
-    default: goto re2c76;
+    case 'v': goto re2c150;
+    default: goto re2c134;
   }
-re2c81:
+re2c139:
+  yych = *++YYCURSOR;
+  switch (yych) {
+    case 'c': goto re2c151;
+    default: goto re2c134;
+  }
+re2c140:
+  yych = *++YYCURSOR;
+  switch (yych) {
+    case 'l': goto re2c152;
+    default: goto re2c134;
+  }
+re2c141:
+  yych = *++YYCURSOR;
+  switch (yych) {
+    case 'g': goto re2c153;
+    default: goto re2c134;
+  }
+re2c142:
+  ++YYCURSOR;
+  { id = arith_token_BITOR; goto match; }
+re2c143:
+  yych = *++YYCURSOR;
+  switch (yych) {
+    case 'm': goto re2c154;
+    default: goto re2c134;
+  }
+re2c144:
+  yych = *++YYCURSOR;
+  switch (yych) {
+    case 'b': goto re2c155;
+    default: goto re2c134;
+  }
+re2c145:
+  yych = *++YYCURSOR;
+  switch (yych) {
+    case 'r': goto re2c156;
+    default: goto re2c134;
+  }
+re2c146:
+  ++YYCURSOR;
+  { id = arith_token_ABSOLUTE; goto match; }
+re2c147:
   ++YYCURSOR;
   { id = arith_token_PLUS; goto match; }
-re2c82:
+re2c148:
+  ++YYCURSOR;
+  { id = arith_token_BITAND; goto match; }
+re2c149:
+  ++YYCURSOR;
+  { id = arith_token_DECREMENT; goto match; }
+re2c150:
   ++YYCURSOR;
   { id = arith_token_DIVIDE; goto match; }
-re2c83:
+re2c151:
+  ++YYCURSOR;
+  { id = arith_token_INCREMENT; goto match; }
+re2c152:
   ++YYCURSOR;
   { id = arith_token_TIMES; goto match; }
-re2c84:
+re2c153:
+  ++YYCURSOR;
+  { id = arith_token_NEGATE; goto match; }
+re2c154:
   ++YYCURSOR;
   { id = arith_token_REMAINDER; goto match; }
-re2c85:
+re2c155:
   ++YYCURSOR;
   { id = arith_token_MINUS; goto match; }
-re2c86:
+re2c156:
+  ++YYCURSOR;
+  { id = arith_token_BITXOR; goto match; }
+re2c157:
   { goto failure; }
 }
 
@@ -832,6 +1380,13 @@ lexer_match_t arith_lexer_re2c_single_regex_bytes_matching(lexer_t l, size_t reg
     case arith_token_TIMES: return arith_match_TIMES(l, iter);
     case arith_token_DIVIDE: return arith_match_DIVIDE(l, iter);
     case arith_token_REMAINDER: return arith_match_REMAINDER(l, iter);
+    case arith_token_BITOR: return arith_match_BITOR(l, iter);
+    case arith_token_BITAND: return arith_match_BITAND(l, iter);
+    case arith_token_BITXOR: return arith_match_BITXOR(l, iter);
+    case arith_token_ABSOLUTE: return arith_match_ABSOLUTE(l, iter);
+    case arith_token_NEGATE: return arith_match_NEGATE(l, iter);
+    case arith_token_INCREMENT: return arith_match_INCREMENT(l, iter);
+    case arith_token_DECREMENT: return arith_match_DECREMENT(l, iter);
     case arith_token_INTEGER: return arith_match_INTEGER(l, iter);
     case arith_token_LPAREN: return arith_match_LPAREN(l, iter);
     case arith_token_RPAREN: return arith_match_RPAREN(l, iter);

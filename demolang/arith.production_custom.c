@@ -122,3 +122,64 @@ proto arith_custom_production_BinOpRemainder(struct arith_parse_state* ctx,
   (void)x1;
   return proto_rem(x2, x3);
 }
+
+proto arith_custom_production_BinOpBitOr(struct arith_parse_state* ctx,
+                                         token /*BITOR*/ x1, proto /*expr*/ x2,
+                                         proto /*expr*/ x3)
+{
+  (void)ctx;
+  (void)x1;
+  return proto_or(x2, x3);
+}
+
+proto arith_custom_production_BinOpBitAnd(struct arith_parse_state* ctx,
+                                         token /*BITAND*/ x1, proto /*expr*/ x2,
+                                         proto /*expr*/ x3)
+{
+  (void)ctx;
+  (void)x1;
+  return proto_and(x2, x3);
+}
+
+proto arith_custom_production_BinOpBitXor(struct arith_parse_state* ctx,
+                                         token /*BITXOR*/ x1, proto /*expr*/ x2,
+                                         proto /*expr*/ x3)
+{
+  (void)ctx;
+  (void)x1;
+  return proto_xor(x2, x3);
+}
+
+
+proto arith_custom_production_UnOpAbsolute(struct arith_parse_state* ctx,
+                                        token /*ABSOLUTE*/ x1, proto /*expr*/ x2)
+{
+  (void)ctx;
+  (void)x1;
+  return proto_abs(x2);
+}
+
+proto arith_custom_production_UnOpNegate(struct arith_parse_state* ctx,
+                                        token /*NEGATE*/ x1, proto /*expr*/ x2)
+{
+  (void)ctx;
+  (void)x1;
+  return proto_neg(x2);
+}
+
+proto arith_custom_production_UnOpIncrement(struct arith_parse_state* ctx,
+                                        token /*INCREMENT*/ x1, proto /*expr*/ x2)
+{
+  (void)ctx;
+  (void)x1;
+  return proto_incr(x2);
+}
+
+proto arith_custom_production_UnOpDecrement(struct arith_parse_state* ctx,
+                                        token /*DECREMENT*/ x1, proto /*expr*/ x2)
+{
+  (void)ctx;
+  (void)x1;
+  return proto_decr(x2);
+}
+
