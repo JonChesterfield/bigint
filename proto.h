@@ -5,7 +5,8 @@
 #include <stddef.h>
 #include <stdint.h>
 
-struct proto_ty {
+struct proto_ty
+{
   size_t used;
   size_t alloc;
   bool zpos;
@@ -17,12 +18,13 @@ typedef struct proto_ty *proto;
 // Create zero with at least digits allocated space
 proto proto_create(size_t digits);
 proto proto_create_invalid(void);
-bool proto_valid(proto x); // allocation succeeded
+bool proto_valid(proto x);  // allocation succeeded
 void proto_destroy(proto x);
 proto proto_copy(proto x);
 void proto_dump(proto x);
 
-typedef struct {
+typedef struct
+{
   char unused;
 } proto_context;
 
@@ -31,7 +33,7 @@ proto proto_sentinel(void);
 bool proto_is_sentinel(proto x);
 
 proto proto_from_u32(uint32_t);
-uint32_t proto_to_u32(proto); // truncates
+uint32_t proto_to_u32(proto);  // truncates
 
 size_t proto_used(proto x);
 size_t proto_alloced(proto x);

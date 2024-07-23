@@ -7,8 +7,10 @@
 #include <stdint.h>
 #include <stdio.h>
 
-EVILUNIT_MAIN_MODULE() {
-  TEST("Initial") {
+EVILUNIT_MAIN_MODULE()
+{
+  TEST("Initial")
+  {
     proto p = proto_create(4);
 
     CHECK(proto_valid(p));
@@ -30,15 +32,17 @@ EVILUNIT_MAIN_MODULE() {
     proto_destroy(p);
   }
 
-  TEST("small values") {
-    for (unsigned i = 0; i < 4; i++) {
-      proto p = proto_from_u32(i);
-      CHECK(proto_valid(p));
-      CHECK(proto_zpos(p));
-      CHECK(!proto_neg(p));
-      CHECK(proto_is_zero(p) == (i == 0));
-      proto_destroy(p);
-    }
+  TEST("small values")
+  {
+    for (unsigned i = 0; i < 4; i++)
+      {
+        proto p = proto_from_u32(i);
+        CHECK(proto_valid(p));
+        CHECK(proto_zpos(p));
+        CHECK(!proto_neg(p));
+        CHECK(proto_is_zero(p) == (i == 0));
+        proto_destroy(p);
+      }
 
     {
       proto p = proto_from_u32(3);
@@ -57,7 +61,8 @@ EVILUNIT_MAIN_MODULE() {
     }
   }
 
-  TEST("small arithmetic") {
+  TEST("small arithmetic")
+  {
     proto x = proto_from_u32(13);
     proto y = proto_from_u32(7);
 
