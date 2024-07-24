@@ -117,7 +117,7 @@ static __attribute__((unused))const char*arith_language_regexes[arith_token_coun
   [arith_token_NEGATE] = 0,
   [arith_token_INCREMENT] = 0,
   [arith_token_DECREMENT] = 0,
-  [arith_token_INTEGER] = "[-]\x3f[\x30-\x39]+",
+  [arith_token_INTEGER] = "[\x30]\x7c[-]\x3f[\x31-\x39][\x30-\x39]*",
   [arith_token_SPACE] = 0,
   [arith_token_NEWLINE] = 0,
   [arith_token_CONTROL] = "[\x40\x41-\x5a\x21\x23\x24\x25\x26]+",

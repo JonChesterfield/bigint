@@ -130,10 +130,6 @@ $(VENDOR_DIR_OBJ)/corpus_runner.o:	corpus_runner.c corpus.h $(VENDOR_HDR)
 	@mkdir -p $(VENDOR_DIR_OBJ)
 	@$(CC) $(CFLAGS) $< -c -o $@
 
-#$(VENDOR_DIR_OBJ)/corpus.o:	corpus.c corpus.h $(VENDOR_HDR)
-#	@mkdir -p $(VENDOR_DIR_OBJ)
-#	@$(CC) $(CFLAGS) $< -c -o $@
-
 # This file gets big and rapidly takes excessive amounts of time to compile
 $(VENDOR_DIR_OBJ)/corpus_test.o:	corpus_test.c $(VENDOR_HDR)
 	@mkdir -p $(VENDOR_DIR_OBJ)
@@ -151,17 +147,43 @@ clean::
 
 
 SEEDFILES := $(wildcard seedfiles/*)
+MORE_FUZZFILES :=
+
+
+# This file is working around makefile passing many files to a single
+# shell invocation which then falls over
+
+$(shell mkdir -p $(VENDOR_DIR_OBJ))
+CAT_FUZZFILES := $(VENDOR_DIR_OBJ)/all_fuzzfiles
+$(file >$(CAT_FUZZFILES))
+$(foreach V,$(MORE_FUZZFILES),$(file >>$(CAT_FUZZFILES),$(file <$V)))
+
 
 FUZZ_FILES_DIR := $(SELF_DIR)/fuzzfiles/
 include fuzzfiles/files.mk
 clean::
-	rm -f fuzzfiles/files.mk
+	@rm -rf $(CAT_FUZZFILES) fuzzfiles
 
 ifeq (,$(wildcard fuzzfiles/files.mk))
-fuzzfiles/files.mk: split.awk
+fuzzfiles/files.mk: split.awk $(CAT_FUZZFILES)
 	@mkdir -p fuzzfiles
-	@gawk --lint -f split.awk fuzzfiles/ $(SEEDFILES)
+	@gawk --lint -f split.awk fuzzfiles/ $(SEEDFILES) $(CAT_FUZZFILES)
 endif
+
+$(info $(fuzzfiles/simple))
+
+SIMPLE_PYTHON := $(addprefix python/test_,$(addsuffix .py,$(fuzzfiles/simple)))
+
+clean::
+	rm -rf $(SIMPLE_PYTHON) python/__pycache__
+
+$(SIMPLE_PYTHON):	python/test_%.py: fuzzfiles/simple/% | python/gen.awk fuzzfiles/files.mk
+	gawk -f python/gen.awk $^ > $@
+
+.PHONY: python
+python: $(SIMPLE_PYTHON) python/gen.awk
+	python3 -m unittest discover python -v
+
 
 calc:
 calc: $(VENDOR_LIBTOMMATH_OBJ)
