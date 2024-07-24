@@ -5,6 +5,7 @@ MAKEFLAGS += -r -j$(shell nproc)
 
 SHELL = sh -xv
 
+SELF_DIR := $(dir $(lastword $(MAKEFILE_LIST)))
 
 ifeq ($(origin CC),default)
 CC = clang
@@ -149,6 +150,18 @@ clean::
 	@rm -f corpus_runner
 
 
+SEEDFILES := $(wildcard seedfiles/*)
+
+FUZZ_FILES_DIR := $(SELF_DIR)/fuzzfiles/
+include fuzzfiles/files.mk
+clean::
+	rm -f fuzzfiles/files.mk
+
+ifeq (,$(wildcard fuzzfiles/files.mk))
+fuzzfiles/files.mk: split.awk
+	@mkdir -p fuzzfiles
+	@gawk --lint -f split.awk fuzzfiles/ $(SEEDFILES)
+endif
 
 calc:
 calc: $(VENDOR_LIBTOMMATH_OBJ)
