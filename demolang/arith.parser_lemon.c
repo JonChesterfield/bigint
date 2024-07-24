@@ -170,18 +170,18 @@ typedef union {
 #define arith_LemonCTX_PARAM
 #define arith_LemonCTX_FETCH
 #define arith_LemonCTX_STORE
-#define YYNSTATE             61
-#define YYNRULE              16
-#define YYNRULE_WITH_ACTION  16
+#define YYNSTATE             62
+#define YYNRULE              17
+#define YYNRULE_WITH_ACTION  17
 #define YYNTOKEN             17
-#define YY_MAX_SHIFT         60
-#define YY_MIN_SHIFTREDUCE   75
-#define YY_MAX_SHIFTREDUCE   90
-#define YY_ERROR_ACTION      91
-#define YY_ACCEPT_ACTION     92
-#define YY_NO_ACTION         93
-#define YY_MIN_REDUCE        94
-#define YY_MAX_REDUCE        109
+#define YY_MAX_SHIFT         61
+#define YY_MIN_SHIFTREDUCE   76
+#define YY_MAX_SHIFTREDUCE   92
+#define YY_ERROR_ACTION      93
+#define YY_ACCEPT_ACTION     94
+#define YY_NO_ACTION         95
+#define YY_MIN_REDUCE        96
+#define YY_MAX_REDUCE        112
 /************* End control #defines *******************************************/
 #define YY_NLOOKAHEAD ((int)(sizeof(yy_lookahead)/sizeof(yy_lookahead[0])))
 
@@ -248,61 +248,63 @@ typedef union {
 **  yy_default[]       Default action for each state.
 **
 *********** Begin parsing tables **********************************************/
-#define YY_ACTTAB_COUNT (96)
+#define YY_ACTTAB_COUNT (106)
 static const YYACTIONTYPE yy_action[] = {
- /*     0 */    24,   58,   55,   52,   49,   46,   43,   40,   37,   34,
- /*    10 */    32,   30,   28,   92,   25,   60,   26,   77,   77,   59,
- /*    20 */    78,   27,   29,   93,   93,   31,   33,   35,   36,   38,
- /*    30 */    39,   41,   42,   44,   45,   47,   48,   50,   51,   53,
- /*    40 */    54,   56,   57,   95,    1,    3,   93,   90,    4,   93,
- /*    50 */    89,    5,   93,   88,    6,   93,   87,   86,    7,    8,
- /*    60 */     9,   93,   93,   85,   84,   10,   11,   93,   12,   13,
- /*    70 */    93,   93,   83,   14,   15,   93,   82,   93,   16,   17,
- /*    80 */    94,   81,   80,   18,   19,   93,   93,   20,   21,   93,
- /*    90 */    79,   22,   93,   23,   93,    2,
+ /*     0 */    24,   57,   54,   51,   48,   45,   42,   39,   36,   33,
+ /*    10 */    31,   29,   27,   79,   57,   54,   51,   48,   45,   42,
+ /*    20 */    39,   36,   33,   31,   29,   27,   94,   79,   25,   61,
+ /*    30 */    80,   79,   95,   60,   59,   58,   95,   95,   26,   28,
+ /*    40 */    30,   32,   34,   35,   37,   38,   40,   41,   43,   44,
+ /*    50 */    46,   47,   97,   49,   50,   52,    2,    4,   53,   55,
+ /*    60 */    56,   92,   91,    5,   95,   90,   89,    6,    7,   95,
+ /*    70 */    88,    8,    9,   95,   87,   10,   11,   95,   86,   85,
+ /*    80 */    12,   13,   14,   15,   98,   95,   84,   16,   95,   17,
+ /*    90 */    96,   83,   82,   18,   19,   20,   21,   95,   81,    3,
+ /*   100 */    95,   22,   23,   95,   95,    1,
 };
 static const YYCODETYPE yy_lookahead[] = {
  /*     0 */    18,    1,    2,    3,    4,    5,    6,    7,    8,    9,
- /*    10 */    10,   11,   12,   17,   19,   19,   20,   13,   13,   18,
- /*    20 */    16,   19,   19,   21,   21,   19,   19,   19,   19,   19,
- /*    30 */    19,   19,   19,   19,   19,   19,   19,   19,   19,   19,
- /*    40 */    19,   19,   19,    0,   14,   14,   21,   15,   14,   21,
- /*    50 */    15,   14,   21,   15,   14,   21,   15,   15,   14,   14,
- /*    60 */    14,   21,   21,   15,   15,   14,   14,   21,   14,   14,
- /*    70 */    21,   21,   15,   14,   14,   21,   15,   21,   14,   14,
- /*    80 */     0,   15,   15,   14,   14,   21,   21,   14,   14,   21,
- /*    90 */    15,   14,   21,   14,   21,   14,   21,   21,   21,   21,
- /*   100 */    21,   21,   21,   21,   21,   21,   21,   21,   21,   21,
- /*   110 */    21,   21,   21,
+ /*    10 */    10,   11,   12,   13,    1,    2,    3,    4,    5,    6,
+ /*    20 */     7,    8,    9,   10,   11,   12,   17,   13,   19,   20,
+ /*    30 */    16,   13,   21,   18,   19,   18,   21,   21,   19,   19,
+ /*    40 */    19,   19,   19,   19,   19,   19,   19,   19,   19,   19,
+ /*    50 */    19,   19,    0,   19,   19,   19,   14,   14,   19,   19,
+ /*    60 */    19,   15,   15,   14,   21,   15,   15,   14,   14,   21,
+ /*    70 */    15,   14,   14,   21,   15,   14,   14,   21,   15,   15,
+ /*    80 */    14,   14,   14,   14,    0,   21,   15,   14,   21,   14,
+ /*    90 */     0,   15,   15,   14,   14,   14,   14,   21,   15,   14,
+ /*   100 */    21,   14,   14,   21,   21,   14,   21,   21,   21,   21,
+ /*   110 */    21,   21,   21,   21,   21,   21,   21,   21,   21,   21,
+ /*   120 */    21,   21,   21,
 };
-#define YY_SHIFT_COUNT    (60)
+#define YY_SHIFT_COUNT    (61)
 #define YY_SHIFT_MIN      (0)
-#define YY_SHIFT_MAX      (81)
+#define YY_SHIFT_MAX      (91)
 static const unsigned char yy_shift_ofst[] = {
- /*     0 */     4,    0,    0,    5,    5,    5,    5,    5,    5,    5,
- /*    10 */     5,    5,    5,    5,    5,    5,    5,    5,    5,    5,
- /*    20 */     5,    5,    5,    5,   43,   30,   31,   32,   34,   35,
- /*    30 */    37,   38,   40,   41,   44,   42,   45,   46,   48,   51,
- /*    40 */    52,   49,   54,   55,   57,   59,   60,   61,   64,   65,
- /*    50 */    66,   69,   70,   67,   73,   74,   75,   77,   79,   80,
- /*    60 */    81,
+ /*     0 */    14,    0,   13,   13,   18,   18,   18,   18,   18,   18,
+ /*    10 */    18,   18,   18,   18,   18,   18,   18,   18,   18,   18,
+ /*    20 */    18,   18,   18,   18,   52,   42,   46,   43,   47,   49,
+ /*    30 */    50,   53,   51,   54,   55,   57,   58,   59,   61,   62,
+ /*    40 */    63,   66,   67,   64,   68,   69,   71,   73,   75,   76,
+ /*    50 */    79,   80,   77,   81,   82,   83,   87,   88,   84,   85,
+ /*    60 */    90,   91,
 };
 #define YY_REDUCE_COUNT (23)
 #define YY_REDUCE_MIN   (-18)
-#define YY_REDUCE_MAX   (23)
+#define YY_REDUCE_MAX   (41)
 static const signed char yy_reduce_ofst[] = {
- /*     0 */    -4,  -18,    1,   -5,    2,    3,    6,    7,    8,    9,
- /*    10 */    10,   11,   12,   13,   14,   15,   16,   17,   18,   19,
- /*    20 */    20,   21,   22,   23,
+ /*     0 */     9,   15,  -18,   17,   19,   20,   21,   22,   23,   24,
+ /*    10 */    25,   26,   27,   28,   29,   30,   31,   32,   34,   35,
+ /*    20 */    36,   39,   40,   41,
 };
 static const YYACTIONTYPE yy_default[] = {
- /*     0 */    91,   91,   91,   91,   91,   91,   91,   91,   91,   91,
- /*    10 */    91,   91,   91,   91,   91,   91,   91,   91,   91,   91,
- /*    20 */    91,   91,   91,   91,   91,   91,   91,   91,   91,   91,
- /*    30 */    91,   91,   91,   91,   91,   91,   91,   91,   91,   91,
- /*    40 */    91,   91,   91,   91,   91,   91,   91,   91,   91,   91,
- /*    50 */    91,   91,   91,   91,   91,   91,   91,   91,   91,   91,
- /*    60 */    91,
+ /*     0 */    93,   93,   93,   93,   93,   93,   93,   93,   93,   93,
+ /*    10 */    93,   93,   93,   93,   93,   93,   93,   93,   93,   93,
+ /*    20 */    93,   93,   93,   93,   93,   93,   93,   93,   93,   93,
+ /*    30 */    93,   93,   93,   93,   93,   93,   93,   93,   93,   93,
+ /*    40 */    93,   93,   93,   93,   93,   93,   93,   93,   93,   93,
+ /*    50 */    93,   93,   93,   93,   93,   93,   93,   93,   93,   93,
+ /*    60 */    93,   93,
 };
 /********** End of lemon-generated parsing tables *****************************/
 
@@ -452,22 +454,23 @@ static const char *const yyTokenName[] = {
 /* For tracing reduce actions, the names of all rules are required.
 */
 static const char *const yyRuleName[] = {
- /*   0 */ "program ::= integer SPACE expr",
- /*   1 */ "program ::= control_block SPACE integer SPACE expr",
- /*   2 */ "integer ::= INTEGER",
- /*   3 */ "control_block ::= CONTROL",
- /*   4 */ "expr ::= PLUS SPACE integer SPACE integer NEWLINE",
- /*   5 */ "expr ::= MINUS SPACE integer SPACE integer NEWLINE",
- /*   6 */ "expr ::= TIMES SPACE integer SPACE integer NEWLINE",
- /*   7 */ "expr ::= DIVIDE SPACE integer SPACE integer NEWLINE",
- /*   8 */ "expr ::= REMAINDER SPACE integer SPACE integer NEWLINE",
- /*   9 */ "expr ::= BITOR SPACE integer SPACE integer NEWLINE",
- /*  10 */ "expr ::= BITAND SPACE integer SPACE integer NEWLINE",
- /*  11 */ "expr ::= BITXOR SPACE integer SPACE integer NEWLINE",
- /*  12 */ "expr ::= ABSOLUTE SPACE integer NEWLINE",
- /*  13 */ "expr ::= NEGATE SPACE integer NEWLINE",
- /*  14 */ "expr ::= INCREMENT SPACE integer NEWLINE",
- /*  15 */ "expr ::= DECREMENT SPACE integer NEWLINE",
+ /*   0 */ "program ::= control_block SPACE expr",
+ /*   1 */ "program ::= integer SPACE expr",
+ /*   2 */ "program ::= control_block SPACE integer SPACE expr",
+ /*   3 */ "integer ::= INTEGER",
+ /*   4 */ "control_block ::= CONTROL",
+ /*   5 */ "expr ::= PLUS SPACE integer SPACE integer NEWLINE",
+ /*   6 */ "expr ::= MINUS SPACE integer SPACE integer NEWLINE",
+ /*   7 */ "expr ::= TIMES SPACE integer SPACE integer NEWLINE",
+ /*   8 */ "expr ::= DIVIDE SPACE integer SPACE integer NEWLINE",
+ /*   9 */ "expr ::= REMAINDER SPACE integer SPACE integer NEWLINE",
+ /*  10 */ "expr ::= BITOR SPACE integer SPACE integer NEWLINE",
+ /*  11 */ "expr ::= BITAND SPACE integer SPACE integer NEWLINE",
+ /*  12 */ "expr ::= BITXOR SPACE integer SPACE integer NEWLINE",
+ /*  13 */ "expr ::= ABSOLUTE SPACE integer NEWLINE",
+ /*  14 */ "expr ::= NEGATE SPACE integer NEWLINE",
+ /*  15 */ "expr ::= INCREMENT SPACE integer NEWLINE",
+ /*  16 */ "expr ::= DECREMENT SPACE integer NEWLINE",
 };
 #endif /* NDEBUG */
 #endif
@@ -896,43 +899,45 @@ static void yy_shift(
 /* For rule J, yyRuleInfoLhs[J] contains the symbol on the left-hand side
 ** of that rule */
 static const YYCODETYPE yyRuleInfoLhs[] = {
-    17,  /* (0) program ::= integer SPACE expr */
-    17,  /* (1) program ::= control_block SPACE integer SPACE expr */
-    19,  /* (2) integer ::= INTEGER */
-    20,  /* (3) control_block ::= CONTROL */
-    18,  /* (4) expr ::= PLUS SPACE integer SPACE integer NEWLINE */
-    18,  /* (5) expr ::= MINUS SPACE integer SPACE integer NEWLINE */
-    18,  /* (6) expr ::= TIMES SPACE integer SPACE integer NEWLINE */
-    18,  /* (7) expr ::= DIVIDE SPACE integer SPACE integer NEWLINE */
-    18,  /* (8) expr ::= REMAINDER SPACE integer SPACE integer NEWLINE */
-    18,  /* (9) expr ::= BITOR SPACE integer SPACE integer NEWLINE */
-    18,  /* (10) expr ::= BITAND SPACE integer SPACE integer NEWLINE */
-    18,  /* (11) expr ::= BITXOR SPACE integer SPACE integer NEWLINE */
-    18,  /* (12) expr ::= ABSOLUTE SPACE integer NEWLINE */
-    18,  /* (13) expr ::= NEGATE SPACE integer NEWLINE */
-    18,  /* (14) expr ::= INCREMENT SPACE integer NEWLINE */
-    18,  /* (15) expr ::= DECREMENT SPACE integer NEWLINE */
+    17,  /* (0) program ::= control_block SPACE expr */
+    17,  /* (1) program ::= integer SPACE expr */
+    17,  /* (2) program ::= control_block SPACE integer SPACE expr */
+    19,  /* (3) integer ::= INTEGER */
+    20,  /* (4) control_block ::= CONTROL */
+    18,  /* (5) expr ::= PLUS SPACE integer SPACE integer NEWLINE */
+    18,  /* (6) expr ::= MINUS SPACE integer SPACE integer NEWLINE */
+    18,  /* (7) expr ::= TIMES SPACE integer SPACE integer NEWLINE */
+    18,  /* (8) expr ::= DIVIDE SPACE integer SPACE integer NEWLINE */
+    18,  /* (9) expr ::= REMAINDER SPACE integer SPACE integer NEWLINE */
+    18,  /* (10) expr ::= BITOR SPACE integer SPACE integer NEWLINE */
+    18,  /* (11) expr ::= BITAND SPACE integer SPACE integer NEWLINE */
+    18,  /* (12) expr ::= BITXOR SPACE integer SPACE integer NEWLINE */
+    18,  /* (13) expr ::= ABSOLUTE SPACE integer NEWLINE */
+    18,  /* (14) expr ::= NEGATE SPACE integer NEWLINE */
+    18,  /* (15) expr ::= INCREMENT SPACE integer NEWLINE */
+    18,  /* (16) expr ::= DECREMENT SPACE integer NEWLINE */
 };
 
 /* For rule J, yyRuleInfoNRhs[J] contains the negative of the number
 ** of symbols on the right-hand side of that rule. */
 static const signed char yyRuleInfoNRhs[] = {
-   -3,  /* (0) program ::= integer SPACE expr */
-   -5,  /* (1) program ::= control_block SPACE integer SPACE expr */
-   -1,  /* (2) integer ::= INTEGER */
-   -1,  /* (3) control_block ::= CONTROL */
-   -6,  /* (4) expr ::= PLUS SPACE integer SPACE integer NEWLINE */
-   -6,  /* (5) expr ::= MINUS SPACE integer SPACE integer NEWLINE */
-   -6,  /* (6) expr ::= TIMES SPACE integer SPACE integer NEWLINE */
-   -6,  /* (7) expr ::= DIVIDE SPACE integer SPACE integer NEWLINE */
-   -6,  /* (8) expr ::= REMAINDER SPACE integer SPACE integer NEWLINE */
-   -6,  /* (9) expr ::= BITOR SPACE integer SPACE integer NEWLINE */
-   -6,  /* (10) expr ::= BITAND SPACE integer SPACE integer NEWLINE */
-   -6,  /* (11) expr ::= BITXOR SPACE integer SPACE integer NEWLINE */
-   -4,  /* (12) expr ::= ABSOLUTE SPACE integer NEWLINE */
-   -4,  /* (13) expr ::= NEGATE SPACE integer NEWLINE */
-   -4,  /* (14) expr ::= INCREMENT SPACE integer NEWLINE */
-   -4,  /* (15) expr ::= DECREMENT SPACE integer NEWLINE */
+   -3,  /* (0) program ::= control_block SPACE expr */
+   -3,  /* (1) program ::= integer SPACE expr */
+   -5,  /* (2) program ::= control_block SPACE integer SPACE expr */
+   -1,  /* (3) integer ::= INTEGER */
+   -1,  /* (4) control_block ::= CONTROL */
+   -6,  /* (5) expr ::= PLUS SPACE integer SPACE integer NEWLINE */
+   -6,  /* (6) expr ::= MINUS SPACE integer SPACE integer NEWLINE */
+   -6,  /* (7) expr ::= TIMES SPACE integer SPACE integer NEWLINE */
+   -6,  /* (8) expr ::= DIVIDE SPACE integer SPACE integer NEWLINE */
+   -6,  /* (9) expr ::= REMAINDER SPACE integer SPACE integer NEWLINE */
+   -6,  /* (10) expr ::= BITOR SPACE integer SPACE integer NEWLINE */
+   -6,  /* (11) expr ::= BITAND SPACE integer SPACE integer NEWLINE */
+   -6,  /* (12) expr ::= BITXOR SPACE integer SPACE integer NEWLINE */
+   -4,  /* (13) expr ::= ABSOLUTE SPACE integer NEWLINE */
+   -4,  /* (14) expr ::= NEGATE SPACE integer NEWLINE */
+   -4,  /* (15) expr ::= INCREMENT SPACE integer NEWLINE */
+   -4,  /* (16) expr ::= DECREMENT SPACE integer NEWLINE */
 };
 
 static void yy_accept(yyParser*);  /* Forward Declaration */
@@ -974,7 +979,18 @@ static YYACTIONTYPE yy_reduce(
   */
 /********** Begin reduce actions **********************************************/
         YYMINORTYPE yylhsminor;
-      case 0: /* program ::= integer SPACE expr */
+      case 0: /* program ::= control_block SPACE expr */
+{
+
+  yylhsminor.yy9 = arith_custom_production_control_expr_to_program(context, yymsp[-2].minor.yy9, yymsp[-1].minor.yy0, yymsp[0].minor.yy9);
+  if (!arith_parse_state_is_failure(context))
+  {
+    arith_parse_state_set_stored_tree(context, yylhsminor.yy9);
+  }
+}
+  yymsp[-2].minor.yy9 = yylhsminor.yy9;
+        break;
+      case 1: /* program ::= integer SPACE expr */
 {
 
   yylhsminor.yy9 = arith_custom_production_result_expr_to_program(context, yymsp[-2].minor.yy9, yymsp[-1].minor.yy0, yymsp[0].minor.yy9);
@@ -985,7 +1001,7 @@ static YYACTIONTYPE yy_reduce(
 }
   yymsp[-2].minor.yy9 = yylhsminor.yy9;
         break;
-      case 1: /* program ::= control_block SPACE integer SPACE expr */
+      case 2: /* program ::= control_block SPACE integer SPACE expr */
 {
 
   yylhsminor.yy9 = arith_custom_production_control_result_expr_to_program(context, yymsp[-4].minor.yy9, yymsp[-3].minor.yy0, yymsp[-2].minor.yy9, yymsp[-1].minor.yy0, yymsp[0].minor.yy9);
@@ -996,7 +1012,7 @@ static YYACTIONTYPE yy_reduce(
 }
   yymsp[-4].minor.yy9 = yylhsminor.yy9;
         break;
-      case 2: /* integer ::= INTEGER */
+      case 3: /* integer ::= INTEGER */
 {
 
   yylhsminor.yy9 = arith_custom_production_FromInteger(context, yymsp[0].minor.yy0);
@@ -1007,7 +1023,7 @@ static YYACTIONTYPE yy_reduce(
 }
   yymsp[0].minor.yy9 = yylhsminor.yy9;
         break;
-      case 3: /* control_block ::= CONTROL */
+      case 4: /* control_block ::= CONTROL */
 {
 
   yylhsminor.yy9 = arith_custom_production_FromControl(context, yymsp[0].minor.yy0);
@@ -1018,7 +1034,7 @@ static YYACTIONTYPE yy_reduce(
 }
   yymsp[0].minor.yy9 = yylhsminor.yy9;
         break;
-      case 4: /* expr ::= PLUS SPACE integer SPACE integer NEWLINE */
+      case 5: /* expr ::= PLUS SPACE integer SPACE integer NEWLINE */
 {
 
   yylhsminor.yy9 = arith_custom_production_BinOpPlus(context, yymsp[-5].minor.yy0, yymsp[-4].minor.yy0, yymsp[-3].minor.yy9, yymsp[-2].minor.yy0, yymsp[-1].minor.yy9, yymsp[0].minor.yy0);
@@ -1029,7 +1045,7 @@ static YYACTIONTYPE yy_reduce(
 }
   yymsp[-5].minor.yy9 = yylhsminor.yy9;
         break;
-      case 5: /* expr ::= MINUS SPACE integer SPACE integer NEWLINE */
+      case 6: /* expr ::= MINUS SPACE integer SPACE integer NEWLINE */
 {
 
   yylhsminor.yy9 = arith_custom_production_BinOpMinus(context, yymsp[-5].minor.yy0, yymsp[-4].minor.yy0, yymsp[-3].minor.yy9, yymsp[-2].minor.yy0, yymsp[-1].minor.yy9, yymsp[0].minor.yy0);
@@ -1040,7 +1056,7 @@ static YYACTIONTYPE yy_reduce(
 }
   yymsp[-5].minor.yy9 = yylhsminor.yy9;
         break;
-      case 6: /* expr ::= TIMES SPACE integer SPACE integer NEWLINE */
+      case 7: /* expr ::= TIMES SPACE integer SPACE integer NEWLINE */
 {
 
   yylhsminor.yy9 = arith_custom_production_BinOpTimes(context, yymsp[-5].minor.yy0, yymsp[-4].minor.yy0, yymsp[-3].minor.yy9, yymsp[-2].minor.yy0, yymsp[-1].minor.yy9, yymsp[0].minor.yy0);
@@ -1051,7 +1067,7 @@ static YYACTIONTYPE yy_reduce(
 }
   yymsp[-5].minor.yy9 = yylhsminor.yy9;
         break;
-      case 7: /* expr ::= DIVIDE SPACE integer SPACE integer NEWLINE */
+      case 8: /* expr ::= DIVIDE SPACE integer SPACE integer NEWLINE */
 {
 
   yylhsminor.yy9 = arith_custom_production_BinOpDivide(context, yymsp[-5].minor.yy0, yymsp[-4].minor.yy0, yymsp[-3].minor.yy9, yymsp[-2].minor.yy0, yymsp[-1].minor.yy9, yymsp[0].minor.yy0);
@@ -1062,7 +1078,7 @@ static YYACTIONTYPE yy_reduce(
 }
   yymsp[-5].minor.yy9 = yylhsminor.yy9;
         break;
-      case 8: /* expr ::= REMAINDER SPACE integer SPACE integer NEWLINE */
+      case 9: /* expr ::= REMAINDER SPACE integer SPACE integer NEWLINE */
 {
 
   yylhsminor.yy9 = arith_custom_production_BinOpRemainder(context, yymsp[-5].minor.yy0, yymsp[-4].minor.yy0, yymsp[-3].minor.yy9, yymsp[-2].minor.yy0, yymsp[-1].minor.yy9, yymsp[0].minor.yy0);
@@ -1073,7 +1089,7 @@ static YYACTIONTYPE yy_reduce(
 }
   yymsp[-5].minor.yy9 = yylhsminor.yy9;
         break;
-      case 9: /* expr ::= BITOR SPACE integer SPACE integer NEWLINE */
+      case 10: /* expr ::= BITOR SPACE integer SPACE integer NEWLINE */
 {
 
   yylhsminor.yy9 = arith_custom_production_BinOpBitOr(context, yymsp[-5].minor.yy0, yymsp[-4].minor.yy0, yymsp[-3].minor.yy9, yymsp[-2].minor.yy0, yymsp[-1].minor.yy9, yymsp[0].minor.yy0);
@@ -1084,7 +1100,7 @@ static YYACTIONTYPE yy_reduce(
 }
   yymsp[-5].minor.yy9 = yylhsminor.yy9;
         break;
-      case 10: /* expr ::= BITAND SPACE integer SPACE integer NEWLINE */
+      case 11: /* expr ::= BITAND SPACE integer SPACE integer NEWLINE */
 {
 
   yylhsminor.yy9 = arith_custom_production_BinOpBitAnd(context, yymsp[-5].minor.yy0, yymsp[-4].minor.yy0, yymsp[-3].minor.yy9, yymsp[-2].minor.yy0, yymsp[-1].minor.yy9, yymsp[0].minor.yy0);
@@ -1095,7 +1111,7 @@ static YYACTIONTYPE yy_reduce(
 }
   yymsp[-5].minor.yy9 = yylhsminor.yy9;
         break;
-      case 11: /* expr ::= BITXOR SPACE integer SPACE integer NEWLINE */
+      case 12: /* expr ::= BITXOR SPACE integer SPACE integer NEWLINE */
 {
 
   yylhsminor.yy9 = arith_custom_production_BinOpBitXor(context, yymsp[-5].minor.yy0, yymsp[-4].minor.yy0, yymsp[-3].minor.yy9, yymsp[-2].minor.yy0, yymsp[-1].minor.yy9, yymsp[0].minor.yy0);
@@ -1106,7 +1122,7 @@ static YYACTIONTYPE yy_reduce(
 }
   yymsp[-5].minor.yy9 = yylhsminor.yy9;
         break;
-      case 12: /* expr ::= ABSOLUTE SPACE integer NEWLINE */
+      case 13: /* expr ::= ABSOLUTE SPACE integer NEWLINE */
 {
 
   yylhsminor.yy9 = arith_custom_production_UnOpAbsolute(context, yymsp[-3].minor.yy0, yymsp[-2].minor.yy0, yymsp[-1].minor.yy9, yymsp[0].minor.yy0);
@@ -1117,7 +1133,7 @@ static YYACTIONTYPE yy_reduce(
 }
   yymsp[-3].minor.yy9 = yylhsminor.yy9;
         break;
-      case 13: /* expr ::= NEGATE SPACE integer NEWLINE */
+      case 14: /* expr ::= NEGATE SPACE integer NEWLINE */
 {
 
   yylhsminor.yy9 = arith_custom_production_UnOpNegate(context, yymsp[-3].minor.yy0, yymsp[-2].minor.yy0, yymsp[-1].minor.yy9, yymsp[0].minor.yy0);
@@ -1128,7 +1144,7 @@ static YYACTIONTYPE yy_reduce(
 }
   yymsp[-3].minor.yy9 = yylhsminor.yy9;
         break;
-      case 14: /* expr ::= INCREMENT SPACE integer NEWLINE */
+      case 15: /* expr ::= INCREMENT SPACE integer NEWLINE */
 {
 
   yylhsminor.yy9 = arith_custom_production_UnOpIncrement(context, yymsp[-3].minor.yy0, yymsp[-2].minor.yy0, yymsp[-1].minor.yy9, yymsp[0].minor.yy0);
@@ -1139,7 +1155,7 @@ static YYACTIONTYPE yy_reduce(
 }
   yymsp[-3].minor.yy9 = yylhsminor.yy9;
         break;
-      case 15: /* expr ::= DECREMENT SPACE integer NEWLINE */
+      case 16: /* expr ::= DECREMENT SPACE integer NEWLINE */
 {
 
   yylhsminor.yy9 = arith_custom_production_UnOpDecrement(context, yymsp[-3].minor.yy0, yymsp[-2].minor.yy0, yymsp[-1].minor.yy9, yymsp[0].minor.yy0);

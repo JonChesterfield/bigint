@@ -63,6 +63,14 @@ bool arith_lexer_string_lexes_to_token(const char *cstr, enum arith_token req)
   return tok == req;
 }
 
+bool arith_lexer_bytes_are_lexeme_stream(const char * bytes, size_t N)
+{
+  lexer_summarise_res_t res = arith_lexer_summarise_string(bytes, N);
+  if (res.unknown != 0) { return false; }
+  if (res.known == 0) { return false; }
+  return true;
+}
+
 lexer_summarise_res_t arith_lexer_summarise_string(const char * bytes, size_t N)
 
 {

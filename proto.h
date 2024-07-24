@@ -50,8 +50,14 @@ bool proto_equal(proto_context ctx, proto x, proto y);
 // Number of base 10 digits
 size_t proto_count_base10(proto_context ctx, proto x);
 
-// Read N [0-9] digits into a bit integer
+// Read N [-]?[0-9]+ digits into a bit integer
 proto proto_from_base10(proto_context ctx, const char *, size_t N);
+
+static inline proto proto_from_base10_cstr(proto_context ctx, const char *str)
+{
+  size_t N = __builtin_strlen(str);
+  return proto_from_base10(ctx, str, N);
+}
 
 // Write proto into out, returning how many bytes written
 size_t proto_into_base10(proto_context ctx, proto, char *out, size_t N);

@@ -14,7 +14,7 @@ ifeq ($(origin CXX),default)
 CXX = clang++
 endif
 
-CFLAGS ?= -std=c99 -Wall -O0 -g -gdwarf-4
+CFLAGS ?= -std=c99 -Wall -O1 -g -gdwarf-4
 LDFLAGS ?=
 
 
@@ -92,17 +92,16 @@ $(VENDOR_LIBTOMMATH_CXX_OBJ):	$(VENDOR_DIR_OBJ)/%.cpp.o:	$(VENDOR_DIR)/%.c $(VEN
 build::	$(VENDOR_OBJ) .vendor.O/libtommath.o $(VENDOR_LIBTOMMATH_CXX_OBJ)
 
 
-$(VENDOR_DIR_OBJ)/proto_impl.o:	proto_impl.c proto.h $(VENDOR_HDR)
+PROTO_SRC := proto_impl.c proto.c proto_derived.c
+PROTO_OBJ := $(PROTO_SRC:%.c=$(VENDOR_DIR_OBJ)/%.o)
+
+$(PROTO_OBJ):	$(VENDOR_DIR_OBJ)/%.o:	%.c proto.h $(VENDOR_HDR)
 	@mkdir -p $(VENDOR_DIR_OBJ)
 	@$(CC) $(CFLAGS) $< -c -o $@
 
-$(VENDOR_DIR_OBJ)/proto.o:	proto.c proto.h $(VENDOR_HDR)
-	@mkdir -p $(VENDOR_DIR_OBJ)
-	@$(CC) $(CFLAGS) $< -c -o $@
 
 
-
-proto:	$(VENDOR_DIR_OBJ)/proto.o $(VENDOR_DIR_OBJ)/proto_impl.o $(VENDOR_LIBTOMMATH_OBJ)
+proto:	$(PROTO_OBJ) $(VENDOR_LIBTOMMATH_OBJ)
 	@$(CC) $(CFLAGS) $(LDFLAGS) $^ -o $@
 clean::
 	@rm -f proto
@@ -126,14 +125,12 @@ $(DEMOLANG_DIR_OBJ)/%.o:	$(DEMOLANG_DIR)/%.c $(DEMOLANG_HDR) proto.h $(VENDOR_HD
 demolang::	$(DEMOLANG_OBJ)
 
 
-
 SEEDFILES := $(wildcard seedfiles/*)
-MORE_FUZZFILES :=
+MORE_FUZZFILES := $(wildcard /scratch/jon/fuzz/corpus/*)
 
 
 # This file is working around makefile passing many files to a single
 # shell invocation which then falls over
-
 $(shell mkdir -p $(VENDOR_DIR_OBJ))
 CAT_FUZZFILES := $(VENDOR_DIR_OBJ)/all_fuzzfiles
 $(file >$(CAT_FUZZFILES))
@@ -151,7 +148,6 @@ fuzzfiles/files.mk: split.awk $(CAT_FUZZFILES)
 	@gawk --lint -f split.awk fuzzfiles/ $(SEEDFILES) $(CAT_FUZZFILES)
 endif
 
-$(info $(fuzzfiles/simple))
 
 SIMPLE_PYTHON := $(addprefix python/test_,$(addsuffix .py,$(fuzzfiles/simple)))
 
@@ -162,13 +158,58 @@ $(SIMPLE_PYTHON):	python/test_%.py: fuzzfiles/simple/% | python/gen.awk fuzzfile
 	gawk -f python/gen.awk $^ > $@
 
 .PHONY: python
+python: ## Run test cases through python interpreter
 python: $(SIMPLE_PYTHON) python/gen.awk
 	python3 -m unittest discover python -v
 
 
+SIMPLE_TESTS := $(addprefix tests/test_,$(addsuffix .c,$(fuzzfiles/simple)))
+
+# this is missing the first case (no mul?, leave it handwritten for the time being)
+#tests/runner.c:	$(SIMPLE_TESTS)
+#	@echo "#include \"../vendor/EvilUnit/EvilUnit.h\"" > $@
+#	@echo "MODULE(tests_runner)" >> $@
+#	@echo "{" >> $@
+#	$(foreach V,$(addprefix test_,$(fuzzfiles/simple)),echo "  DEPENDS($V);"; >> $@)
+#	@echo "}" >> $@
+
+tests/main.c:
+	@echo "#include \"../vendor/EvilUnit/EvilUnit.h\"" > $@
+	@echo "MAIN_MODULE()" >> $@
+	@echo "{" >> $@
+	@echo "  DEPENDS(tests_runner);" >> $@
+	@echo "}" >> $@
+
+
+$(SIMPLE_TESTS):	tests/test_%.c: fuzzfiles/simple/% | tests/gen.awk fuzzfiles/files.mk
+	gawk -f tests/gen.awk $^ > $@
+
+
+SIMPLE_TESTS_SRC := $(SIMPLE_TESTS) tests/runner.c tests/main.c
+clean::
+	rm -f $(SIMPLE_TESTS) tests/main.c
+
+SIMPLE_TESTS_OBJ := $(SIMPLE_TESTS_SRC:tests/%.c=$(VENDOR_DIR_OBJ)/tests/%.o)
+
+$(SIMPLE_TESTS_OBJ): $(VENDOR_DIR_OBJ)/tests/%.o: tests/%.c
+	@mkdir -p $(VENDOR_DIR_OBJ)/tests
+	@$(CC) $(CFLAGS) -O1 $< -c -o $@
+
+
+simple: ## name tbd, Run test cases through C
+simple: $(VENDOR_LIBTOMMATH_OBJ)
+simple: $(VENDOR_DIR_OBJ)/proto_impl.o $(VENDOR_DIR_OBJ)/proto_derived.o
+
+
+simple: $(SIMPLE_TESTS_OBJ) $(DEMOLANG_OBJ) 
+	@$(CC) $(CFLAGS) $^ $(LDFLAGS) -o $@
+
+clean::
+	@rm -f simple
+
 calc:
 calc: $(VENDOR_LIBTOMMATH_OBJ)
-calc: $(VENDOR_DIR_OBJ)/proto_impl.o
+calc: $(VENDOR_DIR_OBJ)/proto_impl.o $(VENDOR_DIR_OBJ)/proto_derived.o
 
 # libfuzzer is a c++ thing
 calc:	$(DEMOLANG_OBJ) 

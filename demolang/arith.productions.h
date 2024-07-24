@@ -6,25 +6,29 @@
 #include "arith.parser.h"
 
 enum arith_production {
-  arith_production_custom_production_result_expr_to_program = 0,
-  arith_production_custom_production_control_result_expr_to_program = 1,
-  arith_production_custom_production_FromInteger = 2,
-  arith_production_custom_production_FromControl = 3,
-  arith_production_custom_production_BinOpPlus = 4,
-  arith_production_custom_production_BinOpMinus = 5,
-  arith_production_custom_production_BinOpTimes = 6,
-  arith_production_custom_production_BinOpDivide = 7,
-  arith_production_custom_production_BinOpRemainder = 8,
-  arith_production_custom_production_BinOpBitOr = 9,
-  arith_production_custom_production_BinOpBitAnd = 10,
-  arith_production_custom_production_BinOpBitXor = 11,
-  arith_production_custom_production_UnOpAbsolute = 12,
-  arith_production_custom_production_UnOpNegate = 13,
-  arith_production_custom_production_UnOpIncrement = 14,
-  arith_production_custom_production_UnOpDecrement = 15,
+  arith_production_custom_production_control_expr_to_program = 0,
+  arith_production_custom_production_result_expr_to_program = 1,
+  arith_production_custom_production_control_result_expr_to_program = 2,
+  arith_production_custom_production_FromInteger = 3,
+  arith_production_custom_production_FromControl = 4,
+  arith_production_custom_production_BinOpPlus = 5,
+  arith_production_custom_production_BinOpMinus = 6,
+  arith_production_custom_production_BinOpTimes = 7,
+  arith_production_custom_production_BinOpDivide = 8,
+  arith_production_custom_production_BinOpRemainder = 9,
+  arith_production_custom_production_BinOpBitOr = 10,
+  arith_production_custom_production_BinOpBitAnd = 11,
+  arith_production_custom_production_BinOpBitXor = 12,
+  arith_production_custom_production_UnOpAbsolute = 13,
+  arith_production_custom_production_UnOpNegate = 14,
+  arith_production_custom_production_UnOpIncrement = 15,
+  arith_production_custom_production_UnOpDecrement = 16,
 };
-enum { arith_production_count = 16 };
+enum { arith_production_count = 17 };
 extern const char*arith_production_names[arith_production_count];
+
+// CustomProduction control_expr_to_program -> arith_grouping_program
+proto arith_custom_production_control_expr_to_program(struct arith_parse_state * ,proto /*control_block*/ x1 ,token /*SPACE*/ x2 ,proto /*expr*/ x3);
 
 // CustomProduction result_expr_to_program -> arith_grouping_program
 proto arith_custom_production_result_expr_to_program(struct arith_parse_state * ,proto /*integer*/ x1 ,token /*SPACE*/ x2 ,proto /*expr*/ x3);

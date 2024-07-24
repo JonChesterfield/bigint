@@ -1,10 +1,9 @@
 #!/usr/bin/gawk -f
 
-
- function basename(file) {
+function basename(file) {
     sub(".*/", "", file)
     return file
-  }
+}
 
 BEGIN {
     print "import unittest"
@@ -24,6 +23,5 @@ BEGIN {
     printf ("        self.assertEqual(%s, %s%s(%s", $1, funcprefix, $2, $3)
     for (i = 3; i < NF; i++)
         printf(", %s", $(i+1))
-    printf("))\n")
-    
+    printf("))\n")   
 }

@@ -17,85 +17,12 @@
 proto arith_custom_production_FromInteger(struct arith_parse_state* parse_ctx,
                                           token /*INTEGER*/ x1)
 {
-  // leaks pretty badly on the failure paths at present
   proto_context ctx = arith_parse_state_get_tree_context(parse_ctx);
 
   size_t width = token_width(x1);
   const char* bytes = token_value(x1);
-  if (width == 0)
-    {
-      proto_create_invalid();
-    }
 
-  bool neg = bytes[0] == '-';
-  if (neg)
-    {
-      if (width == 1)
-        {
-          return proto_create_invalid();
-        }
-      bytes++;
-      width--;
-    }
-
-  proto acc = proto_create(ctx, 1);
-  if (!proto_valid(ctx, acc)) return proto_create_invalid();
-  if (!proto_is_zero(ctx, acc))
-    {
-      proto_destroy(ctx, acc);
-      return proto_create_invalid();
-    }
-
-  proto ten = proto_from_u32(ctx, 10);
-  if (!proto_valid(ctx, ten))
-    {
-      proto_destroy(ctx, acc);
-      return proto_create_invalid();
-    }
-
-  for (size_t i = 0; i < width; i++)
-    {
-      char b = (bytes[i] - '0');
-      if (b < 0 || b > 9)
-        {
-          proto_destroy(ctx, acc);
-          proto_destroy(ctx, ten);
-          return proto_create_invalid();
-        }
-
-      {
-        proto tmp = proto_mul(ctx, acc, ten);
-        if (!proto_valid(ctx, tmp))
-          {
-            proto_destroy(ctx, acc);
-            proto_destroy(ctx, ten);
-            return proto_create_invalid();
-          }
-        proto_destroy(ctx, acc);
-        acc = tmp;
-      }
-
-      {
-        proto addend = proto_from_u32(ctx, (unsigned)b);
-        if (!proto_valid(ctx, addend)) return proto_create_invalid();
-        proto tmp = proto_add(ctx, acc, addend);
-        if (!proto_valid(ctx, tmp)) return proto_create_invalid();
-        proto_destroy(ctx, addend);
-        proto_destroy(ctx, acc);
-        acc = tmp;
-      }
-    }
-
-  proto_destroy(ctx, ten);
-
-  if (neg)
-    {
-      proto tmp = proto_neg(ctx, acc);
-      proto_destroy(ctx, acc);
-      acc = tmp;
-    }
-
-  return acc;
+  return proto_from_base10(ctx, bytes, width);
 }
 
 proto arith_custom_production_BinaryOp(struct arith_parse_state* parse_ctx,
@@ -378,8 +305,14 @@ proto arith_custom_production_result_expr_to_program(
 
   if (!proto_equal(ctx, x1, x3))
     {
+      fprintf(stderr, "Not equal\n");
+      proto_dump(ctx,x1);
+      proto_dump(ctx,x3);
+
+
       proto_destroy(ctx, x1);
       proto_destroy(ctx, x3);
+
       return proto_create_invalid();
     }
 
