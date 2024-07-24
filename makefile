@@ -126,25 +126,6 @@ $(DEMOLANG_DIR_OBJ)/%.o:	$(DEMOLANG_DIR)/%.c $(DEMOLANG_HDR) proto.h $(VENDOR_HD
 demolang::	$(DEMOLANG_OBJ)
 
 
-$(VENDOR_DIR_OBJ)/corpus_runner.o:	corpus_runner.c corpus.h $(VENDOR_HDR)
-	@mkdir -p $(VENDOR_DIR_OBJ)
-	@$(CC) $(CFLAGS) $< -c -o $@
-
-# This file gets big and rapidly takes excessive amounts of time to compile
-$(VENDOR_DIR_OBJ)/corpus_test.o:	corpus_test.c $(VENDOR_HDR)
-	@mkdir -p $(VENDOR_DIR_OBJ)
-	@$(CC) $(CFLAGS) -O0 $< -c -o $@
-
-corpus_runner: $(VENDOR_DIR_OBJ)/proto_impl.o $(VENDOR_LIBTOMMATH_OBJ)
-corpus_runner: $(DEMOLANG_OBJ)
-#corpus_runner: $(VENDOR_DIR_OBJ)/corpus.o
-corpus_runner: $(VENDOR_DIR_OBJ)/corpus_test.o
-corpus_runner: $(VENDOR_DIR_OBJ)/corpus_runner.o
-	@$(CC) $(CFLAGS) $(LDFLAGS) $^ -o $@
-
-clean::
-	@rm -f corpus_runner
-
 
 SEEDFILES := $(wildcard seedfiles/*)
 MORE_FUZZFILES :=
