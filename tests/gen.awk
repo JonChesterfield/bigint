@@ -11,8 +11,9 @@ BEGIN {
 
     
     printf ("MODULE(test_%s)\n{\n", basename(ARGV[1]))
-    printf ("  uint64_t ms = UINT64_MAX;\n")
-    printf ("  proto_context ctx = {.malloc_state = &ms,};\n")
+    printf ("  struct proto_context_ty context_state; \n")
+    printf ("  proto_context ctx = &context_state;\n")
+    printf ("  proto_context_init(ctx);\n")
     funcprefix="proto_"
 }
 

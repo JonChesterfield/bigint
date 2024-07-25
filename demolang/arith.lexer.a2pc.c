@@ -23,7 +23,12 @@
 
 #include <stdbool.h>
 #include <stdint.h>
+#if __has_attribute(musttail)
 #define MUSTTAIL __attribute__((musttail))
+#else
+#warning "Missing attribute musttail"
+#define MUSTTAIL
+#endif
 
 static lexer_match_t result_value(uint64_t active, uint64_t width)
 {

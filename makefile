@@ -77,6 +77,14 @@ $(VENDOR_OBJ):	$(VENDOR_DIR_OBJ)/%.o:	$(VENDOR_DIR)/%.c $(VENDOR_HDR)
 	@mkdir -p $(VENDOR_OBJ_DIR_LIST)
 	@$(CC) $(CFLAGS) $< -c -o $@
 
+
+
+VENDOR_LUA_OBJ := $(filter-out $(VENDOR_DIR_OBJ)/lua/luac.o,$(VENDOR_LUA_SRC:$(VENDOR_DIR)/%.c=$(VENDOR_DIR_OBJ)/%.o))
+lua: $(VENDOR_LUA_OBJ)
+	@$(CC) $(CFLAGS) $^ $(LDFLAGS) -o $@ -lm
+clean::
+	@rm -f lua
+
 VENDOR_LIBTOMMATH_OBJ := $(VENDOR_LIBTOMMATH_SRC:$(VENDOR_DIR)/%.c=$(VENDOR_DIR_OBJ)/%.o)
 .vendor.O/libtommath.o: $(VENDOR_LIBTOMMATH_OBJ)
 	ld -r $^ -o $@
@@ -92,10 +100,10 @@ $(VENDOR_LIBTOMMATH_CXX_OBJ):	$(VENDOR_DIR_OBJ)/%.cpp.o:	$(VENDOR_DIR)/%.c $(VEN
 build::	$(VENDOR_OBJ) .vendor.O/libtommath.o $(VENDOR_LIBTOMMATH_CXX_OBJ)
 
 
-PROTO_SRC := proto_impl.c proto.c proto_derived.c
+PROTO_SRC := proto_impl.c proto.c proto_derived.c proto_memory_check.c
 PROTO_OBJ := $(PROTO_SRC:%.c=$(VENDOR_DIR_OBJ)/%.o)
 
-$(PROTO_OBJ):	$(VENDOR_DIR_OBJ)/%.o:	%.c proto.h $(VENDOR_HDR)
+$(PROTO_OBJ):	$(VENDOR_DIR_OBJ)/%.o:	%.c proto.h proto_memory_check.h $(VENDOR_HDR)
 	@mkdir -p $(VENDOR_DIR_OBJ)
 	@$(CC) $(CFLAGS) $< -c -o $@
 
@@ -108,8 +116,12 @@ clean::
 
 build::	proto
 
-
-
+proto_memory_check.h:	lua api.lua
+	./lua api.lua memory_header proto proto proto_context > $@
+proto_memory_check.c:	lua api.lua
+	./lua api.lua memory_source proto proto proto_context > $@
+clean::
+	rm -f proto_memory_check.?
 
 DEMOLANG_DIR := demolang
 DEMOLANG_DIR_OBJ := .$(DEMOLANG_DIR).O
@@ -155,7 +167,7 @@ clean::
 	rm -rf $(SIMPLE_PYTHON) python/__pycache__
 
 $(SIMPLE_PYTHON):	python/test_%.py: fuzzfiles/simple/% | python/gen.awk fuzzfiles/files.mk
-	gawk -f python/gen.awk $^ > $@
+	gawk -f python/gen.awk $< > $@
 
 .PHONY: python
 python: ## Run test cases through python interpreter
@@ -181,19 +193,21 @@ tests/main.c:
 	@echo "}" >> $@
 
 
-$(SIMPLE_TESTS):	tests/test_%.c: fuzzfiles/simple/% | tests/gen.awk fuzzfiles/files.mk
-	gawk -f tests/gen.awk $^ > $@
+$(SIMPLE_TESTS):	tests/test_%.c: fuzzfiles/simple/% tests/gen.awk fuzzfiles/files.mk
+	gawk -f tests/gen.awk $< > $@
 
 
 SIMPLE_TESTS_SRC := $(SIMPLE_TESTS) tests/runner.c tests/main.c
 clean::
 	rm -f $(SIMPLE_TESTS) tests/main.c
 
+
 SIMPLE_TESTS_OBJ := $(SIMPLE_TESTS_SRC:tests/%.c=$(VENDOR_DIR_OBJ)/tests/%.o)
 
 $(SIMPLE_TESTS_OBJ): $(VENDOR_DIR_OBJ)/tests/%.o: tests/%.c
 	@mkdir -p $(VENDOR_DIR_OBJ)/tests
 	@$(CC) $(CFLAGS) -O0 $< -c -o $@
+
 
 
 simple: ## name tbd, Run test cases through C
@@ -206,6 +220,43 @@ simple: $(SIMPLE_TESTS_OBJ) $(DEMOLANG_OBJ)
 
 clean::
 	@rm -f simple
+
+
+MEMORY_TESTS := $(addprefix memory/test_,$(addsuffix .c,$(fuzzfiles/simple)))
+
+memory/main.c:
+	@echo "#include \"../vendor/EvilUnit/EvilUnit.h\"" > $@
+	@echo "MAIN_MODULE()" >> $@
+	@echo "{" >> $@
+	@echo "  DEPENDS(tests_memchk_runner);" >> $@
+	@echo "}" >> $@
+
+
+$(MEMORY_TESTS):	memory/test_%.c: fuzzfiles/simple/% memory/gen.awk fuzzfiles/files.mk
+	gawk -f memory/gen.awk $< > $@
+
+MEMORY_TESTS_SRC := $(MEMORY_TESTS) memory/runner.c memory/main.c
+clean::
+	rm -f $(MEMORY_TESTS) memory/main.c
+MEMORY_TESTS_OBJ := $(MEMORY_TESTS_SRC:memory/%.c=$(VENDOR_DIR_OBJ)/memory/%.o)
+
+
+$(MEMORY_TESTS_OBJ): $(VENDOR_DIR_OBJ)/memory/%.o: memory/%.c
+	@mkdir -p $(VENDOR_DIR_OBJ)/memory
+	@$(CC) $(CFLAGS) -O0 $< -c -o $@
+
+memory_test: ## name tbd, Run test cases through C
+memory_test: $(VENDOR_LIBTOMMATH_OBJ)
+memory_test: $(VENDOR_DIR_OBJ)/proto_impl.o $(VENDOR_DIR_OBJ)/proto_derived.o
+memory_test: $(VENDOR_DIR_OBJ)/proto_memory_check.o
+
+memory_test: $(MEMORY_TESTS_OBJ) $(DEMOLANG_OBJ) 
+	@$(CC) $(CFLAGS) $^ $(LDFLAGS) -o $@
+
+clean::
+	@rm -f memory_test
+
+
 
 calc:
 calc: $(VENDOR_LIBTOMMATH_OBJ)

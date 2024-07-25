@@ -15,10 +15,61 @@ struct proto_ty
 
 typedef struct proto_ty *proto;
 
-typedef struct
+
+struct proto_context_ty
 {
-  uint64_t *malloc_state;
-} proto_context;
+  uint64_t malloc_fuel;
+  uint64_t malloc_count;
+};
+
+typedef struct proto_context_ty *proto_context;
+
+static inline void proto_context_set_fuel_value(proto_context context, uint64_t value)
+{
+  context->malloc_fuel = value;
+}
+
+static inline uint64_t proto_context_fuel_value(proto_context context)
+{
+  return context->malloc_fuel;
+}
+
+static inline void proto_context_fuel_decrement(proto_context context)
+{
+  if (context->malloc_fuel != UINT64_MAX)
+    {
+      context->malloc_fuel--;
+    }
+}
+
+
+static inline void proto_context_set_count_value(proto_context context, uint64_t value)
+{
+  context->malloc_count = value;
+}
+
+static inline uint64_t proto_context_count_value(proto_context context)
+{
+  return context->malloc_count;
+}
+
+static inline void proto_context_count_increment(proto_context context)
+{
+  if (context->malloc_count != UINT64_MAX)
+    {
+      context->malloc_count++;
+    }
+}
+
+
+static inline void proto_context_init(proto_context context)
+{
+  proto_context_set_fuel_value(context, UINT64_MAX);
+  proto_context_set_count_value(context, 0);
+}
+
+
+
 
 // Create zero with at least digits allocated space
 proto proto_create(proto_context ctx, size_t digits);

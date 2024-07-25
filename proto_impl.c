@@ -12,17 +12,15 @@ _Static_assert(offsetof(struct proto_ty, digits) == 24, "");
 static bool can_alloc(proto_context ctx, size_t bytes)
 {
   (void)bytes;
-  uint64_t s = *(ctx.malloc_state);
-  if (s == UINT64_MAX)
-    {
-      return true;
-    }
+  uint64_t s = proto_context_fuel_value(ctx);
   if (s == 0)
     {
       // fprintf(stderr, "Out of memory tokens!\n");
       return false;
     }
-  (*ctx.malloc_state) = s - 1;
+
+  proto_context_fuel_decrement(ctx);
+  proto_context_count_increment(ctx);
   return true;
 }
 

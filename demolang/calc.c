@@ -102,8 +102,10 @@ int calclib_repeat(const uint8_t *bytes, size_t N, bool verbose,
   struct arith_parse_state parse_state_lemon;
   parse_state_lemon.stored = proto_sentinel();
 
-  uint64_t malloc_state = UINT64_MAX;
-  parse_state_lemon.context = (proto_context){.malloc_state = &malloc_state};
+  struct proto_context_ty proto_context_state;
+  proto_context_init(&proto_context_state);
+  
+  parse_state_lemon.context = &proto_context_state;
 
   lexer_iterator_t lexer_iterator =
       lexer_iterator_t_create((const char *)bytes, N);
@@ -172,7 +174,7 @@ int calclib_repeat(const uint8_t *bytes, size_t N, bool verbose,
     }
 
   bool parse_success = proto_valid(parse_state_lemon.context, lemon_res);
-  bool hit_oom = (malloc_state == 0);
+  bool hit_oom = proto_context_fuel_value(parse_state_lemon.context) == 0;
 
   proto_destroy(parse_state_lemon.context, lemon_res);
   arith_parser_lemon_finalize(&parser);

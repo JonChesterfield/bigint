@@ -9,10 +9,9 @@
 
 EVILUNIT_MODULE(proto)
 {
-  uint64_t malloc_state = UINT64_MAX;
-  proto_context ctx = {
-      .malloc_state = &malloc_state,
-  };
+  struct proto_context_ty state;
+  proto_context ctx = &state;
+  proto_context_init(ctx);
 
   TEST("Initial")
   {

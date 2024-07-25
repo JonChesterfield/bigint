@@ -257,7 +257,7 @@ proto arith_custom_production_FromControl(struct arith_parse_state* parse_ctx,
   // fprintf(stderr, "Setting malloc state to %lu\n", value);
 
   proto_context ctx = arith_parse_state_get_tree_context(parse_ctx);
-  *(ctx.malloc_state) = value;
+  proto_context_set_fuel_value(ctx, value);
 
   // This operation sets the state, doesn't otherwise affect the parse tree
   return proto_from_u32(ctx, 0);
