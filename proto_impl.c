@@ -310,17 +310,46 @@ static proto proto_mutating_unary(proto_context ctx, proto x,
       return proto_create_invalid();
     }
 
-  mp_int mx = proto_to_mp_int(res);
+  mp_int mr = proto_to_mp_int(res);
   global_set(&ctx);
-  mp_err err = func(&mx);
+  mp_err err = func(&mr);
   global_clear();
   if (err == MP_OKAY)
     {
-      return mp_int_to_proto(&mx);
+      return mp_int_to_proto(&mr);
     }
   else
     {
       proto_destroy(ctx, res);
+      return proto_create_invalid();
+    }
+}
+
+static proto proto_op_u32(proto_context ctx, proto x, uint32_t y,
+                          mp_err (*func)(const mp_int *, mp_digit, mp_int *))
+{
+  _Static_assert(MP_DIGIT_MAX >= UINT32_MAX, "");
+
+  mp_int mx = proto_to_mp_int(x);
+
+  proto z = proto_create(ctx, 1);
+  if (!proto_valid(ctx, z))
+    {
+      return proto_create_invalid();
+    }
+  mp_int mz = proto_to_mp_int(z);
+
+  global_set(&ctx);
+  mp_err err = func(&mx, y, &mz);
+  global_clear();
+
+  if (err == MP_OKAY)
+    {
+      return mp_int_to_proto(&mz);
+    }
+  else
+    {
+      proto_destroy(ctx, z);
       return proto_create_invalid();
     }
 }
@@ -380,6 +409,16 @@ static mp_err mp_div_remainder(const mp_int *a, const mp_int *b, mp_int *c)
   err = mp_div(a, b, &tmp, c);
   mp_clear(&tmp);
   return err;
+}
+
+proto proto_add_u32(proto_context ctx, proto x, uint32_t y)
+{
+  return proto_op_u32(ctx, x, y, mp_add_d);
+}
+
+proto proto_mul_u32(proto_context ctx, proto x, uint32_t y)
+{
+  return proto_op_u32(ctx, x, y, mp_mul_d);
 }
 
 proto proto_rem(proto_context ctx, proto x, proto y)

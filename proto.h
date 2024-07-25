@@ -77,4 +77,8 @@ proto proto_or(proto_context ctx, proto x, proto y);
 proto proto_and(proto_context ctx, proto x, proto y);
 proto proto_xor(proto_context ctx, proto x, proto y);
 
+proto proto_add_u32(proto_context ctx, proto x, uint32_t y);
+proto proto_mul_u32(proto_context ctx, proto x, uint32_t y);
+
+
 #endif

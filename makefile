@@ -14,7 +14,7 @@ ifeq ($(origin CXX),default)
 CXX = clang++
 endif
 
-CFLAGS ?= -std=c99 -Wall -O1 -g -gdwarf-4
+CFLAGS ?= -std=c99 -Wall -O1 -g -gdwarf-4 -Wno-unknown-attributes
 LDFLAGS ?=
 
 
@@ -193,7 +193,7 @@ SIMPLE_TESTS_OBJ := $(SIMPLE_TESTS_SRC:tests/%.c=$(VENDOR_DIR_OBJ)/tests/%.o)
 
 $(SIMPLE_TESTS_OBJ): $(VENDOR_DIR_OBJ)/tests/%.o: tests/%.c
 	@mkdir -p $(VENDOR_DIR_OBJ)/tests
-	@$(CC) $(CFLAGS) -O1 $< -c -o $@
+	@$(CC) $(CFLAGS) -O0 $< -c -o $@
 
 
 simple: ## name tbd, Run test cases through C
