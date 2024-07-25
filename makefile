@@ -241,7 +241,7 @@ clean::
 MEMORY_TESTS_OBJ := $(MEMORY_TESTS_SRC:memory/%.c=$(VENDOR_DIR_OBJ)/memory/%.o)
 
 
-$(MEMORY_TESTS_OBJ): $(VENDOR_DIR_OBJ)/memory/%.o: memory/%.c
+$(MEMORY_TESTS_OBJ): $(VENDOR_DIR_OBJ)/memory/%.o: memory/%.c proto_memory_check.h
 	@mkdir -p $(VENDOR_DIR_OBJ)/memory
 	@$(CC) $(CFLAGS) -O0 $< -c -o $@
 
