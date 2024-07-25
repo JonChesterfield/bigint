@@ -21,11 +21,9 @@ fast and also THIN_MUL
 21,950,266 allocs, 21,950,266 frees, 4,128,120,784 bytes allocated
 #endif
 
-#define WITH_REF 0
+#define WITH_REF 1
 #define WITH_FAST 1
-
-#define THIN_MUL 1
-
+  
 static uint32_t next_n(const char *bytes, size_t N, bool *bad)
 {
   // todo, 64 bit
@@ -40,35 +38,23 @@ static uint32_t next_n(const char *bytes, size_t N, bool *bad)
   return cursor;
 }
 
-static proto muladd32(proto_context ctx, proto acc, uint32_t mul,
-                      uint32_t cursor)
+static proto muladd32_move(proto_context ctx, proto acc, uint32_t mul,
+                           uint32_t cursor)
 {
+  // destroys acc
   proto tmp0 = proto_mul_u32(ctx, acc, mul);
   if (proto_valid(ctx, tmp0))
     {
       proto res = proto_add_u32(ctx, tmp0, cursor);
       proto_destroy(ctx, tmp0);
+      proto_destroy(ctx, acc);
       return res;
     }
   else
     {
+      proto_destroy(ctx, acc);
       return proto_create_invalid();
     }
-}
-
-static proto muladd(proto_context ctx, proto acc, proto mul, uint32_t cursor)
-{
-  proto tmp0 = proto_from_u32(ctx, cursor);
-  proto tmp1 = proto_mul(ctx, acc, mul);
-
-  bool ok = proto_valid(ctx, tmp0) && proto_valid(ctx, tmp1);
-
-  proto tmp2 = ok ? proto_add(ctx, tmp0, tmp1) : proto_create_invalid();
-
-  if (proto_valid(ctx, tmp0)) proto_destroy(ctx, tmp0);
-  if (proto_valid(ctx, tmp1)) proto_destroy(ctx, tmp1);
-
-  return tmp2;
 }
 
 static proto proto_from_base10_faster(proto_context ctx, const char *bytes,
@@ -113,16 +99,7 @@ static proto proto_from_base10_faster(proto_context ctx, const char *bytes,
 
   if (!proto_valid(ctx, acc)) return acc;
 
-#if THIN_MUL
   uint32_t mul = 100000000;
-#else
-  proto mul = proto_from_u32(ctx, 100000000);
-  if (!proto_valid(ctx, mul))
-    {
-      proto_destroy(ctx, acc);
-      return proto_create_invalid();
-    }
-#endif
 
   while (width >= 8)
     {
@@ -130,25 +107,16 @@ static proto proto_from_base10_faster(proto_context ctx, const char *bytes,
       bytes += 8;
       width -= 8;
 
-#if THIN_MUL
-      proto tmp = muladd32(ctx, acc, mul, cursor);
-#else
-      proto tmp = muladd(ctx, acc, mul, cursor);
-
-#endif
-      proto_destroy(ctx, acc);
-
-      if (proto_valid(ctx, tmp) && !bad)
+      if (bad)
         {
-          acc = tmp;
+          proto_destroy(ctx, acc);
+          return proto_create_invalid();
         }
-      else
+
+      acc = muladd32_move(ctx, acc, mul, cursor);
+
+      if (!proto_valid(acc))
         {
-          if (proto_valid(ctx, tmp)) proto_destroy(ctx, tmp);
-#if THIN_MUL
-#else
-          proto_destroy(ctx, mul);
-#endif
           return proto_create_invalid();
         }
     }
@@ -159,49 +127,21 @@ static proto proto_from_base10_faster(proto_context ctx, const char *bytes,
         uint32_t mulby = 1;
         for (size_t i = 0; i < width; i++) mulby *= 10;
 
-#if THIN_MUL
         mul = mulby;
-#else
-        {
-          proto nm = proto_from_u32(ctx, mulby);
-          if (proto_valid(ctx, nm))
-            {
-              proto_destroy(ctx, mul);
-              mul = nm;
-            }
-          else
-            {
-              bad = true;
-            }
-        }
-#endif
 
         uint32_t cursor = next_n(bytes, width, &bad);
-#if THIN_MUL
-        proto tmp = muladd32(ctx, acc, mul, cursor);
-#else
-        proto tmp = muladd(ctx, acc, mul, cursor);
-#endif
-        proto_destroy(ctx, acc);
-#if THIN_MUL
-#else
-        proto_destroy(ctx, mul);
-#endif
-
         if (bad)
           {
-            proto_destroy(ctx, tmp);
+            proto_destroy(ctx, acc);
             return proto_create_invalid();
           }
 
-        acc = tmp;
-      }
-    else
-      {
-#if THIN_MUL
-#else
-        proto_destroy(ctx, mul);
-#endif
+        acc = muladd32_move(ctx, acc, mul, cursor);
+
+        if (!proto_valid(acc))
+          {
+            return proto_create_invalid();
+          }
       }
 
     if (neg)

@@ -411,16 +411,6 @@ static mp_err mp_div_remainder(const mp_int *a, const mp_int *b, mp_int *c)
   return err;
 }
 
-proto proto_add_u32(proto_context ctx, proto x, uint32_t y)
-{
-  return proto_op_u32(ctx, x, y, mp_add_d);
-}
-
-proto proto_mul_u32(proto_context ctx, proto x, uint32_t y)
-{
-  return proto_op_u32(ctx, x, y, mp_mul_d);
-}
-
 proto proto_rem(proto_context ctx, proto x, proto y)
 {
   return proto_binary(ctx, x, y, mp_div_remainder);
@@ -437,6 +427,83 @@ proto proto_and(proto_context ctx, proto x, proto y)
 proto proto_xor(proto_context ctx, proto x, proto y)
 {
   return proto_binary(ctx, x, y, mp_xor);
+}
+
+proto proto_add_u32(proto_context ctx, proto x, uint32_t y)
+{
+  return proto_op_u32(ctx, x, y, mp_add_d);
+}
+
+proto proto_mul_u32(proto_context ctx, proto x, uint32_t y)
+{
+  return proto_op_u32(ctx, x, y, mp_mul_d);
+}
+
+// Care needed with error handling here. Assumes that the functions called
+// have no failure modes when passed the same value for both arguments
+
+static proto proto_op_unary_move(proto_context ctx, proto x,
+                                 mp_err (*func)(const mp_int *, mp_int *))
+{
+  if (!proto_valid(ctx, x))
+    {
+      return proto_create_invalid();
+    }
+
+  mp_int mx = proto_to_mp_int(x);
+
+  global_set(&ctx);
+  mp_err res = func(&mx, &mx);
+  (void)res;  // these do not alloc when passed same value twice
+  global_clear();
+
+  return mp_int_to_proto(&mx);
+}
+
+static proto proto_op_u32_move(proto_context ctx, proto x, uint32_t y,
+                               mp_err (*func)(const mp_int *, mp_digit,
+                                              mp_int *))
+{
+  _Static_assert(MP_DIGIT_MAX >= UINT32_MAX, "");
+
+  mp_int mx = proto_to_mp_int(x);
+
+  global_set(&ctx);
+  mp_err err = func(&mx, y, &mx);
+  global_clear();
+
+  // These may need to allocate
+  // Could lift the c->alloc < (a->used + 1) check
+  // They work by making sure there's a word available then clamp at the end
+  if (err == MP_OKAY)
+    {
+      return mp_int_to_proto(&mx);
+    }
+  else
+    {
+      proto_destroy(ctx, x);
+      return proto_create_invalid();
+    }
+}
+
+proto proto_abs_move(proto_context ctx, proto x)
+{
+  return proto_op_unary_move(ctx, x, mp_abs);
+}
+
+proto proto_neg_move(proto_context ctx, proto x)
+{
+  return proto_op_unary_move(ctx, x, mp_neg);
+}
+
+proto proto_add_u32_move(proto_context ctx, proto x, uint32_t y)
+{
+  return proto_op_u32_move(ctx, x, y, mp_add_d);
+}
+
+proto proto_mul_u32_move(proto_context ctx, proto x, uint32_t y)
+{
+  return proto_op_u32_move(ctx, x, y, mp_mul_d);
 }
 
 // Define the libtommath memory interface non-invasively

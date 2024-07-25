@@ -80,5 +80,11 @@ proto proto_xor(proto_context ctx, proto x, proto y);
 proto proto_add_u32(proto_context ctx, proto x, uint32_t y);
 proto proto_mul_u32(proto_context ctx, proto x, uint32_t y);
 
+// As above, except they call destroy on the arguments
+proto proto_abs_move(proto_context ctx, proto x);
+proto proto_neg_move(proto_context ctx, proto x);
+
+proto proto_add_u32_move(proto_context ctx, proto x, uint32_t y);
+proto proto_mul_u32_move(proto_context ctx, proto x, uint32_t y);
 
 #endif
