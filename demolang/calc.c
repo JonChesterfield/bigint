@@ -388,7 +388,7 @@ no_more_lexemes:;
   goto hack;
 }
 
-size_t LLVMFuzzerCustomCrossOver(const uint8_t *Data1, size_t Size1,
+size_t Disabled_LLVMFuzzerCustomCrossOver(const uint8_t *Data1, size_t Size1,
                                  const uint8_t *Data2, size_t Size2,
                                  uint8_t *Out, size_t MaxOutSize,
                                  unsigned int SeedIn)

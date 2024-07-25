@@ -305,10 +305,11 @@ proto arith_custom_production_result_expr_to_program(
 
   if (!proto_equal(ctx, x1, x3))
     {
+#if 0
       fprintf(stderr, "Not equal\n");
       proto_dump(ctx,x1);
       proto_dump(ctx,x3);
-
+#endif
 
       proto_destroy(ctx, x1);
       proto_destroy(ctx, x3);
