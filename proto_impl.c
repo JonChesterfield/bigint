@@ -45,8 +45,20 @@ static proto mp_int_to_proto(mp_int *x)
   return res;
 }
 
-proto proto_create(proto_context ctx, size_t digits)
+proto proto_create_default_size(proto_context ctx)
 {
+  // docs say the alloc size should never be zero
+  // mp_init passes MP_PREC which is probably 8
+  // current tests pass with zero though, lets try it
+  if (proto_context_fuel_value(ctx) != UINT64_MAX)
+    return proto_create(ctx, 0);
+  else
+    return proto_create(ctx, 1); // todo should probably be the same as mp_init
+}
+
+
+proto proto_create(proto_context ctx, size_t digits)
+{  
   size_t bytes = sizeof(struct proto_ty) + digits * sizeof(uint64_t);
   proto state = can_alloc(ctx, bytes) ? malloc(bytes) : 0;
   if (state)
@@ -202,7 +214,7 @@ static void global_clear(void);
 
 proto proto_from_u32(proto_context ctx, uint32_t val)
 {
-  proto p = proto_create(ctx, 1);
+  proto p = proto_create_default_size(ctx);
   if (!proto_valid(ctx, p))
     {
       return p;
@@ -236,7 +248,7 @@ static proto proto_unary(proto_context ctx, proto x,
       return proto_create_invalid();
     }
 
-  proto y = proto_create(ctx, 1);
+  proto y = proto_create_default_size(ctx);
   if (!proto_valid(ctx, y))
     {
       return proto_create_invalid();
@@ -269,7 +281,7 @@ static proto proto_binary(proto_context ctx, proto x, proto y,
       return proto_create_invalid();
     }
 
-  proto z = proto_create(ctx, 1);
+  proto z = proto_create_default_size(ctx);
   if (!proto_valid(ctx, z))
     {
       return proto_create_invalid();
@@ -330,7 +342,7 @@ static proto proto_op_u32(proto_context ctx, proto x, uint32_t y,
 
   mp_int mx = proto_to_mp_int(x);
 
-  proto z = proto_create(ctx, 1);
+  proto z = proto_create_default_size(ctx);
   if (!proto_valid(ctx, z))
     {
       return proto_create_invalid();
@@ -527,7 +539,8 @@ uint32_t proto_base_ten_per_digit(proto_context ctx)
 }
 
 // Define the libtommath memory interface non-invasively
-
+// mp_init passes MP_PREC as the size field, i.e. mp_init
+// can fail.
 mp_err mp_init_size(mp_int *a, int size)
 {
   if (size < 0)
@@ -569,6 +582,24 @@ void mp_clear(mp_int *a)
       a->sign = MP_ZPOS;
     }
 }
+
+
+// This is called in a context where 'size' is known to be the designed value
+// e.g.
+/*
+int used = MP_MAX(a->used, b->used) + 1;
+if (c->alloc < used) {
+  if ((err = mp_grow(c, used)) != MP_OKAY) {
+    return err;
+  }
+}
+*/
+// This is difficult to catch from a fallable malloc. Used is the number of limbs needed
+// in the output, if the value passed in already has some memory allocated, this may never
+// trigger
+// I think there's an invariant in libtommath that alloc is never zero, as well as tending
+// to allocate at least a few words by default
+
 
 mp_err mp_grow(mp_int *a, int size)
 {
