@@ -506,6 +506,28 @@ proto proto_mul_u32_move(proto_context ctx, proto x, uint32_t y)
   return proto_op_u32_move(ctx, x, y, mp_mul_d);
 }
 
+uint64_t proto_digit_max(proto_context ctx)
+{
+  (void)ctx;
+  // hardcoding these for the moment
+  _Static_assert(MP_DIGIT_BIT  ==  60, "");
+  _Static_assert(MP_DIGIT_MAX == 1152921504606846976-1, ""); // 2**60 -1
+
+  // 18 base 10 digitis is the limit
+  // (2**60-1) > 10**18 // true
+  // (2**60-1) > 10**19 // false
+
+  
+  return MP_DIGIT_MAX;
+}
+
+uint32_t proto_base_ten_per_digit(proto_context ctx)
+{
+  (void)ctx;
+  _Static_assert(MP_DIGIT_BIT  ==  60, "");
+  return 18;
+}
+
 // Define the libtommath memory interface non-invasively
 
 mp_err mp_init_size(mp_int *a, int size)

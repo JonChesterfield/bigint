@@ -1,28 +1,24 @@
 #include "proto.h"
 #include <stdio.h>
 
-// Rough timings on this under valgrind
-#if 0
-fast
-1m53
-27,439,426 allocs, 27,439,426 frees, 4,345,449,904 bytes allocated
+// reference allocates much more than fast+move
+// current test suite (moving target, it's whatever is in the fuzz dir) has:
 
-ref
-12m24
-215,283,256 allocs, 215,283,256 frees, 33,950,723,344 bytes allocated
+// both:
+// 31m
+// total heap usage: 819,654,466 allocs, 114,534,478,024 bytes allocated
 
-both
-13m52
-242,232,141 allocs, 242,232,141 frees, 38,210,842,144 bytes allocated
+// ref:
+// 30m19
+// 818,128,671 allocs, 114,351,220,544 bytes allocated
 
-  
-fast and also THIN_MUL
-1m19
-21,950,266 allocs, 21,950,266 frees, 4,128,120,784 bytes allocated
-#endif
+// fast_move:
+// 3m57
+// heap usage: 3,032,951 allocs, 543,236,824 bytes allocated
 
-#define WITH_REF 1
-#define WITH_FAST 1
+#define WITH_REF 0 // simple code path
+#define WITH_FAST 1 // use uint32_t values instead of bigint everywhere
+#define WITH_MOVE 1 // avoids more allocations by mutating in place
   
 static uint32_t next_n(const char *bytes, size_t N, bool *bad)
 {
@@ -42,6 +38,10 @@ static proto muladd32_move(proto_context ctx, proto acc, uint32_t mul,
                            uint32_t cursor)
 {
   // destroys acc
+#if WITH_MOVE
+  acc = proto_mul_u32_move(ctx, acc, mul);
+  return proto_valid(ctx, acc) ? proto_add_u32_move(ctx, acc, cursor) : proto_create_invalid();
+#else
   proto tmp0 = proto_mul_u32(ctx, acc, mul);
   if (proto_valid(ctx, tmp0))
     {
@@ -55,6 +55,7 @@ static proto muladd32_move(proto_context ctx, proto acc, uint32_t mul,
       proto_destroy(ctx, acc);
       return proto_create_invalid();
     }
+#endif
 }
 
 static proto proto_from_base10_faster(proto_context ctx, const char *bytes,
@@ -76,22 +77,60 @@ static proto proto_from_base10_faster(proto_context ctx, const char *bytes,
       width--;
     }
 
+  // trim leading '0' here?
+  
   bool bad = false;
   size_t lim = width < 8 ? width : 8;
 
-  proto acc = bad ? proto_create_invalid()
-                  : proto_from_u32(ctx, next_n(bytes, lim, &bad));
+  
+  uint32_t cur = next_n(bytes, lim, &bad);
+  if (bad) {
+    return proto_create_invalid();
+  }
+  
+#if WITH_MOVE
+  // Move means adding to zero is cheap, can control the allocation size
+  // size is in base ten, can use the number of base ten values stored in a
+  // digit to get an overestimate of the storage needed
+
+#if 1
+  const uint32_t base_ten_per = proto_base_ten_per_digit(ctx); // todo, make this compile time?
+  size_t est = (width + base_ten_per-1) / base_ten_per;
+#else
+  size_t est = 1;
+#endif
+  
+  proto acc = proto_create(ctx, est);
+  if (!proto_valid(ctx, acc))
+    {
+      return proto_create_invalid();
+    }
+  acc = proto_add_u32_move(ctx, acc, cur);
+  // known valid, allocated at least one digit and cursor fits in that
+#else
+  proto acc = proto_from_u32(ctx, cur);
+  if (!proto_valid(ctx, acc))
+    {
+      return proto_create_invalid();
+    }
+  
+#endif
 
   bytes += lim;
   width -= lim;
 
+  
   if (width == 0)
     {
       if (neg)
         {
+#if WITH_MOVE
+          acc = proto_neg_move(ctx, acc);
+#else
           proto tmp1 = proto_neg(ctx, acc);
           proto_destroy(ctx, acc);
           acc = tmp1;
+#endif
         }
 
       return acc;
@@ -115,7 +154,7 @@ static proto proto_from_base10_faster(proto_context ctx, const char *bytes,
 
       acc = muladd32_move(ctx, acc, mul, cursor);
 
-      if (!proto_valid(acc))
+      if (!proto_valid(ctx, acc))
         {
           return proto_create_invalid();
         }
@@ -138,7 +177,7 @@ static proto proto_from_base10_faster(proto_context ctx, const char *bytes,
 
         acc = muladd32_move(ctx, acc, mul, cursor);
 
-        if (!proto_valid(acc))
+        if (!proto_valid(ctx, acc))
           {
             return proto_create_invalid();
           }
@@ -146,9 +185,13 @@ static proto proto_from_base10_faster(proto_context ctx, const char *bytes,
 
     if (neg)
       {
+#if WITH_MOVE
+        acc = proto_neg_move(ctx, acc);
+#else
         proto tmp1 = proto_neg(ctx, acc);
         proto_destroy(ctx, acc);
         acc = tmp1;
+#endif
       }
 
     return acc;

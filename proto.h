@@ -87,4 +87,10 @@ proto proto_neg_move(proto_context ctx, proto x);
 proto proto_add_u32_move(proto_context ctx, proto x, uint32_t y);
 proto proto_mul_u32_move(proto_context ctx, proto x, uint32_t y);
 
+// Misc, not sure how to expose this interface yet
+// need to know how big a digit is to know how many to allocate
+// it's the base 2 number that can be stored in a single digit
+uint64_t proto_digit_max(proto_context);
+uint32_t proto_base_ten_per_digit(proto_context);
+
 #endif
