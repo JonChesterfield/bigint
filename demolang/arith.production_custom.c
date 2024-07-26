@@ -2,6 +2,7 @@
 #include "arith.parser.h"
 #include "arith.productions.h"
 
+#include "../proto_memory_check.h"
 #define EXPLICIT_SPACING 1
 
 #if EXPLICIT_SPACING
@@ -56,7 +57,7 @@ proto arith_custom_production_BinOpPlus(struct arith_parse_state* parse_ctx,
   VOID(0);
   VOID(1);
   VOID(2);
-  return arith_custom_production_BinaryOp(parse_ctx, proto_add, x2, x3);
+  return arith_custom_production_BinaryOp(parse_ctx, proto_memchk_add, x2, x3);
 }
 
 // CustomProduction BinOpMinus -> arith_grouping_expr
@@ -69,7 +70,7 @@ proto arith_custom_production_BinOpMinus(struct arith_parse_state* parse_ctx,
   VOID(0);
   VOID(1);
   VOID(2);
-  return arith_custom_production_BinaryOp(parse_ctx, proto_sub, x2, x3);
+  return arith_custom_production_BinaryOp(parse_ctx, proto_memchk_sub, x2, x3);
 }
 
 // CustomProduction BinOpTimes -> arith_grouping_expr
@@ -82,7 +83,7 @@ proto arith_custom_production_BinOpTimes(struct arith_parse_state* parse_ctx,
   VOID(0);
   VOID(1);
   VOID(2);
-  return arith_custom_production_BinaryOp(parse_ctx, proto_mul, x2, x3);
+  return arith_custom_production_BinaryOp(parse_ctx, proto_memchk_mul, x2, x3);
 }
 
 // CustomProduction BinOpDivide -> arith_grouping_expr
@@ -95,7 +96,7 @@ proto arith_custom_production_BinOpDivide(struct arith_parse_state* parse_ctx,
   VOID(0);
   VOID(1);
   VOID(2);
-  return arith_custom_production_BinaryOp(parse_ctx, proto_div, x2, x3);
+  return arith_custom_production_BinaryOp(parse_ctx, proto_memchk_div, x2, x3);
 }
 
 // CustomProduction BinOpModulo -> arith_grouping_expr
@@ -107,7 +108,7 @@ proto arith_custom_production_BinOpRemainder(
   VOID(0);
   VOID(1);
   VOID(2);
-  return arith_custom_production_BinaryOp(parse_ctx, proto_rem, x2, x3);
+  return arith_custom_production_BinaryOp(parse_ctx, proto_memchk_rem, x2, x3);
 }
 
 proto arith_custom_production_BinOpBitOr(struct arith_parse_state* parse_ctx,
@@ -119,7 +120,7 @@ proto arith_custom_production_BinOpBitOr(struct arith_parse_state* parse_ctx,
   VOID(0);
   VOID(1);
   VOID(2);
-  return arith_custom_production_BinaryOp(parse_ctx, proto_or, x2, x3);
+  return arith_custom_production_BinaryOp(parse_ctx, proto_memchk_or, x2, x3);
 }
 
 proto arith_custom_production_BinOpBitAnd(struct arith_parse_state* parse_ctx,
@@ -131,7 +132,7 @@ proto arith_custom_production_BinOpBitAnd(struct arith_parse_state* parse_ctx,
   VOID(0);
   VOID(1);
   VOID(2);
-  return arith_custom_production_BinaryOp(parse_ctx, proto_and, x2, x3);
+  return arith_custom_production_BinaryOp(parse_ctx, proto_memchk_and, x2, x3);
 }
 
 proto arith_custom_production_BinOpBitXor(struct arith_parse_state* parse_ctx,
@@ -143,7 +144,7 @@ proto arith_custom_production_BinOpBitXor(struct arith_parse_state* parse_ctx,
   VOID(0);
   VOID(1);
   VOID(2);
-  return arith_custom_production_BinaryOp(parse_ctx, proto_xor, x2, x3);
+  return arith_custom_production_BinaryOp(parse_ctx, proto_memchk_xor, x2, x3);
 }
 
 proto arith_custom_production_UnOpAbsolute(struct arith_parse_state* parse_ctx,
@@ -154,7 +155,7 @@ proto arith_custom_production_UnOpAbsolute(struct arith_parse_state* parse_ctx,
   (void)x1;
   VOID(0);
   VOID(1);
-  return arith_custom_production_UnaryOp(parse_ctx, proto_abs, x2);
+  return arith_custom_production_UnaryOp(parse_ctx, proto_memchk_abs, x2);
 }
 
 proto arith_custom_production_UnOpNegate(struct arith_parse_state* parse_ctx,
@@ -164,7 +165,7 @@ proto arith_custom_production_UnOpNegate(struct arith_parse_state* parse_ctx,
   (void)x1;
   VOID(0);
   VOID(1);
-  return arith_custom_production_UnaryOp(parse_ctx, proto_neg, x2);
+  return arith_custom_production_UnaryOp(parse_ctx, proto_memchk_neg, x2);
 }
 
 proto arith_custom_production_UnOpIncrement(struct arith_parse_state* parse_ctx,
@@ -175,7 +176,7 @@ proto arith_custom_production_UnOpIncrement(struct arith_parse_state* parse_ctx,
   (void)x1;
   VOID(0);
   VOID(1);
-  return arith_custom_production_UnaryOp(parse_ctx, proto_incr, x2);
+  return arith_custom_production_UnaryOp(parse_ctx, proto_memchk_incr, x2);
 }
 
 proto arith_custom_production_UnOpDecrement(struct arith_parse_state* parse_ctx,
@@ -186,7 +187,7 @@ proto arith_custom_production_UnOpDecrement(struct arith_parse_state* parse_ctx,
   (void)x1;
   VOID(0);
   VOID(1);
-  return arith_custom_production_UnaryOp(parse_ctx, proto_decr, x2);
+  return arith_custom_production_UnaryOp(parse_ctx, proto_memchk_decr, x2);
 }
 
 static uint32_t base32_decode(char c)
@@ -303,6 +304,11 @@ proto arith_custom_production_result_expr_to_program(
       return proto_create_invalid();
     }
 
+#if 0
+  // if the calculation is interesting to the fuzzer, we can sort out
+  // the right answer to it later. Likewise could tolerate variable
+  // amounts of whitespace etc - its easy to normalise it afterwards
+  
   if (!proto_equal(ctx, x1, x3))
     {
 #if 0
@@ -316,6 +322,7 @@ proto arith_custom_production_result_expr_to_program(
 
       return proto_create_invalid();
     }
+#endif
 
   proto_destroy(ctx, x1);
   return x3;

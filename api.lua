@@ -100,6 +100,8 @@ for _, row in ipairs(api_table) do
    call = call .. ")"
 
    -- todo, generalise the other strings
+   -- the off by one in the for loop is unfortunate, meant never catching
+   -- the last memory allocation in the routine
    r = r .. string.format([[
 {
    uint64_t initial_fuel = proto_context_fuel_value(context);
@@ -114,7 +116,8 @@ for _, row in ipairs(api_table) do
    if (%s_valid(context, result))
    {
      uint64_t used = proto_context_count_value(context);
-     for (uint64_t allow = used-1; allow --> 0;)
+     
+     for (uint64_t allow = used/*-1*/; allow --> 0;)
      {
        proto_context_set_fuel_value(context, allow);     
        proto_context_set_count_value(context, 0);

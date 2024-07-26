@@ -81,7 +81,7 @@ $(VENDOR_OBJ):	$(VENDOR_DIR_OBJ)/%.o:	$(VENDOR_DIR)/%.c $(VENDOR_HDR)
 
 VENDOR_LUA_OBJ := $(filter-out $(VENDOR_DIR_OBJ)/lua/luac.o,$(VENDOR_LUA_SRC:$(VENDOR_DIR)/%.c=$(VENDOR_DIR_OBJ)/%.o))
 lua: $(VENDOR_LUA_OBJ)
-	@$(CC) $(CFLAGS) $^ $(LDFLAGS) -o $@ -lm
+	@$(CC) $(CFLAGS) $^ -o $@ -lm # no ldflags, don't want to link in a fuzzer
 clean::
 	@rm -f lua
 
@@ -130,7 +130,7 @@ DEMOLANG_SRC := $(addprefix demolang/,$(filter %.c,$(DEMOLANG_FILES)))
 DEMOLANG_HDR := $(addprefix demolang/,$(filter %.h,$(DEMOLANG_FILES)))
 DEMOLANG_OBJ := $(DEMOLANG_SRC:$(DEMOLANG_DIR)/%.c=$(DEMOLANG_DIR_OBJ)/%.o)
 
-$(DEMOLANG_DIR_OBJ)/%.o:	$(DEMOLANG_DIR)/%.c $(DEMOLANG_HDR) proto.h $(VENDOR_HDR)
+$(DEMOLANG_DIR_OBJ)/%.o:	$(DEMOLANG_DIR)/%.c $(DEMOLANG_HDR) proto.h $(VENDOR_HDR)  proto_memory_check.h proto.h
 	@mkdir -p $(DEMOLANG_DIR_OBJ)
 	@$(CC) $(CFLAGS) $< -c -o $@
 
@@ -212,7 +212,7 @@ $(SIMPLE_TESTS_OBJ): $(VENDOR_DIR_OBJ)/tests/%.o: tests/%.c
 
 simple: ## name tbd, Run test cases through C
 simple: $(VENDOR_LIBTOMMATH_OBJ)
-simple: $(VENDOR_DIR_OBJ)/proto_impl.o $(VENDOR_DIR_OBJ)/proto_derived.o
+simple: $(VENDOR_DIR_OBJ)/proto_impl.o $(VENDOR_DIR_OBJ)/proto_derived.o $(VENDOR_DIR_OBJ)/proto_memory_check.o
 
 
 simple: $(SIMPLE_TESTS_OBJ) $(DEMOLANG_OBJ) 
@@ -260,7 +260,7 @@ clean::
 
 calc:
 calc: $(VENDOR_LIBTOMMATH_OBJ)
-calc: $(VENDOR_DIR_OBJ)/proto_impl.o $(VENDOR_DIR_OBJ)/proto_derived.o
+calc: $(VENDOR_DIR_OBJ)/proto_impl.o $(VENDOR_DIR_OBJ)/proto_derived.o $(VENDOR_DIR_OBJ)/proto_memory_check.o
 
 # libfuzzer is a c++ thing
 calc:	$(DEMOLANG_OBJ) 
