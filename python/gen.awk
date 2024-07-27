@@ -16,11 +16,13 @@ BEGIN {
     printf ("class Test_%s_Function(unittest.TestCase):\n", basename(ARGV[1]))
     printf ("    def test_cases(self):\n")
 
-    funcprefix="bigint.op_"
+    funcprefix="bigint.opmap['"
+    funcsuffix="']"
 }
 
 {
-    printf ("        self.assertEqual(%s, %s%s(%s", $1, funcprefix, $2, $3)
+
+    printf ("        self.assertEqual(%s, %s%s%s(%s", $1, funcprefix, $2, funcsuffix, $3)
     for (i = 3; i < NF; i++)
         printf(", %s", $(i+1))
     printf("))\n")   

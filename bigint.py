@@ -44,3 +44,19 @@ def op_abs(x):
 
 def op_neg(x):
     return -1 * x
+
+
+opmap = {
+    'add' : op_add,
+    'sub' : op_sub,
+    'mul' : op_mul,
+    'div' : op_div,
+    'rem' : op_rem,
+    'and' : op_and,
+    'or' : op_or,
+    'xor' : op_xor,
+    'incr' : op_incr,
+    'decr' : op_decr,
+    'abs' : op_abs,
+    'neg' : op_neg,
+}

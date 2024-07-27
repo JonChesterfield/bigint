@@ -138,7 +138,7 @@ demolang::	$(DEMOLANG_OBJ)
 
 
 SEEDFILES := $(wildcard seedfiles/*)
-MORE_FUZZFILES := $(wildcard /scratch/jon/fuzz/corpus/*)
+MORE_FUZZFILES := #$(wildcard /scratch/jon/fuzz/corpus/*)
 
 
 # This file is working around makefile passing many files to a single
@@ -150,23 +150,39 @@ $(foreach V,$(MORE_FUZZFILES),$(file >>$(CAT_FUZZFILES),$(file <$V)))
 
 
 FUZZ_FILES_DIR := $(SELF_DIR)/fuzzfiles/
-include fuzzfiles/files.mk
 clean::
 	@rm -rf $(CAT_FUZZFILES) fuzzfiles
 
-ifeq (,$(wildcard fuzzfiles/files.mk))
-fuzzfiles/files.mk: split.awk $(CAT_FUZZFILES)
-	@mkdir -p fuzzfiles
-	@gawk --lint -f split.awk fuzzfiles/ $(SEEDFILES) $(CAT_FUZZFILES)
+
+EXTRACT_FILES_DIR := $(SELF_DIR)/extractfiles/
+include extractfiles/files.mk
+clean::
+	@rm -rf $(CAT_EXTRACTFILES) extractfiles
+
+ifeq (,$(wildcard extractfiles/files.mk))
+extractfiles/files.mk: extract.awk $(CAT_EXTRACTFILES)
+	@mkdir -p extractfiles
+	@gawk --lint -f extract.awk extractfiles/ $(SEEDFILES) $(CAT_FUZZFILES)
 endif
 
 
-SIMPLE_PYTHON := $(addprefix python/test_,$(addsuffix .py,$(fuzzfiles/simple)))
+EXTRACT_SOURCE := $(addprefix extractfiles/,$(extract_files))
+
+TESTCASE_SOURCE := $(addprefix testcases/,$(extract_files))
+
+# Calculates the answer python expects for the given arithmetic
+$(TESTCASE_SOURCE): testcases/%: extractfiles/% extractfiles/files.mk testcases.py
+	python3 testcases.py $< > $@
 
 clean::
-	rm -rf $(SIMPLE_PYTHON) python/__pycache__
+	@rm -f $(TESTCASE_SOURCE)
 
-$(SIMPLE_PYTHON):	python/test_%.py: fuzzfiles/simple/% | python/gen.awk fuzzfiles/files.mk
+SIMPLE_PYTHON := $(addprefix python/test_,$(addsuffix .py,$(extract_files)))
+
+clean::
+	@rm -rf $(SIMPLE_PYTHON) python/__pycache__ __pycache__
+
+$(SIMPLE_PYTHON):	python/test_%.py: testcases/% | python/gen.awk extractfiles/files.mk
 	gawk -f python/gen.awk $< > $@
 
 .PHONY: python
@@ -175,15 +191,8 @@ python: $(SIMPLE_PYTHON) python/gen.awk
 	python3 -m unittest discover python -v
 
 
-SIMPLE_TESTS := $(addprefix tests/test_,$(addsuffix .c,$(fuzzfiles/simple)))
+SIMPLE_TESTS := $(addprefix tests/test_,$(addsuffix .c,$(extract_files)))
 
-# this is missing the first case (no mul?, leave it handwritten for the time being)
-#tests/runner.c:	$(SIMPLE_TESTS)
-#	@echo "#include \"../vendor/EvilUnit/EvilUnit.h\"" > $@
-#	@echo "MODULE(tests_runner)" >> $@
-#	@echo "{" >> $@
-#	$(foreach V,$(addprefix test_,$(fuzzfiles/simple)),echo "  DEPENDS($V);"; >> $@)
-#	@echo "}" >> $@
 
 tests/main.c:
 	@echo "#include \"../vendor/EvilUnit/EvilUnit.h\"" > $@
@@ -193,7 +202,7 @@ tests/main.c:
 	@echo "}" >> $@
 
 
-$(SIMPLE_TESTS):	tests/test_%.c: fuzzfiles/simple/% tests/gen.awk fuzzfiles/files.mk
+$(SIMPLE_TESTS):	tests/test_%.c: testcases/% tests/gen.awk extractfiles/files.mk
 	gawk -f tests/gen.awk $< > $@
 
 
@@ -210,6 +219,7 @@ $(SIMPLE_TESTS_OBJ): $(VENDOR_DIR_OBJ)/tests/%.o: tests/%.c
 
 
 
+
 simple: ## name tbd, Run test cases through C
 simple: $(VENDOR_LIBTOMMATH_OBJ)
 simple: $(VENDOR_DIR_OBJ)/proto_impl.o $(VENDOR_DIR_OBJ)/proto_derived.o $(VENDOR_DIR_OBJ)/proto_memory_check.o
@@ -222,7 +232,7 @@ clean::
 	@rm -f simple
 
 
-MEMORY_TESTS := $(addprefix memory/test_,$(addsuffix .c,$(fuzzfiles/simple)))
+MEMORY_TESTS := $(addprefix memory/test_,$(addsuffix .c,$(extract_files)))
 
 memory/main.c:
 	@echo "#include \"../vendor/EvilUnit/EvilUnit.h\"" > $@
@@ -232,7 +242,7 @@ memory/main.c:
 	@echo "}" >> $@
 
 
-$(MEMORY_TESTS):	memory/test_%.c: fuzzfiles/simple/% memory/gen.awk fuzzfiles/files.mk
+$(MEMORY_TESTS):	memory/test_%.c: testcases/% memory/gen.awk extractfiles/files.mk
 	gawk -f memory/gen.awk $< > $@
 
 MEMORY_TESTS_SRC := $(MEMORY_TESTS) memory/runner.c memory/main.c
