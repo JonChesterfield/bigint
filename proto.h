@@ -128,6 +128,27 @@ proto proto_or(proto_context ctx, proto x, proto y);
 proto proto_and(proto_context ctx, proto x, proto y);
 proto proto_xor(proto_context ctx, proto x, proto y);
 
+#if 0
+// Complicated by tommath (sensibly) only accepting int for distance
+proto proto_ash(proto_context ctx, proto x, proto y);
+proto proto_rsh(proto_context ctx, proto x, proto y);
+proto proto_lsh(proto_context ctx, proto x, proto y);
+#endif
+
+typedef enum
+{
+  proto_cmp_res_lt = -1,
+  proto_cmp_res_eq = 0,
+  proto_cmp_res_gt = 1,    
+} proto_cmp_res;
+
+proto_cmp_res proto_cmp_enum(proto_context ctx, proto x, proto y);
+proto_cmp_res proto_cmp_enum_u32(proto_context ctx, proto x, uint32_t y);
+
+// returns -1 for lt, 0 for eq, +1 for gt
+proto proto_cmp(proto_context ctx, proto x, proto y);
+proto proto_cmp_u32(proto_context ctx, proto x, uint32_t y);
+
 proto proto_add_u32(proto_context ctx, proto x, uint32_t y);
 proto proto_mul_u32(proto_context ctx, proto x, uint32_t y);
 

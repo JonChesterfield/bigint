@@ -309,3 +309,29 @@ proto proto_from_base10(proto_context ctx, const char *bytes, size_t width)
 #endif
 #endif
 }
+
+
+static proto proto_from_enum(proto_context ctx, proto_cmp_res e)
+{
+  switch (e)
+    {
+    case proto_cmp_res_lt:
+      return proto_neg(ctx, proto_from_u32(ctx, 1));
+    case proto_cmp_res_eq:
+      return proto_from_u32(ctx, 0);
+    case proto_cmp_res_gt:
+      return proto_from_u32(ctx, 1);
+    default:
+      return proto_create_invalid();      
+    }
+}
+
+proto proto_cmp(proto_context ctx, proto x, proto y)
+{
+  return proto_from_enum(ctx, proto_cmp_enum(ctx, x, y));
+}
+
+proto proto_cmp_u32(proto_context ctx, proto x, uint32_t y)
+{
+  return proto_from_enum(ctx, proto_cmp_enum_u32(ctx, x, y));
+}

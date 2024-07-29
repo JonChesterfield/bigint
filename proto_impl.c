@@ -338,6 +338,7 @@ static proto proto_mutating_unary(proto_context ctx, proto x,
 static proto proto_op_u32(proto_context ctx, proto x, uint32_t y,
                           mp_err (*func)(const mp_int *, mp_digit, mp_int *))
 {
+  // This is on thin ice if the underlying size is int32_t on portability grounds
   _Static_assert(MP_DIGIT_MAX >= UINT32_MAX, "");
 
   mp_int mx = proto_to_mp_int(x);
@@ -437,6 +438,44 @@ proto proto_and(proto_context ctx, proto x, proto y)
 proto proto_xor(proto_context ctx, proto x, proto y)
 {
   return proto_binary(ctx, x, y, mp_xor);
+}
+
+
+static proto_cmp_res mp_ord_to_proto_cmp(mp_ord x)
+{
+  switch (x)
+    {
+    case MP_LT: return proto_cmp_res_lt;
+    case MP_EQ: return proto_cmp_res_eq;
+    case MP_GT: return proto_cmp_res_gt;
+    default:
+      return (proto_cmp_res)x;
+    }                      
+
+}
+proto_cmp_res proto_cmp_enum(proto_context ctx, proto x, proto y)
+{
+  mp_int mx = proto_to_mp_int(x);
+  mp_int my = proto_to_mp_int(y);
+  global_set(&ctx);
+  mp_ord res = mp_cmp(&mx, &my);
+  global_clear();
+  return mp_ord_to_proto_cmp(res);
+}
+
+proto_cmp_res proto_cmp_enum_u32(proto_context ctx, proto x, uint32_t y)
+{
+  _Static_assert(MP_DIGIT_MAX >= UINT32_MAX, ""); // dubious
+  // if (y < MP_DIGIT_MAX)
+    {
+      mp_int mx = proto_to_mp_int(x);
+      global_set(&ctx);
+      mp_ord res = mp_cmp_d(&mx, y);
+      global_clear();
+      return mp_ord_to_proto_cmp(res);
+    }
+
+    __builtin_trap();
 }
 
 proto proto_add_u32(proto_context ctx, proto x, uint32_t y)

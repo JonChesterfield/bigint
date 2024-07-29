@@ -12,7 +12,7 @@
 BEGIN {
   DST=ARGV[1]
   ARGV[1] = ""
-  print "Writing with base " DST
+  # print "Writing with base " DST
 
   mkvar_varname = "extract_files"
 }
@@ -100,7 +100,9 @@ END {
     printf ("%s :=", mkvar_varname) > mkfilename
     for (name in files)
     {
-        system("sort -u -o " DST name " " DST name)
+        # It's convenient to call sort here, but also means sorting files
+        # runs in series. Faster to have the makefile do it
+        # system("sort -u -o " DST name " " DST name)
 
         printf (" \\\n  %s", name) > mkfilename
         
@@ -110,5 +112,5 @@ END {
     close(mkfilename)
 
     
-    print "Done"
+    # print "Done"
 }

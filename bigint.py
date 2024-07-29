@@ -1,3 +1,6 @@
+# Python 3.10 decided big integers are a denial of service attack vector
+import sys
+sys.set_int_max_str_digits(0)
 
 def op_add(x, y):
     return x + y
@@ -45,6 +48,12 @@ def op_abs(x):
 def op_neg(x):
     return -1 * x
 
+def op_cmp(x, y):
+    if x < y:
+        return -1
+    if y < x:
+        return +1
+    return 0
 
 opmap = {
     'add' : op_add,
@@ -59,4 +68,5 @@ opmap = {
     'decr' : op_decr,
     'abs' : op_abs,
     'neg' : op_neg,
+    'cmp' : op_cmp,
 }

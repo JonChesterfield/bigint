@@ -138,7 +138,7 @@ demolang::	$(DEMOLANG_OBJ)
 
 
 SEEDFILES := $(wildcard seedfiles/*)
-MORE_FUZZFILES := #$(wildcard /scratch/jon/fuzz/corpus/*)
+MORE_FUZZFILES := $(wildcard /scratch/jon/fuzz/corpus/*)
 
 
 # This file is working around makefile passing many files to a single
@@ -172,6 +172,7 @@ TESTCASE_SOURCE := $(addprefix testcases/,$(extract_files))
 
 # Calculates the answer python expects for the given arithmetic
 $(TESTCASE_SOURCE): testcases/%: extractfiles/% extractfiles/files.mk testcases.py
+	@mkdir -p testcases
 	python3 testcases.py $< > $@
 
 clean::
@@ -185,9 +186,9 @@ clean::
 $(SIMPLE_PYTHON):	python/test_%.py: testcases/% | python/gen.awk extractfiles/files.mk
 	gawk -f python/gen.awk $< > $@
 
-.PHONY: python
-python: ## Run test cases through python interpreter
-python: $(SIMPLE_PYTHON) python/gen.awk
+.PHONY: test_python
+test_python: ## Run test cases through python interpreter
+test_python: $(SIMPLE_PYTHON) python/gen.awk
 	python3 -m unittest discover python -v
 
 
@@ -266,6 +267,11 @@ memory_test: $(MEMORY_TESTS_OBJ) $(DEMOLANG_OBJ)
 clean::
 	@rm -f memory_test
 
+
+run_tests: $(SIMPLE_PYTHON) simple memory_test
+	python3 -m unittest discover python -v
+	./simple
+	./memory_test
 
 
 calc:
