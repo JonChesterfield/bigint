@@ -16,10 +16,10 @@
 // 3m57
 // heap usage: 3,032,951 allocs, 543,236,824 bytes allocated
 
-#define WITH_REF 0 // simple code path
-#define WITH_FAST 1 // use uint32_t values instead of bigint everywhere
-#define WITH_MOVE 1 // avoids more allocations by mutating in place
-  
+#define WITH_REF 0   // simple code path
+#define WITH_FAST 1  // use uint32_t values instead of bigint everywhere
+#define WITH_MOVE 1  // avoids more allocations by mutating in place
+
 static uint32_t next_n(const char *bytes, size_t N, bool *bad)
 {
   // todo, 64 bit
@@ -40,7 +40,8 @@ static proto muladd32_move(proto_context ctx, proto acc, uint32_t mul,
   // destroys acc
 #if WITH_MOVE
   acc = proto_mul_u32_move(ctx, acc, mul);
-  return proto_valid(ctx, acc) ? proto_add_u32_move(ctx, acc, cursor) : proto_create_invalid();
+  return proto_valid(ctx, acc) ? proto_add_u32_move(ctx, acc, cursor)
+                               : proto_create_invalid();
 #else
   proto tmp0 = proto_mul_u32(ctx, acc, mul);
   if (proto_valid(ctx, tmp0))
@@ -78,28 +79,29 @@ static proto proto_from_base10_faster(proto_context ctx, const char *bytes,
     }
 
   // trim leading '0' here?
-  
+
   bool bad = false;
   size_t lim = width < 8 ? width : 8;
 
-  
   uint32_t cur = next_n(bytes, lim, &bad);
-  if (bad) {
-    return proto_create_invalid();
-  }
-  
+  if (bad)
+    {
+      return proto_create_invalid();
+    }
+
 #if WITH_MOVE
-  // Move means adding to zero is cheap, can control the allocation size
-  // size is in base ten, can use the number of base ten values stored in a
-  // digit to get an overestimate of the storage needed
+    // Move means adding to zero is cheap, can control the allocation size
+    // size is in base ten, can use the number of base ten values stored in a
+    // digit to get an overestimate of the storage needed
 
 #if 1
-  const uint32_t base_ten_per = proto_base_ten_per_digit(ctx); // todo, make this compile time?
-  size_t est = (width + base_ten_per-1) / base_ten_per;
+  const uint32_t base_ten_per =
+      proto_base_ten_per_digit(ctx);  // todo, make this compile time?
+  size_t est = (width + base_ten_per - 1) / base_ten_per;
 #else
   size_t est = 1;
 #endif
-  
+
   proto acc = proto_create(ctx, est);
   if (!proto_valid(ctx, acc))
     {
@@ -113,13 +115,12 @@ static proto proto_from_base10_faster(proto_context ctx, const char *bytes,
     {
       return proto_create_invalid();
     }
-  
+
 #endif
 
   bytes += lim;
   width -= lim;
 
-  
   if (width == 0)
     {
       if (neg)
@@ -310,19 +311,18 @@ proto proto_from_base10(proto_context ctx, const char *bytes, size_t width)
 #endif
 }
 
-
 static proto proto_from_enum(proto_context ctx, proto_cmp_res e)
 {
   switch (e)
     {
-    case proto_cmp_res_lt:
-      return proto_neg(ctx, proto_from_u32(ctx, 1));
-    case proto_cmp_res_eq:
-      return proto_from_u32(ctx, 0);
-    case proto_cmp_res_gt:
-      return proto_from_u32(ctx, 1);
-    default:
-      return proto_create_invalid();      
+      case proto_cmp_res_lt:
+        return proto_neg(ctx, proto_from_u32(ctx, 1));
+      case proto_cmp_res_eq:
+        return proto_from_u32(ctx, 0);
+      case proto_cmp_res_gt:
+        return proto_from_u32(ctx, 1);
+      default:
+        return proto_create_invalid();
     }
 }
 

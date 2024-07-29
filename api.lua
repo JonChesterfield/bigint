@@ -36,7 +36,7 @@ local api_table = {
    {"or", 2,},
    {"and", 2,},
    {"xor", 2,},
-
+   {"cmp", 2,},
 }
 
 

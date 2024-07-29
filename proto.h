@@ -15,7 +15,6 @@ struct proto_ty
 
 typedef struct proto_ty *proto;
 
-
 struct proto_context_ty
 {
   uint64_t malloc_fuel;
@@ -24,7 +23,8 @@ struct proto_context_ty
 
 typedef struct proto_context_ty *proto_context;
 
-static inline void proto_context_set_fuel_value(proto_context context, uint64_t value)
+static inline void proto_context_set_fuel_value(proto_context context,
+                                                uint64_t value)
 {
   context->malloc_fuel = value;
 }
@@ -42,8 +42,8 @@ static inline void proto_context_fuel_decrement(proto_context context)
     }
 }
 
-
-static inline void proto_context_set_count_value(proto_context context, uint64_t value)
+static inline void proto_context_set_count_value(proto_context context,
+                                                 uint64_t value)
 {
   context->malloc_count = value;
 }
@@ -61,15 +61,11 @@ static inline void proto_context_count_increment(proto_context context)
     }
 }
 
-
 static inline void proto_context_init(proto_context context)
 {
   proto_context_set_fuel_value(context, UINT64_MAX);
   proto_context_set_count_value(context, 0);
 }
-
-
-
 
 // Create zero with at least digits allocated space
 proto proto_create(proto_context ctx, size_t digits);
@@ -139,7 +135,7 @@ typedef enum
 {
   proto_cmp_res_lt = -1,
   proto_cmp_res_eq = 0,
-  proto_cmp_res_gt = 1,    
+  proto_cmp_res_gt = 1,
 } proto_cmp_res;
 
 proto_cmp_res proto_cmp_enum(proto_context ctx, proto x, proto y);
