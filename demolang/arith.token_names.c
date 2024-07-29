@@ -11,6 +11,7 @@ const char*arith_token_names[arith_token_count] = {
   [arith_token_BITOR] = "BITOR",
   [arith_token_BITAND] = "BITAND",
   [arith_token_BITXOR] = "BITXOR",
+  [arith_token_CMP] = "CMP",
   [arith_token_ABSOLUTE] = "ABSOLUTE",
   [arith_token_NEGATE] = "NEGATE",
   [arith_token_INCREMENT] = "INCREMENT",

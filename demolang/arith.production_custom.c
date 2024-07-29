@@ -2,7 +2,12 @@
 #include "arith.parser.h"
 #include "arith.productions.h"
 
-#include "../proto_memory_check.h"
+#define WITH_MEMCHECK() 1
+
+#if WITH_MEMCHECK()
+#include "proto_memory_check.h"
+#endif
+
 #define EXPLICIT_SPACING 1
 
 #if EXPLICIT_SPACING
@@ -14,6 +19,111 @@
 #define NEWLINE(X)
 #define VOID(X)
 #endif
+
+static proto proto_dispatch_abs(proto_context ctx, proto x)
+{
+#if WITH_MEMCHECK()
+  return proto_memchk_abs(ctx, x);
+#else
+  return proto_abs(ctx, x);
+#endif
+}
+static proto proto_dispatch_neg(proto_context ctx, proto x)
+{
+#if WITH_MEMCHECK()
+  return proto_memchk_neg(ctx, x);
+#else
+  return proto_neg(ctx, x);
+#endif
+}
+static proto proto_dispatch_incr(proto_context ctx, proto x)
+{
+#if WITH_MEMCHECK()
+  return proto_memchk_incr(ctx, x);
+#else
+  return proto_incr(ctx, x);
+#endif
+}
+static proto proto_dispatch_decr(proto_context ctx, proto x)
+{
+#if WITH_MEMCHECK()
+  return proto_memchk_decr(ctx, x);
+#else
+  return proto_decr(ctx, x);
+#endif
+}
+static proto proto_dispatch_add(proto_context ctx, proto x, proto y)
+{
+#if WITH_MEMCHECK()
+  return proto_memchk_add(ctx, x, y);
+#else
+  return proto_add(ctx, x, y);
+#endif
+}
+static proto proto_dispatch_sub(proto_context ctx, proto x, proto y)
+{
+#if WITH_MEMCHECK()
+  return proto_memchk_sub(ctx, x, y);
+#else
+  return proto_sub(ctx, x, y);
+#endif
+}
+static proto proto_dispatch_mul(proto_context ctx, proto x, proto y)
+{
+#if WITH_MEMCHECK()
+  return proto_memchk_mul(ctx, x, y);
+#else
+  return proto_mul(ctx, x, y);
+#endif
+}
+static proto proto_dispatch_div(proto_context ctx, proto x, proto y)
+{
+#if WITH_MEMCHECK()
+  return proto_memchk_div(ctx, x, y);
+#else
+  return proto_div(ctx, x, y);
+#endif
+}
+static proto proto_dispatch_rem(proto_context ctx, proto x, proto y)
+{
+#if WITH_MEMCHECK()
+  return proto_memchk_rem(ctx, x, y);
+#else
+  return proto_rem(ctx, x, y);
+#endif
+}
+static proto proto_dispatch_or(proto_context ctx, proto x, proto y)
+{
+#if WITH_MEMCHECK()
+  return proto_memchk_or(ctx, x, y);
+#else
+  return proto_or(ctx, x, y);
+#endif
+}
+static proto proto_dispatch_and(proto_context ctx, proto x, proto y)
+{
+#if WITH_MEMCHECK()
+  return proto_memchk_and(ctx, x, y);
+#else
+  return proto_and(ctx, x, y);
+#endif
+}
+static proto proto_dispatch_xor(proto_context ctx, proto x, proto y)
+{
+#if WITH_MEMCHECK()
+  return proto_memchk_xor(ctx, x, y);
+#else
+  return proto_xor(ctx, x, y);
+#endif
+}
+static proto proto_dispatch_cmp(proto_context ctx, proto x, proto y)
+{
+#if WITH_MEMCHECK()
+  return proto_memchk_cmp(ctx, x, y);
+#else
+  return proto_cmp(ctx, x, y);
+#endif
+}
 
 proto arith_custom_production_FromInteger(struct arith_parse_state* parse_ctx,
                                           token /*INTEGER*/ x1)
@@ -57,7 +167,8 @@ proto arith_custom_production_BinOpPlus(struct arith_parse_state* parse_ctx,
   VOID(0);
   VOID(1);
   VOID(2);
-  return arith_custom_production_BinaryOp(parse_ctx, proto_memchk_add, x2, x3);
+  return arith_custom_production_BinaryOp(parse_ctx, proto_dispatch_add, x2,
+                                          x3);
 }
 
 // CustomProduction BinOpMinus -> arith_grouping_expr
@@ -70,7 +181,8 @@ proto arith_custom_production_BinOpMinus(struct arith_parse_state* parse_ctx,
   VOID(0);
   VOID(1);
   VOID(2);
-  return arith_custom_production_BinaryOp(parse_ctx, proto_memchk_sub, x2, x3);
+  return arith_custom_production_BinaryOp(parse_ctx, proto_dispatch_sub, x2,
+                                          x3);
 }
 
 // CustomProduction BinOpTimes -> arith_grouping_expr
@@ -83,7 +195,8 @@ proto arith_custom_production_BinOpTimes(struct arith_parse_state* parse_ctx,
   VOID(0);
   VOID(1);
   VOID(2);
-  return arith_custom_production_BinaryOp(parse_ctx, proto_memchk_mul, x2, x3);
+  return arith_custom_production_BinaryOp(parse_ctx, proto_dispatch_mul, x2,
+                                          x3);
 }
 
 // CustomProduction BinOpDivide -> arith_grouping_expr
@@ -96,7 +209,8 @@ proto arith_custom_production_BinOpDivide(struct arith_parse_state* parse_ctx,
   VOID(0);
   VOID(1);
   VOID(2);
-  return arith_custom_production_BinaryOp(parse_ctx, proto_memchk_div, x2, x3);
+  return arith_custom_production_BinaryOp(parse_ctx, proto_dispatch_div, x2,
+                                          x3);
 }
 
 // CustomProduction BinOpModulo -> arith_grouping_expr
@@ -108,7 +222,8 @@ proto arith_custom_production_BinOpRemainder(
   VOID(0);
   VOID(1);
   VOID(2);
-  return arith_custom_production_BinaryOp(parse_ctx, proto_memchk_rem, x2, x3);
+  return arith_custom_production_BinaryOp(parse_ctx, proto_dispatch_rem, x2,
+                                          x3);
 }
 
 proto arith_custom_production_BinOpBitOr(struct arith_parse_state* parse_ctx,
@@ -120,7 +235,7 @@ proto arith_custom_production_BinOpBitOr(struct arith_parse_state* parse_ctx,
   VOID(0);
   VOID(1);
   VOID(2);
-  return arith_custom_production_BinaryOp(parse_ctx, proto_memchk_or, x2, x3);
+  return arith_custom_production_BinaryOp(parse_ctx, proto_dispatch_or, x2, x3);
 }
 
 proto arith_custom_production_BinOpBitAnd(struct arith_parse_state* parse_ctx,
@@ -132,7 +247,8 @@ proto arith_custom_production_BinOpBitAnd(struct arith_parse_state* parse_ctx,
   VOID(0);
   VOID(1);
   VOID(2);
-  return arith_custom_production_BinaryOp(parse_ctx, proto_memchk_and, x2, x3);
+  return arith_custom_production_BinaryOp(parse_ctx, proto_dispatch_and, x2,
+                                          x3);
 }
 
 proto arith_custom_production_BinOpBitXor(struct arith_parse_state* parse_ctx,
@@ -144,7 +260,21 @@ proto arith_custom_production_BinOpBitXor(struct arith_parse_state* parse_ctx,
   VOID(0);
   VOID(1);
   VOID(2);
-  return arith_custom_production_BinaryOp(parse_ctx, proto_memchk_xor, x2, x3);
+  return arith_custom_production_BinaryOp(parse_ctx, proto_dispatch_xor, x2,
+                                          x3);
+}
+
+proto arith_custom_production_BinOpCmp(struct arith_parse_state* parse_ctx,
+                                          token /*CMP*/ x1,
+                                          SPACE(0) proto /*expr*/ x2,
+                                          SPACE(1) proto /*expr*/ x3 NEWLINE(2))
+{
+  (void)x1;
+  VOID(0);
+  VOID(1);
+  VOID(2);
+  return arith_custom_production_BinaryOp(parse_ctx, proto_dispatch_cmp, x2,
+                                          x3);
 }
 
 proto arith_custom_production_UnOpAbsolute(struct arith_parse_state* parse_ctx,
@@ -155,7 +285,7 @@ proto arith_custom_production_UnOpAbsolute(struct arith_parse_state* parse_ctx,
   (void)x1;
   VOID(0);
   VOID(1);
-  return arith_custom_production_UnaryOp(parse_ctx, proto_memchk_abs, x2);
+  return arith_custom_production_UnaryOp(parse_ctx, proto_dispatch_abs, x2);
 }
 
 proto arith_custom_production_UnOpNegate(struct arith_parse_state* parse_ctx,
@@ -165,7 +295,7 @@ proto arith_custom_production_UnOpNegate(struct arith_parse_state* parse_ctx,
   (void)x1;
   VOID(0);
   VOID(1);
-  return arith_custom_production_UnaryOp(parse_ctx, proto_memchk_neg, x2);
+  return arith_custom_production_UnaryOp(parse_ctx, proto_dispatch_neg, x2);
 }
 
 proto arith_custom_production_UnOpIncrement(struct arith_parse_state* parse_ctx,
@@ -176,7 +306,7 @@ proto arith_custom_production_UnOpIncrement(struct arith_parse_state* parse_ctx,
   (void)x1;
   VOID(0);
   VOID(1);
-  return arith_custom_production_UnaryOp(parse_ctx, proto_memchk_incr, x2);
+  return arith_custom_production_UnaryOp(parse_ctx, proto_dispatch_incr, x2);
 }
 
 proto arith_custom_production_UnOpDecrement(struct arith_parse_state* parse_ctx,
@@ -187,7 +317,7 @@ proto arith_custom_production_UnOpDecrement(struct arith_parse_state* parse_ctx,
   (void)x1;
   VOID(0);
   VOID(1);
-  return arith_custom_production_UnaryOp(parse_ctx, proto_memchk_decr, x2);
+  return arith_custom_production_UnaryOp(parse_ctx, proto_dispatch_decr, x2);
 }
 
 static uint32_t base32_decode(char c)
@@ -304,11 +434,7 @@ proto arith_custom_production_result_expr_to_program(
       return proto_create_invalid();
     }
 
-#if 0
-  // if the calculation is interesting to the fuzzer, we can sort out
-  // the right answer to it later. Likewise could tolerate variable
-  // amounts of whitespace etc - its easy to normalise it afterwards
-  
+#if 0  // Better fuzzing results if we sort out "correct" values after the fact
   if (!proto_equal(ctx, x1, x3))
     {
 #if 0

@@ -13,16 +13,17 @@ enum arith_token {
   arith_token_BITOR = 6,
   arith_token_BITAND = 7,
   arith_token_BITXOR = 8,
-  arith_token_ABSOLUTE = 9,
-  arith_token_NEGATE = 10,
-  arith_token_INCREMENT = 11,
-  arith_token_DECREMENT = 12,
-  arith_token_INTEGER = 13,
-  arith_token_SPACE = 14,
-  arith_token_NEWLINE = 15,
-  arith_token_CONTROL = 16,
+  arith_token_CMP = 9,
+  arith_token_ABSOLUTE = 10,
+  arith_token_NEGATE = 11,
+  arith_token_INCREMENT = 12,
+  arith_token_DECREMENT = 13,
+  arith_token_INTEGER = 14,
+  arith_token_SPACE = 15,
+  arith_token_NEWLINE = 16,
+  arith_token_CONTROL = 17,
 };
-enum { arith_token_count = 17 };
+enum { arith_token_count = 18 };
 
 
 #endif // ARITH_TOKEN_T_INCLUDED
