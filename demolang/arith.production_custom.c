@@ -2,7 +2,7 @@
 #include "arith.parser.h"
 #include "arith.productions.h"
 
-#define WITH_MEMCHECK() 1
+#define WITH_MEMCHECK() 0
 
 #if WITH_MEMCHECK()
 #include "proto_memory_check.h"
@@ -90,6 +90,38 @@ static proto proto_dispatch_rem(proto_context ctx, proto x, proto y)
   return proto_memchk_rem(ctx, x, y);
 #else
   return proto_rem(ctx, x, y);
+#endif
+}
+static proto proto_dispatch_ash(proto_context ctx, proto x, proto y)
+{
+#if WITH_MEMCHECK()
+  return proto_memchk_ash(ctx, x, y);
+#else
+  return proto_ash(ctx, x, y);
+#endif
+}
+static proto proto_dispatch_lsh(proto_context ctx, proto x, proto y)
+{
+#if WITH_MEMCHECK()
+  return proto_memchk_lsh(ctx, x, y);
+#else
+  return proto_lsh(ctx, x, y);
+#endif
+}
+static proto proto_dispatch_rsh(proto_context ctx, proto x, proto y)
+{
+#if WITH_MEMCHECK()
+  return proto_memchk_rsh(ctx, x, y);
+#else
+  return proto_rsh(ctx, x, y);
+#endif
+}
+static proto proto_dispatch_not(proto_context ctx, proto x)
+{
+#if WITH_MEMCHECK()
+  return proto_memchk_not(ctx, x);
+#else
+  return proto_not(ctx, x);
 #endif
 }
 static proto proto_dispatch_or(proto_context ctx, proto x, proto y)
@@ -224,6 +256,52 @@ proto arith_custom_production_BinOpRemainder(
   VOID(2);
   return arith_custom_production_BinaryOp(parse_ctx, proto_dispatch_rem, x2,
                                           x3);
+}
+
+proto arith_custom_production_BinOpAsh(
+    struct arith_parse_state* parse_ctx, token /*ASH*/ x1,
+    SPACE(0) proto /*expr*/ x2, SPACE(1) proto /*expr*/ x3 NEWLINE(2))
+{
+  (void)x1;
+  VOID(0);
+  VOID(1);
+  VOID(2);
+  return arith_custom_production_BinaryOp(parse_ctx, proto_dispatch_ash, x2,
+                                          x3);
+}
+
+proto arith_custom_production_BinOpLsh(
+    struct arith_parse_state* parse_ctx, token /*LSH*/ x1,
+    SPACE(0) proto /*expr*/ x2, SPACE(1) proto /*expr*/ x3 NEWLINE(2))
+{
+  (void)x1;
+  VOID(0);
+  VOID(1);
+  VOID(2);
+  return arith_custom_production_BinaryOp(parse_ctx, proto_dispatch_lsh, x2,
+                                          x3);
+}
+
+proto arith_custom_production_BinOpRsh(
+    struct arith_parse_state* parse_ctx, token /*RSH*/ x1,
+    SPACE(0) proto /*expr*/ x2, SPACE(1) proto /*expr*/ x3 NEWLINE(2))
+{
+  (void)x1;
+  VOID(0);
+  VOID(1);
+  VOID(2);
+  return arith_custom_production_BinaryOp(parse_ctx, proto_dispatch_rsh, x2,
+                                          x3);
+}
+
+proto arith_custom_production_BinOpBitNot(struct arith_parse_state* parse_ctx,
+                                         token /*BITNOT*/ x1,
+                                         SPACE(0) proto /*expr*/ x2 NEWLINE(1))
+{
+  (void)x1;
+  VOID(0);
+  VOID(1);
+  return arith_custom_production_UnaryOp(parse_ctx, proto_dispatch_not, x2);
 }
 
 proto arith_custom_production_BinOpBitOr(struct arith_parse_state* parse_ctx,

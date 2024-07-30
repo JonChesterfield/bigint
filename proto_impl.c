@@ -427,6 +427,10 @@ proto proto_rem(proto_context ctx, proto x, proto y)
   return proto_binary(ctx, x, y, mp_div_remainder);
 }
 
+proto proto_not(proto_context ctx, proto x)
+{
+  return proto_unary(ctx, x, mp_complement);
+}
 proto proto_or(proto_context ctx, proto x, proto y)
 {
   return proto_binary(ctx, x, y, mp_or);
@@ -438,6 +442,153 @@ proto proto_and(proto_context ctx, proto x, proto y)
 proto proto_xor(proto_context ctx, proto x, proto y)
 {
   return proto_binary(ctx, x, y, mp_xor);
+}
+
+// arithmetic shift is called signed_rsh
+
+bool proto_within_int32(proto_context ctx, proto x)
+{
+  
+  if (proto_zpos(x))
+    {
+      return proto_cmp_enum_u32(ctx, x, INT32_MAX) == proto_cmp_res_lt;
+    }
+  else
+    {
+      if (proto_used(x) > 1)
+        {
+          return false;
+        }
+      else
+        {
+          return x->digits[0] < INT32_MAX; // might be off by one here
+        }
+    }
+}
+
+proto proto_ash(proto_context ctx, proto x, proto y)
+{
+  if (!proto_within_int32(ctx, y))
+    {
+      return proto_create_invalid();
+    }
+
+  // libtommath doesn't ignore negative shifts here, but
+  // also doesn't do any obvious handling for them. Just
+  // passes into divide (as large unsigned values)
+  // but as lsh and rsh are currently returning invalid, do so here too
+  if (!proto_zpos(y))
+    {
+      return proto_create_invalid();
+    }
+
+  uint32_t by = proto_to_u32(ctx, y);
+  if (by > INT32_MAX) {
+    // internal error in within_int32 test
+    __builtin_trap();
+  }
+
+  proto z = proto_create_default_size(ctx);
+  if (!proto_valid(ctx, z))
+    {
+      return proto_create_invalid();
+    }
+
+  mp_int mx = proto_to_mp_int(x);
+  mp_int mz = proto_to_mp_int(z);
+  
+  global_set(&ctx);
+  mp_err err = mp_signed_rsh(&mx, (int)by, &mz);
+  global_clear();
+  if (err == MP_OKAY)
+    {
+      return mp_int_to_proto(&mz);
+    }
+  else
+    {
+      proto_destroy(ctx, z);
+      return proto_create_invalid();
+    }
+}
+
+proto proto_rsh(proto_context ctx, proto x, proto y)
+{
+  if (!proto_within_int32(ctx, y))
+    {
+      return proto_create_invalid();
+    }
+
+  // left shift by negative amount means what?
+  // libtommath thinks it's a no-op, C thinks it's UB
+  // reject for now
+  if (!proto_zpos(y))
+    {
+      return proto_create_invalid();
+    }
+
+  uint32_t by = proto_to_u32(ctx, y);
+  if (by > INT32_MAX) {
+    // internal error in within_int32 test
+    __builtin_trap();
+  }
+
+  proto res = proto_copy(ctx, x);
+  if (!proto_valid(ctx, res))
+    {
+      return proto_create_invalid();
+    }
+
+  mp_int mr = proto_to_mp_int(res);
+  global_set(&ctx);
+  // right shift doesn't fail
+  mp_rshd(&mr, (int)by);
+  global_clear();
+
+  return mp_int_to_proto(&mr);
+}
+
+
+proto proto_lsh(proto_context ctx, proto x, proto y)
+{
+  if (!proto_within_int32(ctx, y))
+    {
+      return proto_create_invalid();
+    }
+
+  // left shift by negative amount means what?
+  // libtommath thinks it's a no-op, C thinks it's UB
+  // reject for now
+  if (!proto_zpos(y))
+    {
+      return proto_create_invalid();
+    }
+
+  uint32_t by = proto_to_u32(ctx, y);
+  if (by > INT32_MAX) {
+    // internal error in within_int32 test
+    __builtin_trap();
+  }
+
+  proto res = proto_copy(ctx, x);
+  if (!proto_valid(ctx, res))
+    {
+      return proto_create_invalid();
+    }
+
+  
+  mp_int mr = proto_to_mp_int(res);
+  global_set(&ctx);
+  mp_err err = mp_lshd(&mr, (int)by);
+  global_clear();
+  if (err == MP_OKAY)
+    {
+      return mp_int_to_proto(&mr);
+    }
+  else
+    {
+      proto_destroy(ctx, res);
+      return proto_create_invalid();
+    }  
 }
 
 

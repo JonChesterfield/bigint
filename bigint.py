@@ -22,6 +22,21 @@ def op_div(x, y):
 def op_rem(x, y):
     return x % y
 
+def op_ash(x, y):
+    return x >> y
+
+def op_lsh(x, y):
+    return x << y
+
+def op_rsh(x, y):
+    # todo, work out how to represent this in python
+    return 0
+
+
+def op_not(x):
+    # This may have printing challenges
+    return ~x
+
 def op_and(x, y):
     return x & y
 
@@ -61,8 +76,12 @@ opmap = {
     'mul' : op_mul,
     'div' : op_div,
     'rem' : op_rem,
-    'and' : op_and,
+    'lsh' : op_lsh,
+    'rsh' : op_rsh,
+    'ash' : op_ash,
+    'not' : op_not,
     'or' : op_or,
+    'and' : op_and,
     'xor' : op_xor,
     'incr' : op_incr,
     'decr' : op_decr,

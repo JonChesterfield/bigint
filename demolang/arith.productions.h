@@ -17,16 +17,20 @@ enum arith_production {
   arith_production_custom_production_BinOpTimes = 8,
   arith_production_custom_production_BinOpDivide = 9,
   arith_production_custom_production_BinOpRemainder = 10,
-  arith_production_custom_production_BinOpBitOr = 11,
-  arith_production_custom_production_BinOpBitAnd = 12,
-  arith_production_custom_production_BinOpBitXor = 13,
-  arith_production_custom_production_BinOpCmp = 14,
-  arith_production_custom_production_UnOpAbsolute = 15,
-  arith_production_custom_production_UnOpNegate = 16,
-  arith_production_custom_production_UnOpIncrement = 17,
-  arith_production_custom_production_UnOpDecrement = 18,
+  arith_production_custom_production_BinOpAsh = 11,
+  arith_production_custom_production_BinOpLsh = 12,
+  arith_production_custom_production_BinOpRsh = 13,
+  arith_production_custom_production_BinOpBitNot = 14,
+  arith_production_custom_production_BinOpBitOr = 15,
+  arith_production_custom_production_BinOpBitAnd = 16,
+  arith_production_custom_production_BinOpBitXor = 17,
+  arith_production_custom_production_BinOpCmp = 18,
+  arith_production_custom_production_UnOpAbsolute = 19,
+  arith_production_custom_production_UnOpNegate = 20,
+  arith_production_custom_production_UnOpIncrement = 21,
+  arith_production_custom_production_UnOpDecrement = 22,
 };
-enum { arith_production_count = 19 };
+enum { arith_production_count = 23 };
 extern const char*arith_production_names[arith_production_count];
 
 // AssignProduction expr_to_program -> arith_grouping_program
@@ -61,6 +65,18 @@ proto arith_custom_production_BinOpDivide(struct arith_parse_state * ,token /*DI
 
 // CustomProduction BinOpRemainder -> arith_grouping_expr
 proto arith_custom_production_BinOpRemainder(struct arith_parse_state * ,token /*REMAINDER*/ x1 ,token /*SPACE*/ x2 ,proto /*integer*/ x3 ,token /*SPACE*/ x4 ,proto /*integer*/ x5 ,token /*NEWLINE*/ x6);
+
+// CustomProduction BinOpAsh -> arith_grouping_expr
+proto arith_custom_production_BinOpAsh(struct arith_parse_state * ,token /*ASH*/ x1 ,token /*SPACE*/ x2 ,proto /*integer*/ x3 ,token /*SPACE*/ x4 ,proto /*integer*/ x5 ,token /*NEWLINE*/ x6);
+
+// CustomProduction BinOpLsh -> arith_grouping_expr
+proto arith_custom_production_BinOpLsh(struct arith_parse_state * ,token /*LSH*/ x1 ,token /*SPACE*/ x2 ,proto /*integer*/ x3 ,token /*SPACE*/ x4 ,proto /*integer*/ x5 ,token /*NEWLINE*/ x6);
+
+// CustomProduction BinOpRsh -> arith_grouping_expr
+proto arith_custom_production_BinOpRsh(struct arith_parse_state * ,token /*RSH*/ x1 ,token /*SPACE*/ x2 ,proto /*integer*/ x3 ,token /*SPACE*/ x4 ,proto /*integer*/ x5 ,token /*NEWLINE*/ x6);
+
+// CustomProduction BinOpBitNot -> arith_grouping_expr
+proto arith_custom_production_BinOpBitNot(struct arith_parse_state * ,token /*BITNOT*/ x1 ,token /*SPACE*/ x2 ,proto /*integer*/ x3 ,token /*NEWLINE*/ x4);
 
 // CustomProduction BinOpBitOr -> arith_grouping_expr
 proto arith_custom_production_BinOpBitOr(struct arith_parse_state * ,token /*BITOR*/ x1 ,token /*SPACE*/ x2 ,proto /*integer*/ x3 ,token /*SPACE*/ x4 ,proto /*integer*/ x5 ,token /*NEWLINE*/ x6);

@@ -120,16 +120,14 @@ proto proto_mul(proto_context ctx, proto x, proto y);
 proto proto_div(proto_context ctx, proto x, proto y);
 proto proto_rem(proto_context ctx, proto x, proto y);
 
+proto proto_not(proto_context ctx, proto x);
 proto proto_or(proto_context ctx, proto x, proto y);
 proto proto_and(proto_context ctx, proto x, proto y);
 proto proto_xor(proto_context ctx, proto x, proto y);
 
-#if 0
-// Complicated by tommath (sensibly) only accepting int for distance
 proto proto_ash(proto_context ctx, proto x, proto y);
 proto proto_rsh(proto_context ctx, proto x, proto y);
 proto proto_lsh(proto_context ctx, proto x, proto y);
-#endif
 
 typedef enum
 {
