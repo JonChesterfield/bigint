@@ -18,6 +18,11 @@ struct base_operations
   // Allocate size digits of storage, true on success
   static bool create(mp_int *a, mp_count size);
 
+
+  // Create a value containing the passed integer, true on success
+  static bool create_fixed(mp_int *a, int32_t);
+  static bool create_fixed(mp_int *a, int64_t);
+
   // Increase digits of storage to size, true on success
   static bool grow(mp_int *a, mp_count size);
 
@@ -49,12 +54,36 @@ struct base_operations
   static mp_digit get_digit(const mp_int*, mp_count);
   static void set_digit(mp_int*, mp_count, mp_digit);
 
+
+  // open_fixed returns true if the out parameter is exact, i.e. wasn't truncated
+  static bool open_fixed(const mp_int*, int32_t *out);
+  static bool open_fixed(const mp_int*, int64_t *out);
+
   // Temporary. Tommath uses pointers into storage to define some of the
   // algorithms. This interferes with bounds checking and somewhat violates
   // const-correctneess. Uses can all be replaced with an iterator and the
   // above calls but haven't been at present.
   static mp_digit * get_digit_iter(const mp_int*);
 };
+
+template <typename IntType>
+IntType create_invalid()
+{
+  using ops = base_operations<IntType>;
+  IntType result;
+  ops::create_invalid(&result);
+  return result;
+}
+
+template <typename IntType>
+bool is_invalid(IntType x)
+{
+  using ops = base_operations<IntType>;
+  return ops::is_invalid(&x);
+}
+
+
+
 
 }
 
