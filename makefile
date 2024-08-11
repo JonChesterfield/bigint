@@ -286,6 +286,15 @@ clean::
 	@rm -rf $(DEMOLANG_DIR_OBJ)
 	@rm -f calc
 
+fuzz_bigint/lexer.h: fuzz_bigint/lexer.h.re2c
+	re2c --no-debug-info -W -Wno-useless-escape --no-generation-date $< > $@
+
+fuzz_bigint/bigint: $(addprefix fuzz_bigint/,bigint.cpp lexer.h base_operations.hpp bigint.hpp bigint_tommath.hpp interpreter.hpp simple_via_tommath.hpp)
+	$(CXX) -O2 -fsanitize=fuzzer $< -o $@
+
+clean::
+	@rm -f fuzz_bigint/lexer.h fuzz_bigint/bigint
+
 
 HELP_PADDING := 30
 help:
