@@ -289,7 +289,7 @@ clean::
 fuzz_bigint/lexer.h: fuzz_bigint/lexer.h.re2c
 	re2c --no-debug-info -W -Wno-useless-escape --no-generation-date $< > $@
 
-fuzz_bigint/bigint: $(addprefix fuzz_bigint/,bigint.cpp lexer.h base_operations.hpp bigint.hpp bigint_tommath.hpp interpreter.hpp simple_via_tommath.hpp)
+fuzz_bigint/bigint: $(addprefix fuzz_bigint/,bigint.cpp lexer.h base_operations.hpp bigint.hpp bigint_tommath.hpp interpreter.hpp)
 	$(CXX) -O2 -fsanitize=fuzzer $< -o $@
 
 clean::

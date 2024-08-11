@@ -3,7 +3,6 @@
 
 #include "bigint_tommath.hpp"
 
-#include "simple_via_tommath.hpp"
 
 #include "interpreter.hpp"
 #include "lexer.h"
@@ -108,11 +107,17 @@ extern "C"
   }
 }
 
-#if 0
+
+__attribute__((weak))
 int main()
 {
   bigint_data x = bigint::interp_cstr<bigint_data>("sub 4 15");
 
   bigint_data y = bigint::abs(x);
+
+  bigint::base_operations<bigint_data>::destroy(&x);
+  bigint::base_operations<bigint_data>::destroy(&y);
+  
+  return 0;
 }
-#endif
+
