@@ -1,0 +1,213 @@
+#ifndef BIGINT_LEXER_H_INCLUDED
+#define BIGINT_LEXER_H_INCLUDED
+/*!re2c
+   re2c:yyfill:enable = 0;
+   re2c:eof = 0;
+   re2c:api = custom;
+   re2c:api:style = free-form;
+   re2c:define:YYCTYPE = short;
+   re2c:define:YYLESSTHAN = "cursor >= lim";
+   re2c:define:YYPEEK = "cursor < lim ? *cursor : 256";
+   re2c:define:YYSKIP = "++cursor;";
+   re2c:define:YYBACKUP = ;//"marker = cursor;";
+   re2c:define:YYRESTORE = ;//"cursor = marker;";
+*/
+#include <stdbool.h>
+#include <stddef.h>
+#include <stdint.h>
+
+typedef enum {
+  bigint_lexer_unknown = 0,
+  bigint_lexer_number = 1,
+  bigint_lexer_whitespace = 2,
+  bigint_lexer_first_function = 3,
+  bigint_lexer_abs = 3,
+  bigint_lexer_neg = 4,
+  bigint_lexer_incr = 5,
+  bigint_lexer_decr = 6,
+  bigint_lexer_add = 7,
+  bigint_lexer_sub = 8,
+  bigint_lexer_mul = 9,
+  bigint_lexer_div = 10,
+  bigint_lexer_rem = 11,
+  bigint_lexer_lsh = 12,
+  bigint_lexer_rsh = 13,
+  bigint_lexer_bitwise_not = 14,
+  bigint_lexer_bitwise_or = 15,
+  bigint_lexer_bitwise_and = 16,
+  bigint_lexer_bitwise_xor = 17,
+  bigint_lexer_equal = 18,
+  bigint_lexer_cmp = 19,
+  bigint_lexer_last_function = 19,
+  bigint_lexer_count = 20,
+} bigint_lexer_t;
+
+static unsigned char const bigint_lexer_arity[bigint_lexer_count] = {
+  0, 0, 0, 1, 1, 1, 1, 2, 2, 2, 2, 2, 2, 2, 1, 2, 2, 2, 2, 2,
+};
+
+enum { bigint_lexer_arity_maximum = 2, };
+
+static const char * const bigint_lexer_names[bigint_lexer_count] = {
+  "abs","neg","incr","decr",
+  "add","sub","mul","div",
+  "rem","lsh","rsh","bitwise_not",
+  "bitwise_or","bitwise_and","bitwise_xor","equal",
+  "cmp",
+};
+
+typedef struct
+{
+  bigint_lexer_t tag;
+  const char * start; // todo, size_t
+  size_t width;
+} lexer_token;
+
+static inline lexer_token lex(const char *str, const char *lim);
+static inline lexer_token lex_cstr(const char *str)
+{
+  return lex(str, str + __builtin_strlen(str));
+}
+
+typedef struct 
+{
+  bigint_lexer_t op; // Unknown indicates failure
+  lexer_token args[bigint_lexer_arity_maximum];
+} parse_result;
+
+
+static inline bool parses(const char *str, const char * lim);
+static inline bool parses_cstr(const char *str)
+{
+  return parses(str, str + __builtin_strlen(str));
+}
+
+static inline parse_result parse(const char *str, const char * lim);
+static inline parse_result parse_cstr(const char *str)
+{
+  return parse(str, str + __builtin_strlen(str));
+}
+
+
+#if 0
+static inline void dump_lexer_token(lexer_token t)
+{
+  printf("(lexer_token) {%u, %zu}\n", t.tag, t.width);
+}
+#endif
+
+static inline lexer_token tok(bigint_lexer_t tag, const char * start, size_t width)
+{
+  lexer_token result;
+  result.tag = tag;
+  result.start = start,
+  result.width = width;
+  return result;
+}
+
+static inline lexer_token lex(const char *str, const char *lim) {
+
+    const char *cursor = str;
+    // const char *marker;
+
+    /*!re2c
+    number = [-+]?[1-9][0-9]*;
+    [ \n]+ { return tok(bigint_lexer_whitespace, str, cursor - str); }
+
+    number { return tok(bigint_lexer_number, str, cursor - str); }
+
+    "abs" { return tok(bigint_lexer_abs, str, 3); }
+    "neg" { return tok(bigint_lexer_neg, str, 3); }
+    "incr" { return tok(bigint_lexer_incr, str, 4); }
+    "decr" { return tok(bigint_lexer_decr, str, 4); }
+    "add" { return tok(bigint_lexer_add, str, 3); }
+    "sub" { return tok(bigint_lexer_sub, str, 3); }
+    "mul" { return tok(bigint_lexer_mul, str, 3); }
+    "div" { return tok(bigint_lexer_div, str, 3); }
+    "rem" { return tok(bigint_lexer_rem, str, 3); }
+    "lsh" { return tok(bigint_lexer_lsh, str, 3); }
+    "rsh" { return tok(bigint_lexer_rsh, str, 3); }
+    "bitwise_not" { return tok(bigint_lexer_bitwise_not, str, 11); }
+    "bitwise_or" { return tok(bigint_lexer_bitwise_or, str, 10); }
+    "bitwise_and" { return tok(bigint_lexer_bitwise_and, str, 11); }
+    "bitwise_xor" { return tok(bigint_lexer_bitwise_xor, str, 11); }
+    "equal" { return tok(bigint_lexer_equal, str, 5); }
+    "cmp" { return tok(bigint_lexer_cmp, str, 3); }
+
+    // default
+    *    { return tok(bigint_lexer_unknown, str, 0); }
+
+    // on end of input
+    $    { return tok(bigint_lexer_unknown, str, 0); }
+    */
+
+   return tok(bigint_lexer_unknown, str, 0);
+}
+
+
+static inline const char * skip_over_optional_whitespace(const char* str, const char*lim)
+{
+  lexer_token l = lex(str, lim);
+  size_t w = (l.tag == bigint_lexer_whitespace) ? l.width : 0;
+  return str + w;
+}
+
+
+
+static inline bool parses_implementation(const char *str, const char * lim, parse_result * result)
+{
+  if (result) result->op = bigint_lexer_unknown;
+
+  str = skip_over_optional_whitespace(str, lim);
+  lexer_token l = lex(str, lim);
+
+  if ((l.tag < bigint_lexer_first_function) ||
+      (l.tag > bigint_lexer_last_function))
+  {
+    return false;
+  }
+
+  const bigint_lexer_t op = l.tag;
+  str += l.width;  
+
+  if (result) result->op = op;
+
+
+
+  unsigned char arity = bigint_lexer_arity[op];
+
+  for (unsigned i = 0; i < arity; i++)
+  {
+    str = skip_over_optional_whitespace(str, lim);
+
+    l = lex(str, lim);
+
+    if (l.tag != bigint_lexer_number) return false;
+
+    if (result) result->args[i] = l;
+
+    str += l.width;
+  }
+
+  str = skip_over_optional_whitespace(str, lim);
+
+  bool parsed_completely = (str == lim);
+  if (result && parsed_completely) result->op = op;
+  return parsed_completely;
+}
+
+static inline bool parses(const char *str, const char * lim)
+{
+  return parses_implementation(str, lim, 0);
+}
+
+static inline parse_result parse(const char *str, const char * lim)
+{
+  parse_result res;
+  parses_implementation(str, lim, &res);
+  return res;
+}
+
+
+#endif // BIGINT_LEXER_H_INCLUDED
+
