@@ -70,22 +70,31 @@ def op_cmp(x, y):
         return +1
     return 0
 
+def op_equal(x, y):
+    return x == y
+
+
 opmap = {
     'add' : op_add,
     'sub' : op_sub,
     'mul' : op_mul,
     'div' : op_div,
     'rem' : op_rem,
+    
     'lsh' : op_lsh,
+    'shift_left' : op_lsh,
     'rsh' : op_rsh,
+    'shift_right' : op_rsh,
+    
     'ash' : op_ash,
-    'not' : op_not,
-    'or' : op_or,
-    'and' : op_and,
-    'xor' : op_xor,
+    'bitwise_not' : op_not,
+    'bitwise_or' : op_or,
+    'bitwise_and' : op_and,
+    'bitwise_xor' : op_xor,
     'incr' : op_incr,
     'decr' : op_decr,
-    'abs' : op_abs,
-    'neg' : op_neg,
+    'absolute' : op_abs,
+    'negate' : op_neg,
     'cmp' : op_cmp,
+    'equal' : op_equal,
 }

@@ -15,6 +15,7 @@ BEGIN {
 
     printf ("class Test_%s_Function(unittest.TestCase):\n", basename(ARGV[1]))
     printf ("    def test_cases(self):\n")
+    printf ("        self.assertEqual(0, 0)") # in case there are no cases
 
     funcprefix="bigint.opmap['"
     funcsuffix="']"

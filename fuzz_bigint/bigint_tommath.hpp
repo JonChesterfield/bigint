@@ -66,15 +66,79 @@ IntType from_decimal(const char* start, const char *end)
   return create_invalid<IntType>();
 }
 
+template <typename IntType>
+size_t decimal_length(IntType x)
+{
+  using TM = impl::tommath<IntType>;
+  typename TM::mp_count res;
+  if (TM::mp_decimal_length(&x, &res) == TM::MP_OKAY)
+  {
+    return res;
+  }
+  return SIZE_MAX;
+}
+
+// On failure, may still have written into the buffer
+template <typename IntType>
+size_t to_decimal(IntType x, char* buffer, size_t buffer_available)
+{
+  using TM = impl::tommath<IntType>;
+
+  size_t written;
+
+  if (TM::mp_to_decimal(&x, buffer, buffer_available, &written) == TM::MP_OKAY)
+  {
+    return written;
+  }
+
+  return SIZE_MAX;
+}
+
+
 
 template <typename IntType>
-IntType abs(IntType arg0)
+IntType from_i64(int64_t arg0)
+{
+  using TM = impl::tommath<IntType>;
+  IntType result;
+  
+  if (TM::mp_init(&result) != TM::MP_OKAY)
+  {
+    return create_invalid<IntType>();
+  }
+
+  if (TM::mp_set_i64(&result, arg0) == TM::MP_OKAY)
+  {
+    return result;
+  }
+
+  TM::mp_clear(&result);
+  return create_invalid<IntType>();
+}
+
+template <typename IntType>
+int64_t trunc_i64(IntType arg0)
+{
+  using TM = impl::tommath<IntType>;
+  return TM::mp_get_i64(&arg0);
+}
+
+template <typename IntType>
+bool boolean_equal(IntType x, IntType y)
+{
+  using TM = impl::tommath<IntType>;
+  return TM::mp_equal(&x, &y) == TM::MP_YES;
+}
+
+
+template <typename IntType>
+IntType absolute(IntType arg0)
 {
   return impl::unary<IntType, impl::tommath<IntType>::mp_abs>(arg0);
 }
 
 template <typename IntType>
-IntType neg(IntType arg0)
+IntType negate(IntType arg0)
 {
   return impl::unary<IntType, impl::tommath<IntType>::mp_neg>(arg0);
 }
@@ -92,45 +156,45 @@ IntType decr(IntType arg0)
 }
 
 template <typename IntType>
-IntType add(IntType arg0 ,IntType arg1)
+IntType add(IntType arg0, IntType arg1)
 {
-  return impl::binary<IntType, impl::tommath<IntType>::mp_add>(arg0 ,arg1);
+  return impl::binary<IntType, impl::tommath<IntType>::mp_add>(arg0, arg1);
 }
 
 template <typename IntType>
-IntType sub(IntType arg0 ,IntType arg1)
+IntType sub(IntType arg0, IntType arg1)
 {
-  return impl::binary<IntType, impl::tommath<IntType>::mp_sub>(arg0 ,arg1);
+  return impl::binary<IntType, impl::tommath<IntType>::mp_sub>(arg0, arg1);
 }
 
 template <typename IntType>
-IntType mul(IntType arg0 ,IntType arg1)
+IntType mul(IntType arg0, IntType arg1)
 {
-  return impl::binary<IntType, impl::tommath<IntType>::mp_mul>(arg0 ,arg1);
+  return impl::binary<IntType, impl::tommath<IntType>::mp_mul>(arg0, arg1);
 }
 
 template <typename IntType>
-IntType div(IntType arg0 ,IntType arg1)
+IntType div(IntType arg0, IntType arg1)
 {
-  return impl::binary<IntType, impl::tommath<IntType>::mp_div_no_rem>(arg0 ,arg1);
+  return impl::binary<IntType, impl::tommath<IntType>::mp_div_no_rem>(arg0, arg1);
 }
 
 template <typename IntType>
-IntType rem(IntType arg0 ,IntType arg1)
+IntType rem(IntType arg0, IntType arg1)
 {
-  return impl::binary<IntType, impl::tommath<IntType>::mp_div_only_rem>(arg0 ,arg1);
+  return impl::binary<IntType, impl::tommath<IntType>::mp_div_only_rem>(arg0, arg1);
 }
 
 template <typename IntType>
-IntType lsh(IntType arg0 ,IntType arg1)
+IntType shift_left(IntType arg0, IntType arg1)
 {
-  return impl::binary<IntType, impl::tommath<IntType>::mp_lsh>(arg0 ,arg1);
+  return impl::binary<IntType, impl::tommath<IntType>::mp_lsh>(arg0, arg1);
 }
 
 template <typename IntType>
-IntType rsh(IntType arg0 ,IntType arg1)
+IntType shift_right(IntType arg0, IntType arg1)
 {
-  return impl::binary<IntType, impl::tommath<IntType>::mp_rsh>(arg0 ,arg1);
+  return impl::binary<IntType, impl::tommath<IntType>::mp_rsh>(arg0, arg1);
 }
 
 template <typename IntType>
@@ -140,33 +204,39 @@ IntType bitwise_not(IntType arg0)
 }
 
 template <typename IntType>
-IntType bitwise_or(IntType arg0 ,IntType arg1)
+IntType bitwise_or(IntType arg0, IntType arg1)
 {
-  return impl::binary<IntType, impl::tommath<IntType>::mp_or>(arg0 ,arg1);
+  return impl::binary<IntType, impl::tommath<IntType>::mp_or>(arg0, arg1);
 }
 
 template <typename IntType>
-IntType bitwise_and(IntType arg0 ,IntType arg1)
+IntType bitwise_and(IntType arg0, IntType arg1)
 {
-  return impl::binary<IntType, impl::tommath<IntType>::mp_and>(arg0 ,arg1);
+  return impl::binary<IntType, impl::tommath<IntType>::mp_and>(arg0, arg1);
 }
 
 template <typename IntType>
-IntType bitwise_xor(IntType arg0 ,IntType arg1)
+IntType bitwise_xor(IntType arg0, IntType arg1)
 {
-  return impl::binary<IntType, impl::tommath<IntType>::mp_xor>(arg0 ,arg1);
+  return impl::binary<IntType, impl::tommath<IntType>::mp_xor>(arg0, arg1);
 }
 
 template <typename IntType>
-bool equal(IntType arg0 ,IntType arg1)
+IntType equal(IntType arg0, IntType arg1)
 {
-  return impl::binary<IntType, impl::tommath<IntType>::mp_equal>(arg0 ,arg1);
+  using TM = impl::tommath<IntType>;
+  typename TM::mp_bool r = TM::mp_equal(&arg0, &arg1);
+  int64_t i = (r == TM::MP_YES) ? 1 : 0;
+  return from_i64<IntType>(i);
 }
 
 template <typename IntType>
-int cmp(IntType arg0 ,IntType arg1)
+IntType cmp(IntType arg0, IntType arg1)
 {
-  return impl::binary<IntType, impl::tommath<IntType>::mp_cmp>(arg0 ,arg1);
+  using TM = impl::tommath<IntType>;
+  typename TM::mp_ord r = TM::mp_cmp(&arg0, &arg1);
+  int64_t i = (r == TM::MP_LT) ? -1 : ((r == TM::MP_GT) ? 1 : 0);
+  return from_i64<IntType>(i);
 }
 
 namespace impl
@@ -174,6 +244,7 @@ namespace impl
 template <typename IntType>
 class tommath
 {
+public:
   using ops = typename bigint::base_operations<IntType>;
 public:
   using mp_int = typename ops::mp_int;
@@ -201,7 +272,7 @@ public:
      MP_MEM   = -2,  /* out of mem */
      MP_VAL   = -3,  /* invalid input */
      // MP_ITER  = -4,  /* maximum iterations reached */
-     // MP_BUF   = -5   /* buffer overflow, supplied buffer too small */
+     MP_BUF   = -5   /* buffer overflow, supplied buffer too small */
   } mp_err;
 
 static mp_err mp_init_size(mp_int *a, mp_count size)
@@ -285,7 +356,7 @@ public:
 
 #define MP_STRINGIZE(x)  MP__STRINGIZE(x)
 #define MP__STRINGIZE(x) ""#x""
-#define MP_HAS(x)        (sizeof(MP_STRINGIZE(BN_##x##_C)) == 1u)
+#define MP_HAS(x) (1) /* (sizeof(MP_STRINGIZE(BN_##x##_C)) == 1u) */
 #define MP_IS_2EXPT(x) (((x) != 0u) && (((x) & ((x) - 1u)) == 0u))
 
 
@@ -655,6 +726,16 @@ static
         }
      }
      return MP_EQ;
+  }
+static
+  mp_bool mp_equal(const mp_int *a, const mp_int *b)
+  {
+    if (mp_get_sign(a) != mp_get_sign(b)) {
+      return MP_YES;
+    }
+    /* given the signs are equal, equal iff the values are equal ignoring sign */
+    mp_ord cmp = mp_cmp_mag(a, b);
+    return cmp == MP_EQ ? MP_YES : MP_NO;
   }
 static
   mp_err mp_complement(const mp_int *a, mp_int *b)
@@ -1027,6 +1108,7 @@ static
 static
   mp_err mp_from_decimal(const char * start, const char * end, mp_int *c)
   {
+    mp_err err;
     size_t width = end - start;
     if (width == 0) return MP_VAL;
   
@@ -1049,16 +1131,16 @@ static
         return MP_VAL;
       }
   
-      if (mp_mul_d(c, 10, c) != MP_OKAY)
+      if ((err = mp_mul_d(c, 10, c)) != MP_OKAY)
       {
         mp_clear(c);
-        return MP_MEM;
+        return err;
       }
   
-      if (mp_add_d(c, b, c) != MP_OKAY)
+      if ((err = mp_add_d(c, b, c)) != MP_OKAY)
       {
         mp_clear(c);
-        return MP_MEM;
+        return err;
       }
     }
   
@@ -1068,6 +1150,143 @@ static
     }
   
     return MP_OKAY;
+  }
+  
+static
+  mp_err mp_to_decimal(const mp_int* a, char* str, size_t maxlen, size_t *written)
+  {
+    const int radix = 10;
+  
+     size_t  digs;
+     mp_err  err;
+     mp_int  t;
+     mp_digit d;
+     char   *_s = str;
+  
+    if (maxlen < 1) { return MP_BUF; }
+  
+     /* quick out if its zero */
+     if (MP_IS_ZERO(a)) {
+        *str++ = '0';
+        if (written != NULL) {
+           *written = 1u;
+        }
+        return MP_OKAY;
+     }
+  
+     if ((err = mp_init_copy(&t, a)) != MP_OKAY) {
+        return err;
+     }
+  
+     
+    
+     /* if it is negative output a - */
+     if (mp_get_sign(&t) == MP_NEG) {
+        /* we have to reverse our digits later... but not the - sign!! */
+        ++_s;
+  
+        /* store the flag and mark the number as positive */
+        *str++ = '-';
+        mp_set_sign(&t, MP_ZPOS);
+  
+        /* subtract a char */
+        --maxlen;
+     }
+     digs = 0u;
+     while (!MP_IS_ZERO(&t)) {
+        if (maxlen-- < 1u) {
+           /* no more room */
+           err = MP_BUF;
+           goto LBL_ERR;
+        }
+        if ((err = mp_div_d(&t, (mp_digit)radix, &t, &d)) != MP_OKAY) {
+           goto LBL_ERR;
+        }
+        *str++ = d + '0'; // as opposed to mp_s_rmap[d];
+  
+        ++digs;
+     }
+     /* reverse the digits of the string.  In this case _s points
+      * to the first digit [exluding the sign] of the number
+      */
+     s_mp_reverse((unsigned char *)_s, digs);
+  
+     if (written != NULL) {
+        *written = (mp_get_sign(a) == MP_NEG) ? (digs + 1u): digs;
+     }
+  
+  LBL_ERR:
+     mp_clear(&t);
+     return err;
+  }
+  
+static
+  mp_err mp_radix_size(const mp_int *a, int radix, int *size)
+  {
+     mp_err  err;
+     int digs;
+     mp_int   t;
+     mp_digit d;
+  
+     *size = 0;
+  
+     /* make sure the radix is in range */
+     if ((radix < 2) || (radix > 64)) {
+        return MP_VAL;
+     }
+  
+     if (MP_IS_ZERO(a)) {
+        *size = 2;
+        return MP_OKAY;
+     }
+  
+     /* special case for binary */
+     if (radix == 2) {
+        *size = (mp_count_bits(a) + ((mp_get_sign(a) == MP_NEG) ? 1 : 0) + 1);
+        return MP_OKAY;
+     }
+  
+     /* digs is the digit count */
+     digs = 0;
+  
+     /* if it's negative add one for the sign */
+     if (mp_get_sign(a) == MP_NEG) {
+        ++digs;
+     }
+  
+     /* init a copy of the input */
+     if ((err = mp_init_copy(&t, a)) != MP_OKAY) {
+        return err;
+     }
+  
+     /* force temp to positive */
+     mp_set_sign(&t, MP_ZPOS);
+  
+     /* fetch out all of the digits */
+     while (!MP_IS_ZERO(&t)) {
+        if ((err = mp_div_d(&t, (mp_digit)radix, &t, &d)) != MP_OKAY) {
+           goto LBL_ERR;
+        }
+        ++digs;
+     }
+  
+     /* return digs + 1, the 1 is for the NULL byte that would be required. */
+     *size = digs + 1;
+     err = MP_OKAY;
+  
+  LBL_ERR:
+     mp_clear(&t);
+     return err;
+  }
+  
+static
+  mp_err mp_decimal_length(const mp_int* a, mp_count *size)
+  {
+    /* radix_size adds one for a trailing null, this doesn't */
+    mp_count tmp;
+    mp_err r = mp_radix_size(a, 10, &tmp);
+    if (r == MP_OKAY) { *size = tmp - 1; }
+    return r;
   }
   
 static
@@ -1150,12 +1369,11 @@ static
     // TODO, this is clumsy
   
     mp_int tmp;
-    if (mp_init_size(&tmp, 2) != MP_OKAY) return MP_MEM; 
-    mp_set_i32(&tmp, INT32_MAX);
+    if (mp_set_i32(&tmp, INT32_MAX) != MP_OKAY) return MP_MEM;
   
     if (mp_cmp(b, &tmp) == MP_GT)
     {
-      // Shift by > int not presently available
+      // Shift by > INT_MAX not presently available
       mp_clear(&tmp);
       return MP_VAL;
     }
@@ -1682,24 +1900,36 @@ static
   #  endif
   #endif
 static
-  void mp_set_i32(mp_int * a, int32_t b)
+  mp_err mp_set_i32(mp_int * a, int32_t b)
   {
-      mp_set_u32(a, (b < 0) ? -(uint32_t)b : (uint32_t)b);
-      if (b < 0) {
+      mp_err r = mp_set_u32(a, (b < 0) ? -(uint32_t)b : (uint32_t)b);
+      
+      if ((r == MP_OKAY) && (b < 0)) {
           mp_set_sign(a, MP_NEG);
       }
+      return r;
   }
 static
-  void mp_set_i64(mp_int * a, int64_t b)
+  mp_err mp_set_i64(mp_int * a, int64_t b)
   {
-      mp_set_u64(a, (b < 0) ? -(uint64_t)b : (uint64_t)b);
-      if (b < 0) {
+      mp_err r = mp_set_u64(a, (b < 0) ? -(uint64_t)b : (uint64_t)b);
+      
+      if ((r == MP_OKAY) && (b < 0)) {
           mp_set_sign(a, MP_NEG);
       }
+      return r;
   }
 static
-  void mp_set_u32(mp_int * a, uint32_t b)
+  mp_err mp_set_u32(mp_int * a, uint32_t b)
   {
+      enum { digits_needed = (8 * sizeof(uint32_t) + MP_DIGIT_BIT - 1) / MP_DIGIT_BIT, };
+      mp_err err;
+      
+       if (mp_get_alloc(a) < digits_needed) {
+          if ((err = mp_grow(a, digits_needed)) != MP_OKAY) {
+             return err;
+          }
+       }
       mp_count i = 0;
       while (b != 0u) {
           mp_set_digit(a, i++, ((mp_digit)b & MP_MASK));
@@ -1709,10 +1939,19 @@ static
       mp_set_used(a, i);
       mp_set_sign(a, MP_ZPOS);
       MP_ZERO_DIGITS(mp_get_digit_iter(a) + mp_get_used(a), mp_get_alloc(a) - mp_get_used(a));
+      return MP_OKAY;
   }
 static
-  void mp_set_u64(mp_int * a, uint64_t b)
+  mp_err mp_set_u64(mp_int * a, uint64_t b)
   {
+      enum { digits_needed = (8 * sizeof(uint64_t) + MP_DIGIT_BIT - 1) / MP_DIGIT_BIT, };
+      mp_err err;
+      
+       if (mp_get_alloc(a) < digits_needed) {
+          if ((err = mp_grow(a, digits_needed)) != MP_OKAY) {
+             return err;
+          }
+       }
       mp_count i = 0;
       while (b != 0u) {
           mp_set_digit(a, i++, ((mp_digit)b & MP_MASK));
@@ -1722,11 +1961,16 @@ static
       mp_set_used(a, i);
       mp_set_sign(a, MP_ZPOS);
       MP_ZERO_DIGITS(mp_get_digit_iter(a) + mp_get_used(a), mp_get_alloc(a) - mp_get_used(a));
+      return MP_OKAY;
   }
 static
   MP_GET_SIGNED(mp_get_i32, mp_get_mag_u32, int32_t, uint32_t)
 static
+  MP_GET_SIGNED(mp_get_i64, mp_get_mag_u64, int64_t, uint64_t)
+static
   MP_GET_MAG(mp_get_mag_u32, uint32_t)
+static
+  MP_GET_MAG(mp_get_mag_u64, uint64_t)
 static
   mp_err mp_signed_rsh(const mp_int *a, int b, mp_int *c)
   {
@@ -2792,6 +3036,22 @@ static
      return MP_OKAY;
   }
   
+static
+  void s_mp_reverse(unsigned char *s, size_t len)
+  {
+     size_t   ix, iy;
+     unsigned char t;
+  
+     ix = 0u;
+     iy = len - 1u;
+     while (ix < iy) {
+        t     = s[ix];
+        s[ix] = s[iy];
+        s[iy] = t;
+        ++ix;
+        --iy;
+     }
+  }
 };
 } // namespace impl
 } // namespace tommath

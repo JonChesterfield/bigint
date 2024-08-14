@@ -82,7 +82,33 @@ bool is_invalid(IntType x)
   return ops::is_invalid(&x);
 }
 
+template <typename IntType>
+void destroy(IntType x)
+{
+  using ops = base_operations<IntType>;
+  ops::destroy(&x);
+}
 
+template <typename IntType>
+IntType create_fixed(int64_t v)
+{
+  using ops = base_operations<IntType>;
+  IntType result;
+  if (!ops::create_fixed(&result, v))
+  {
+    ops::create_invalid(&result);
+  }
+  return result;
+}
+
+template <typename IntType>
+int64_t truncate(IntType x)
+{
+  using ops = base_operations<IntType>;
+  int64_t r;
+  ops::open_fixed(&x, &r);
+  return r;
+}
 
 
 }

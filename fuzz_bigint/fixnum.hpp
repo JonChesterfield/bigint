@@ -39,7 +39,7 @@ int64_t open_i64(IntType x, bool *all_exact)
 }
 
 template <typename IntType>
-IntType create_i64(int64_t x)
+IntType from_i64(int64_t x)
 {
   using ops = typename bigint::base_operations<IntType>;
   IntType tmp;
@@ -50,6 +50,86 @@ IntType create_i64(int64_t x)
   return tmp;
 }
 
+template <typename IntType>
+int64_t trunc_i64(IntType x, bool *all_exact)
+{
+  bool exact = true;
+  return open_i64(x, &exact);
+}
+
+template <typename IntType>
+size_t decimal_length(IntType x)
+{
+  // This has an off by one look to it
+  bool exact = true;
+  int64_t xf = open_i64(x, &exact);
+  if (!exact) return SIZE_MAX;
+
+  size_t res = 0;
+  if (xf < 0)
+    {
+      res++;
+      xf *= -1;
+    }
+
+  if (xf == 0) { return 1; }
+  
+  while (xf != 0)
+    {
+      xf /= 10;
+      res++;
+    }
+
+  return res;
+}
+
+template <typename IntType>
+size_t to_decimal(IntType x, char *buffer, size_t buffer_available)
+{
+  bool exact = true;
+  int64_t xf = open_i64(x, &exact);
+  if (!exact || (buffer_available < 1) ) return SIZE_MAX;
+  
+  if (xf == 0) {    
+    buffer[0] = '0';
+    return 1;
+  }
+
+  // bignum works a digit at a time then reverses
+  // divide int64_t by ten should be cheap though
+  size_t len = decimal_length(x);
+  
+  size_t written = 0;
+  if (xf < 0)
+    {
+      buffer[0] = '-';
+      written++;
+      buffer++;
+      buffer_available--;
+      xf *= -1;
+    }
+  
+  
+  for (size_t i = len; i --> 0;)
+    {
+      buffer[i] = (xf % 10) + '0';
+      xf /= 10;      
+    }
+
+  return written + len;  
+}
+
+template <typename IntType>
+bool boolean_equal(IntType x, IntType y)
+{
+  // Hazard here in exact handling
+  bool exact = true;
+  int64_t xf = open_i64(x, &exact);
+  int64_t yf = open_i64(y, &exact);
+  return (xf == yf) && exact;
+}
+
+  
 static int64_t add_checked(int64_t xf, int64_t yf, bool *all_exact)
 {
   int64_t rf;
@@ -99,7 +179,7 @@ static IntType op_via_checked(IntType x, IntType y)
   int64_t xf = open_i64(x, &exact);
   int64_t yf = open_i64(y, &exact);
   int64_t rf = Op(xf, yf, &exact);
-  return exact ? create_i64<IntType>(rf) : create_invalid<IntType>();
+  return exact ? from_i64<IntType>(rf) : create_invalid<IntType>();
 }
 
 static_assert(INT64_MAX * -1 == INT64_MIN + 1);
@@ -107,7 +187,7 @@ static_assert(((INT64_MIN + 1) * -1) == INT64_MAX);
 static_assert(INT64_MAX * -1 == (INT64_MIN + 1), "");
 
 template <typename IntType>
-IntType abs(IntType x)
+IntType absolute(IntType x)
 {
   using ops = typename bigint::base_operations<IntType>;
   bool exact = true;
@@ -124,11 +204,11 @@ IntType abs(IntType x)
         }
     }
 
-  return exact ? create_i64<IntType>(xf) : create_invalid<IntType>();
+  return exact ? from_i64<IntType>(xf) : create_invalid<IntType>();
 }
 
 template <typename IntType>
-IntType neg(IntType x)
+IntType negate(IntType x)
 {
   using ops = typename bigint::base_operations<IntType>;
   bool exact = true;
@@ -141,7 +221,7 @@ IntType neg(IntType x)
 
   xf *= -1;
 
-  return exact ? create_i64<IntType>(xf) : create_invalid<IntType>();
+  return exact ? from_i64<IntType>(xf) : create_invalid<IntType>();
 }
 
 template <typename IntType>
@@ -159,7 +239,7 @@ IntType incr(IntType x)
       xf++;
     }
 
-  return exact ? create_i64<IntType>(xf) : create_invalid<IntType>();
+  return exact ? from_i64<IntType>(xf) : create_invalid<IntType>();
 }
 
 template <typename IntType>
@@ -176,7 +256,7 @@ IntType decr(IntType x)
     {
       xf--;
     }
-  return exact ? create_i64<IntType>(xf) : create_invalid<IntType>();
+  return exact ? from_i64<IntType>(xf) : create_invalid<IntType>();
 }
 
 template <typename IntType>
@@ -208,13 +288,13 @@ static IntType rem(IntType x, IntType y)
 }
 
 template <typename IntType>
-static IntType lsh(IntType x, IntType y)
+static IntType shift_left(IntType x, IntType y)
 {
   return create_invalid<IntType>();
 }
 
 template <typename IntType>
-static IntType rsh(IntType x, IntType y)
+static IntType shift_right(IntType x, IntType y)
 {
   return create_invalid<IntType>();
 }
@@ -244,17 +324,17 @@ static IntType bitwise_xor(IntType x, IntType y)
 }
 
 template <typename IntType>
-static bool equal(IntType x, IntType y)
+static IntType equal(IntType x, IntType y)
 {
-  return false;
+  return from_i64<IntType>(0);  // false
 }
 
 template <typename IntType>
-static int cmp(IntType x, IntType y)
+static IntType cmp(IntType x, IntType y)
 {
-  return -2;
+  return from_i64<IntType>(-2);  // nonsense
 }
 
-} // namespace fixnum
-} // namespace bigint
+}  // namespace fixnum
+}  // namespace bigint
 #endif

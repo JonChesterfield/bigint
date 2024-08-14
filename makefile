@@ -137,7 +137,7 @@ $(DEMOLANG_DIR_OBJ)/%.o:	$(DEMOLANG_DIR)/%.c $(DEMOLANG_HDR) proto.h $(VENDOR_HD
 demolang::	$(DEMOLANG_OBJ)
 
 
-SEEDFILES := $(wildcard seedfiles/*)
+SEEDFILES := # $(wildcard seedfiles/*)
 MORE_FUZZFILES := $(wildcard /scratch/jon/fuzz/corpus/*)
 
 
@@ -192,7 +192,6 @@ test_python: $(SIMPLE_PYTHON) python/gen.awk
 	python3 -m unittest discover python -v
 
 
-SIMPLE_TESTS := $(addprefix tests/test_,$(addsuffix .c,$(extract_files)))
 
 
 tests/main.c:
@@ -203,6 +202,7 @@ tests/main.c:
 	@echo "}" >> $@
 
 
+SIMPLE_TESTS := $(addprefix tests/test_,$(addsuffix .c,$(extract_files)))
 $(SIMPLE_TESTS):	tests/test_%.c: testcases/% tests/gen.awk extractfiles/files.mk
 	gawk -f tests/gen.awk $< > $@
 
@@ -289,11 +289,48 @@ clean::
 fuzz_bigint/lexer.h: fuzz_bigint/lexer.h.re2c
 	re2c --no-debug-info -W -Wno-useless-escape --no-generation-date $< > $@
 
-fuzz_bigint/bigint: $(addprefix fuzz_bigint/,bigint.cpp lexer.h base_operations.hpp bigint.hpp bigint_tommath.hpp interpreter.hpp fixnum.hpp)
-	$(CXX) -O2 -fsanitize=fuzzer $< -o $@
+fuzz_bigint_source := $(addprefix fuzz_bigint/,bigint.cpp lexer.h base_operations.hpp bigint.hpp bigint_tommath.hpp interpreter.hpp fixnum.hpp vtable.hpp)
+
+fuzz_bigint/bigint_tommath: $(fuzz_bigint_source)
+	$(CXX) -DBIGINT_IMPL=tommath -O2 -fsanitize=fuzzer $< -o $@
+
+fuzz_bigint/bigint_fixnum: $(fuzz_bigint_source)
+	$(CXX) -DBIGINT_IMPL=fixnum -O2 -fsanitize=fuzzer $< -o $@
+
+
+
+FUZZTESTS_TESTS := $(addprefix fuzz_bigint/test_,$(addsuffix .cpp,$(extract_files)))
+$(FUZZTESTS_TESTS):	fuzz_bigint/test_%.cpp: testcases/% fuzz_bigint/gen.awk extractfiles/files.mk
+	gawk -f fuzz_bigint/gen.awk $< > $@
+
+fuzz_bigint/runner.cpp: tests/runner.c
+	cp $< $@
+
+
+fuzz_bigint/main.cpp:
+	@echo "#include \"../vendor/EvilUnit/EvilUnit.h\"" > $@
+	@echo "MAIN_MODULE()" >> $@
+	@echo "{" >> $@
+	@echo "  DEPENDS(tests_runner);" >> $@
+	@echo "}" >> $@
+
+FUZZTESTS_SRC := $(FUZZTESTS_TESTS) fuzz_bigint/runner.cpp fuzz_bigint/main.cpp
+
+FUZZTESTS_OBJ := $(FUZZTESTS_SRC:fuzz_bigint/%.cpp=$(VENDOR_DIR_OBJ)/fuzz_bigint/%.o)
+
+
+$(FUZZTESTS_OBJ): $(VENDOR_DIR_OBJ)/fuzz_bigint/%.o: fuzz_bigint/%.cpp
+	@mkdir -p $(VENDOR_DIR_OBJ)/fuzz_bigint
+	@$(CXX) $(CXXFLAGS) -O0 $< -c -o $@
+
+fuzz_bigint/fuzz_bigint_test: $(FUZZTESTS_OBJ)
+	@$(CXX) $(CXXFLAGS) -O0 $^ -o $@
 
 clean::
-	@rm -f fuzz_bigint/lexer.h fuzz_bigint/bigint
+	@rm -f fuzz_bigint/lexer.h fuzz_bigint/bigint_tommath fuzz_bigint/bigint_fixnum fuzz_bigint/fuzz_bigint_test $(FUZZTESTS_SRC)
+
+fuzztests: ## various fuzz test things
+fuzztests: fuzz_bigint/bigint_tommath fuzz_bigint/bigint_fixnum $(FUZZTESTS_TESTS)
 
 
 HELP_PADDING := 30

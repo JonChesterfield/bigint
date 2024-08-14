@@ -3,12 +3,16 @@
 
 #include "bigint_tommath.hpp"
 
-
 #include "interpreter.hpp"
 #include "lexer.h"
 
 #include <stdint.h>
 #include <stdlib.h>
+
+#include <array>
+#include <iostream>
+#include <iterator>
+#include <vector>
 
 struct bigint_data
 {
@@ -16,6 +20,8 @@ struct bigint_data
   int alloc = 0;
   bool sign = true;
   bool valid = false;
+  bool is_fixed = true;
+  int64_t fixed = 0;
   uint32_t* dp = 0;
 };
 
@@ -45,6 +51,36 @@ struct base_operations<bigint_data>
         return true;
       }
     return false;
+  }
+
+  static bool create_fixed(mp_int* a, int32_t v)
+  {
+    return create_fixed(a, (int64_t)v);
+  }
+
+  static bool create_fixed(mp_int* a, int64_t v) {
+    a->used = 0;
+    a->alloc = 0;
+    a->sign = v < 0;
+    a->valid = true;
+    a->is_fixed = true;
+    a->fixed = v;
+    a->dp = 0;
+    return true;
+  }
+
+  static bool open_fixed(mp_int* a, int64_t* out)
+  {
+    if (a->is_fixed)
+      {
+        *out = a->fixed;
+        return true;
+      }
+    else
+      {
+        *out = 0;
+        return false;
+      }
   }
 
   static bool grow(mp_int* a, mp_count size)
@@ -88,18 +124,25 @@ struct base_operations<bigint_data>
 };
 }  // namespace bigint
 
+const constexpr bigint::vtable<bigint_data> vtab =
+    bigint::create_vtable<bigint_data>();
+
 extern "C"
 {
   int LLVMFuzzerTestOneInput(const uint8_t* Data, size_t Size)
   {
     const char* str = (const char*)Data;
     const char* lim = str + Size;
-    if (!parses(str, lim))
+
+    parse_result p = parse(str, lim);
+    if ((p.op < bigint_lexer_first_function) ||
+        (p.op > bigint_lexer_last_function))
       {
+        // If parse failed or was a single number, discard it
         return -1;
       }
 
-    bigint_data res = bigint::interp<bigint_data>(str, lim);
+    bigint_data res = bigint::interp<bigint_data>(vtab, str, lim);
 
     bigint::base_operations<bigint_data>::destroy(&res);
 
@@ -107,17 +150,72 @@ extern "C"
   }
 }
 
+const std::size_t INIT_BUFFER_SIZE = 1024;
 
-__attribute__((weak))
-int main()
+__attribute__((weak)) int main()
 {
-  bigint_data x = bigint::interp_cstr<bigint_data>("sub 4 15");
+  std::vector<char> input;
 
-  bigint_data y = bigint::abs(x);
+  {
+    std::freopen(nullptr, "rb", stdin);
 
-  bigint::base_operations<bigint_data>::destroy(&x);
-  bigint::base_operations<bigint_data>::destroy(&y);
-  
+    if(std::ferror(stdin)) return 1;
+
+    std::size_t len;
+    std::array<char, INIT_BUFFER_SIZE> buf;
+
+    while((len = std::fread(buf.data(), sizeof(buf[0]), buf.size(), stdin)) > 0)
+      {
+        if(std::ferror(stdin) && !std::feof(stdin)) return 2;
+
+        input.insert(input.end(), buf.data(), buf.data() + len); // append to vector
+      }
+  }
+
+  input.push_back('\0');
+
+
+  const char * d = input.data();
+  size_t w = input.size();
+
+  bigint_data res = bigint::interp<bigint_data>(vtab, d, d + w);
+
+  if (!bigint::is_invalid(res))
+    {
+      size_t len = bigint::decimal_length(res);
+      // printf("Parsed %s, result uses %zu bytes\n", d, len);
+
+      if (len != SIZE_MAX)
+        {
+          input.clear();
+          input.reserve(len);
+
+          size_t r = bigint::to_decimal(res, input.data(), input.capacity());
+          if (r == SIZE_MAX)
+            {
+              fprintf(stderr, "to_decimal failed, gave it %zu bytes\n",
+                      input.capacity());
+            }
+          else if (r != len)
+            {
+              fprintf(stderr,
+                      "internal consistency error, length claimed %zu but "
+                      "to_decimal wrote %zu\n",
+                      len, r);
+            }
+          else
+            {
+              // success
+              printf("%.*s\n", (int)r, input.data());
+            }
+        }
+    }
+  else
+    {
+      fprintf(stderr, "Rejected %s\n", d);
+    }
+
+  bigint::base_operations<bigint_data>::destroy(&res);
+
   return 0;
 }
-

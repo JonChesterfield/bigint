@@ -102,7 +102,7 @@ END {
     {
         # It's convenient to call sort here, but also means sorting files
         # runs in series. Faster to have the makefile do it
-        # system("sort -u -o " DST name " " DST name)
+        system("sort -u -o " DST name " " DST name)
 
         printf (" \\\n  %s", name) > mkfilename
         
